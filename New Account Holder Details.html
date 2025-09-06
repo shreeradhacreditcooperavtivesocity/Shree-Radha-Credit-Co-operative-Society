@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Account Opening Form</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root {
+    --maroon: #800000;
+    --light-maroon: #c28c8c;
+  }
+
+  @media print {
+    body { margin: 0; padding: 0; background: white; }
+    .a4 { width: 210mm; height: 297mm; margin: auto; box-shadow: none; }
+    .print-note { display: block !important; }
+    .no-print, button, input[type="file"] { display: none !important; }
+    input, select, textarea { background: white !important; }
+  }
+
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: white;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    font-size: 13px;
+    color: var(--maroon);
+  }
+
+  .a4 {
+    width: 794px;
+    background: #fff;
+    border: 2px solid var(--maroon);
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    padding: 25px 35px;
+  }
+
+  h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    background: var(--maroon);
+    color: white;
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 16px;
+    line-height: 1.4;
+  }
+
+  .form-container {
+    display: flex;
+    gap: 20px;
+  }
+
+  .left-column {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  label {
+    font-weight: 600;
+    margin-bottom: 4px;
+    border-left: 4px solid var(--maroon);
+    padding-left: 6px;
+    font-size: 12.5px;
+  }
+
+  input, select, textarea {
+    padding: 7px;
+    border: 1px solid var(--maroon);
+    border-radius: 4px;
+    color: var(--maroon);
+    background-color: #fffdfd;
+    outline: none;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--light-maroon);
+    box-shadow: 0 0 4px var(--light-maroon);
+  }
+
+  textarea { resize: none; }
+
+  .full { grid-column: span 2; }
+
+  /* Buttons same line */
+  .form-buttons {
+    grid-column: span 2;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 15px;
+  }
+
+  .form-buttons button {
+    flex: 1;
+    max-width: 150px;
+    padding: 10px 20px;
+    background-color: var(--maroon);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  .form-buttons button:hover {
+    background-color: #a00000;
+  }
+
+  .photo-box {
+    width: 180px;
+    text-align: center;
+    background-color: #fff8f8;
+    padding: 12px;
+    border: 2px solid var(--maroon);
+    border-radius: 6px;
+    align-self: flex-start;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  #preview {
+    width: 120px;
+    height: 140px;
+    object-fit: cover;
+    border: 1px solid var(--maroon);
+    border-radius: 5px;
+    margin: auto;
+  }
+
+  .qr-note {
+    margin-top: 10px;
+    font-size: 11px;
+    line-height: 1.4;
+    color: var(--maroon);
+    border-top: 1px dashed var(--maroon);
+    padding-top: 6px;
+    text-align: left;
+  }
+
+  .print-note {
+    display: none;
+    margin-top: 25px;
+    padding: 12px;
+    border: 2px solid var(--maroon);
+    border-radius: 6px;
+    background: #fff8f8;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+</style>
+</head>
+
+<body>
+  <div class="a4">
+    <h2>
+      Shree Radha Credit Co-operative Society Limited, Gujri (Dhamnod)<br>
+      Reg. No.: DR/DHR/151716
+    </h2>
+
+    <form id="accountForm" class="form-container">
+      <div class="left-column">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" name="fullName" required />
+        </div>
+        <div class="form-group">
+          <label>Father's Name</label>
+          <input type="text" name="fatherName" required />
+        </div>
+        <div class="form-group">
+          <label>Mother's Name</label>
+          <input type="text" name="motherName" required />
+        </div>
+        <div class="form-group">
+          <label>Mobile</label>
+          <input type="tel" name="mobile" required />
+        </div>
+        <div class="form-group">
+          <label>Gender</label>
+          <select name="gender" required>
+            <option>Male</option>
+            <option>Female</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>Date of Birth</label>
+          <input type="date" name="birthDate" required />
+        </div>
+        <div class="form-group">
+          <label>Account Number</label>
+          <input type="text" name="accountNumber" id="accountNumber" required />
+        </div>
+        <div class="form-group">
+          <label>Account Type</label>
+          <select name="accountType" required>
+            <option>Savings</option>
+            <option>Current</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Opening Date</label>
+          <input type="date" name="openingDate" id="openingDate" readonly />
+        </div>
+        <div class="form-group">
+          <label>Pin Code</label>
+          <input type="text" name="pinCode" required />
+        </div>
+        <div class="form-group">
+          <label>City</label>
+          <input type="text" name="city" required />
+        </div>
+        <div class="form-group">
+          <label>District</label>
+          <input type="text" name="district" required />
+        </div>
+        <div class="form-group full">
+          <label>Full Address</label>
+          <textarea name="fullAddress" rows="3" required></textarea>
+        </div>
+        <input type="hidden" name="photoUrl" id="photoUrl" />
+
+        <!-- Buttons same row -->
+        <div class="form-buttons no-print">
+          <button type="submit">Submit</button>
+          <button type="button" onclick="printForm()">Print Form</button>
+        </div>
+      </div>
+
+      <div class="photo-box">
+        <label>Photo</label>
+        <input type="file" accept="image/*" onchange="previewPhoto(event)" />
+        <img id="preview" src="" />
+        <label>QR Code</label>
+        <canvas id="qrCanvas"></canvas>
+
+        <!-- QR Code ke niche Note -->
+        <div class="qr-note">
+          <p><strong>नोट — प्रिंट करने के बाद</strong><br>
+          प्रिंट अनिवार्य है — प्रबंधक द्वारा सत्यापन एवं हस्ताक्षर आवश्यक है।</p>
+          <p>Print this form and get it verified & signed by the Manager.</p>
+          <p><strong>Date & Time:</strong> <span id="currentDateTime"></span></p>
+        </div>
+      </div>
+    </form>
+
+    <div class="print-note">
+      <strong>नोट:</strong><br />
+      खाता खोलने के लिए आवेदन पत्र पूर्ण रूप से भरकर जमा करें।<br />
+      आधार कार्ड, फोटो, और अन्य आवश्यक दस्तावेज संलग्न करें।<br />
+      प्रत्येक खाता समिति के नियमों और शर्तों के अधीन होगा।<br />
+      समिति को खाता स्वीकृत या अस्वीकृत करने का पूरा अधिकार रहेगा।<br />
+      सदस्य को सभी नियमों का पालन करना अनिवार्य होगा।
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+  <script>
+    const form = document.getElementById("accountForm");
+    document.getElementById("openingDate").value = new Date().toISOString().split("T")[0];
+
+    function previewPhoto(event) {
+      const reader = new FileReader();
+      reader.onload = function () {
+        document.getElementById("preview").src = reader.result;
+        document.getElementById("photoUrl").value = reader.result;
+      };
+      reader.readAsDataURL(event.target.files[0]);
+    }
+
+    // Date-Time auto set
+    function updateDateTime() {
+      const now = new Date();
+      const options = { 
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit' 
+      };
+      document.getElementById("currentDateTime").innerText = now.toLocaleString("en-IN", options);
+    }
+    updateDateTime();
+
+    function printForm() {
+      updateDateTime(); // refresh time before print
+      window.print();
+    }
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const formData = new FormData(form);
+      const data = {};
+      formData.forEach((value, key) => data[key] = value);
+
+      new QRious({
+        element: document.getElementById("qrCanvas"),
+        value: JSON.stringify({
+          Name: data.fullName,
+          Mobile: data.mobile,
+          Account: data.accountNumber
+        }),
+        size: 120
+      });
+
+      fetch("https://script.google.com/macros/s/AKfycbxouSC-_kwdGKyYaCKI3BFZZgcedDK-pd2DC7lHrnV_uhDWFaMPsKFKhtacd2n47jT6/exec", {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      })
+      .then(() => alert("Account created successfully!"))
+      .catch(() => alert("Error saving data."));
+    });
+  </script>
+</body>
+</html>

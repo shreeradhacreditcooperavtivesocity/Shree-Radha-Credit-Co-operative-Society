@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Withdrawal Form — Shree Radha Credit Co-operative Society</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <style>
+    :root{--maroon:#800000;--light-maroon:#a55252;--paper:#fff}
+    html,body{height:100%;margin:0;background:var(--paper);font-family:Arial,Helvetica,sans-serif;color:#222}
+
+    /* 🔒 Security Screen */
+    #securityScreen {
+      display:flex;align-items:center;justify-content:center;
+      height:100vh;background:#fff;
+    }
+    #securityBox {
+      background:#fff;border:2px solid var(--maroon);border-radius:12px;
+      padding:30px 40px;text-align:center;
+      box-shadow:0 6px 18px rgba(0,0,0,0.15);
+      width:300px;
+    }
+    #securityBox h2 {margin-bottom:20px;color:var(--maroon);font-size:20px;}
+    #securityBox input {
+      padding:10px;border-radius:6px;border:2px solid var(--maroon);
+      font-size:16px;width:100%;text-align:center;margin-bottom:15px;outline:none;
+    }
+    #securityBox button {
+      padding:10px 20px;border:0;border-radius:6px;
+      background:var(--maroon);color:#fff;cursor:pointer;
+      font-size:15px;width:100%;
+    }
+    #accessMsg {font-size:14px;color:red;margin-top:10px;}
+
+    /* Shake Animation */
+    .shake{animation:shake 0.3s;}
+    @keyframes shake{
+      0%{transform:translateX(0px);}
+      25%{transform:translateX(-6px);}
+      50%{transform:translateX(6px);}
+      75%{transform:translateX(-6px);}
+      100%{transform:translateX(0px);}
+    }
+
+    /* 🔽 Form Styles */
+    .a4{width:210mm;max-width:900px;margin:12px auto;padding:18px;
+        border:1px solid var(--maroon);box-shadow:0 6px 18px rgba(0,0,0,.06);background:#fff}
+    header{display:flex;align-items:center;justify-content:space-between;
+           border-bottom:4px solid var(--maroon);padding-bottom:10px;margin-bottom:12px}
+    .coop h1{margin:0;font-size:18px;color:var(--maroon)}
+    .coop p{margin:2px 0;font-size:12px}
+    form.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .full{grid-column:1/-1}
+    label{display:block;font-size:12px;margin-bottom:6px}
+    input[type=text], input[type=number], input[type=date], select{
+      width:100%;padding:10px;border:2px solid var(--maroon);border-radius:6px;
+      background:#fff;box-sizing:border-box
+    }
+    .actions{margin-top:14px;display:flex;gap:8px;align-items:center}
+    button{padding:10px 14px;border-radius:8px;border:0;cursor:pointer}
+    .btn-save{background:var(--maroon);color:white}
+    .btn-print{background:#27ae60;color:white}
+    .right-side{float:right;width:32%;min-width:220px;margin-left:12px;
+                border-left:2px solid var(--light-maroon);padding-left:12px}
+    .note{background:linear-gradient(180deg,rgba(128,0,0,0.06),transparent);
+          padding:8px;border-radius:6px;border:1px dashed var(--maroon);font-size:13px}
+    .qrwrap{text-align:center;margin-top:6px}
+    @media print{.a4{box-shadow:none;border:0;margin:0;width:210mm;height:297mm}.no-print{display:none}}
+  </style>
+</head>
+<body>
+
+<!-- 🔒 Security Code Screen -->
+<div id="securityScreen">
+  <div id="securityBox">
+    <h2>Enter Security Code</h2>
+    <input type="password" id="secCode" placeholder="Enter Code" />
+    <button onclick="checkCode()">Submit</button>
+    <div id="accessMsg"></div>
+  </div>
+</div>
+
+<!-- 🔽 Main Content Hidden until code correct -->
+<div id="mainContent" style="display:none">
+  <div class="a4">
+    <header>
+      <div class="coop">
+        <h1>Shree Radha Credit Co-operative Society Limited, Gujri (Dhamnod)</h1>
+        <p>Reg. No.: DR/DHR/151716</p>
+      </div>
+      <div style="text-align:right; font-size:12px; color:var(--maroon)">
+        <strong>Withdrawal Form</strong>
+      </div>
+    </header>
+
+    <div style="display:flex;gap:12px;align-items:flex-start">
+      <div style="flex:1">
+        <form id="withdrawForm" class="grid">
+          <div>
+            <label>Account Number</label>
+            <input type="text" name="accountNumber" required />
+          </div>
+          <div>
+            <label>Withdrawal Amount (₹)</label>
+            <input type="number" name="withdrawAmount" id="withdrawAmount" required />
+          </div>
+          <div>
+            <label>Date</label>
+            <input type="date" name="date" id="dateField" required />
+          </div>
+          <div class="full">
+            <label>Amount (in words)</label>
+            <input type="text" name="amountWords" id="amountWords" readonly />
+          </div>
+          <div>
+            <label>System Operator ID</label>
+            <input type="text" name="operatorId" required />
+          </div>
+          <div>
+            <label>Withdrawal Type</label>
+            <select name="withdrawalType" required>
+              <option value="">-- Select --</option>
+              <option value="Daily Collection">Daily Collection</option>
+              <option value="Saving">Saving</option>
+              <option value="FD">FD</option>
+              <option value="RD">RD</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="full">
+            <div class="actions">
+              <button type="submit" class="btn-save">Save</button>
+              <button type="button" class="btn-print" onclick="window.print()">Print</button>
+              <div style="flex:1"></div>
+              <div id="status" style="font-size:13px;color:var(--maroon)"></div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <aside class="right-side">
+        <div class="note">
+          <strong>नोट — प्रिंट करने के बाद</strong>
+          <p style="margin:6px 0">प्रिंट अनिवार्य है — प्रबंधक द्वारा सत्यापन एवं हस्ताक्षर आवश्यक है।</p>
+          <p style="margin:6px 0">Print this form and get it verified & signed by the Manager.</p>
+          <span id="timestamp"></span>
+        </div>
+        <div class="qrwrap">
+          <div id="qrcode"></div>
+          <div style="font-size:11px;margin-top:6px">QR contains the submitted form data</div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>
+
+<script>
+  const CORRECT_CODE = "R@dha9754";
+  function checkCode(){
+    const input = document.getElementById("secCode");
+    const value = input.value.trim();
+    if(value === CORRECT_CODE){
+      document.getElementById("securityScreen").style.display="none";
+      document.getElementById("mainContent").style.display="block";
+    } else {
+      document.getElementById("accessMsg").innerText = "❌ Access Denied";
+      input.style.borderColor = "red";
+      input.classList.add("shake");
+      setTimeout(()=>input.classList.remove("shake"),300);
+    }
+  }
+  // ✅ Enter दबाने पर भी काम करेगा
+  document.getElementById("secCode").addEventListener("keypress", function(e){
+    if(e.key === "Enter"){
+      e.preventDefault();
+      checkCode();
+    }
+  });
+
+  // Auto-fill current date
+  document.getElementById("dateField").value = new Date().toISOString().split("T")[0];
+
+  // Number to Words
+  function numberToWords(num) {
+    if (!num) return "";
+    const a = ["","One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten",
+      "Eleven","Twelve","Thirteen","Fourteen","Fifteen","Sixteen",
+      "Seventeen","Eighteen","Nineteen"];
+    const b = ["","","Twenty","Thirty","Forty","Fifty","Sixty","Seventy","Eighty","Ninety"];
+    function inWords(n){
+      if(n<20) return a[n];
+      if(n<100) return b[Math.floor(n/10)] + (n%10 ? " "+a[n%10]:"");
+      if(n<1000) return a[Math.floor(n/100)] + " Hundred " + inWords(n%100);
+      return "";
+    }
+    let str="";
+    let units=[10000000,100000,1000,1];
+    let names=["Crore","Lakh","Thousand",""];
+    for(let i=0;i<units.length;i++){
+      let div=Math.floor(num/units[i]);
+      if(div){
+        str+=inWords(div)+" "+names[i]+" ";
+        num%=units[i];
+      }
+    }
+    return str.trim()+" Rupees Only";
+  }
+  document.getElementById("withdrawAmount").addEventListener("input",function(){
+    document.getElementById("amountWords").value = numberToWords(parseInt(this.value));
+  });
+
+  // Form submit + QR + Google Sheets
+  (function(){
+    const form=document.getElementById("withdrawForm");
+    const qrdiv=document.getElementById("qrcode");
+    const ts=document.getElementById("timestamp");
+    ts.innerText="Date & Time: "+new Date().toLocaleString("en-IN");
+
+    form.addEventListener("submit", async e=>{
+      e.preventDefault();
+      const data=Object.fromEntries(new FormData(form).entries());
+
+      // Generate QR
+      qrdiv.innerHTML="";
+      await QRCode.toCanvas(JSON.stringify(data), {width:150}, (err,canvas)=>{
+        if(!err) qrdiv.appendChild(canvas);
+      });
+
+      // Send to Google Sheet
+      fetch("https://script.google.com/macros/s/AKfycbwINtKJR-cTcptQrBI9UjSljWGTrTFVir6baEdpigeKaxdM0ZaRTkTVu5d4DPaZ3vcR1g/exec", {
+        method:"POST",
+        body: JSON.stringify(data),
+        headers: { "Content-Type":"application/json" },
+        mode:"no-cors"
+      }).then(()=>{
+        document.getElementById("status").textContent="✅ Withdrawal Amount (₹) successfully";
+      }).catch(err=>{
+        document.getElementById("status").textContent="❌ Save failed";
+        console.error(err);
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>
