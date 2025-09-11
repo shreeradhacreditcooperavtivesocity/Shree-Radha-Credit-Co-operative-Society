@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WhatsApp Banking - Shree Radha Credit Co-operative Society</title>
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --maroon:#800000;
+      --light:#a55252;
+      --green:#1e9e55;
+      --white:#fff;
+      --muted:#555;
+    }
+    body{
+      margin:0;
+      font-family:'Poppins',sans-serif;
+      background:linear-gradient(180deg,#fff,#fffaf2);
+      color:#222;
+      text-align:center;
+    }
+
+    header{
+      background:linear-gradient(90deg,var(--maroon),var(--light));
+      color:white;
+      padding:18px 20px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+    .brand{display:flex;gap:16px;align-items:center}
+    .logo{
+      width:72px;
+      height:72px;
+      background:white;
+      border-radius:8px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:var(--maroon);
+      font-weight:700;
+      font-family:'Merriweather',serif;
+      font-size:18px;
+    }
+    .titles{line-height:1;text-align:left}
+    .titles h1{margin:0;font-size:20px; color:white;}
+    .titles p{margin:2px 0 0;font-size:13px;opacity:0.95}
+
+    .container{
+      max-width:700px;
+      margin:40px auto;
+      background:var(--white);
+      padding:25px;
+      border-radius:12px;
+      box-shadow:0 4px 15px rgba(0,0,0,0.1);
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      align-items:center;
+      gap:20px;
+    }
+
+    .content{
+      flex:1 1 300px;
+      text-align:left;
+    }
+
+    h1{
+      color:white; /* Heading color white */
+      text-shadow:1px 1px 2px rgba(0,0,0,0.5);
+      font-family:'Merriweather',serif;
+      margin-bottom:15px;
+    }
+
+    p{
+      font-size:16px;
+      margin-bottom:20px;
+      color:#333;
+    }
+
+    .whatsapp-btn{
+      display:inline-block;
+      background-color:var(--green);
+      color:#fff;
+      padding:15px 25px;
+      border-radius:50px;
+      text-decoration:none;
+      font-weight:600;
+      font-size:18px;
+      transition:0.3s;
+    }
+    .whatsapp-btn:hover{
+      background:#167a40;
+    }
+
+    .note{
+      margin-top:20px;
+      font-size:14px;
+      color:var(--muted);
+    }
+
+    canvas{
+      width:150px;
+      height:150px;
+    }
+
+    footer{
+      margin-top:30px;
+      font-size:13px;
+      color:white;
+      padding:12px;
+      text-align:center;
+      background:var(--light);
+      border-radius:0 0 12px 12px;
+    }
+
+    @media(max-width:600px){
+      .container{
+        flex-direction:column;
+        text-align:center;
+      }
+      .content{
+        text-align:center;
+      }
+      canvas{
+        margin-top:15px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="brand">
+      <div class="logo">SRCCS</div>
+      <div class="titles">
+        <h1>Shree Radha Credit Co-operative Society Ltd.</h1>
+        <p>WhatsApp Banking Portal</p>
+        <p style="font-size:12px;margin-top:6px;opacity:0.92">Reg. No: DR/DHR/151716</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Container -->
+  <div class="container">
+    <div class="content">
+      <h1>WhatsApp Banking</h1>
+      <p>आप अपने बैंकिंग सेवाओं के लिए सीधे WhatsApp पर संपर्क कर सकते हैं।</p>
+      <a class="whatsapp-btn" href="https://wa.me/918370022176?text=नमस्ते%2C%20मुझे%20बैंकिंग%20सहायता%20चाहिए।" target="_blank">
+        WhatsApp पर संपर्क करें
+      </a>
+      <div class="note">
+        श्री राधा क्रेडिट को-ऑपरेटिव सोसाइटी<br>
+        नंबर: 8370022176
+      </div>
+    </div>
+    <canvas id="qrCanvas"></canvas>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    Provided by: <b>Shree Radha Credit Co-operative Society</b> | Reg. No: <b>DR/DHR/151716</b>
+  </footer>
+
+  <!-- QRCode JS Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+  <script>
+    const canvas = document.getElementById('qrCanvas');
+    const size = 150;
+
+    canvas.width = size;
+    canvas.height = size;
+
+    const qr = new QRious({
+      element: canvas,
+      value: 'https://wa.me/918370022176?text=नमस्ते%2C%20मुझे%20बैंकिंग%20सहायता%20चाहिए।',
+      size: size,
+      background: 'white',
+      foreground: 'black',
+      level: 'H'
+    });
+
+    const ctx = canvas.getContext('2d');
+
+    const drawCenterLogo = () => {
+      const boxSize = 40;
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+
+      // White background square
+      ctx.fillStyle = "white";
+      ctx.fillRect(centerX - boxSize/2, centerY - boxSize/2, boxSize, boxSize);
+
+      // Maroon text like heading
+      ctx.font = "bold 16px 'Merriweather', serif";
+      ctx.fillStyle = "#800000"; // maroon same as heading
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("SRCCS", centerX, centerY);
+    };
+
+    qr.image.onload = drawCenterLogo;
+  </script>
+
+</body>
+</html>
