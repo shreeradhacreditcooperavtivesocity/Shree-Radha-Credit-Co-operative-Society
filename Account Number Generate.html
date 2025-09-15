@@ -182,11 +182,24 @@
       else { overlay.style.display='none'; pageContent.style.display='none'; deniedScreen.style.display='flex'; }
     }
 
-    // Generate Account Number
+    // पहले से generated account numbers
+    const usedAccounts = [
+      "SRC3578","SRC3668","SRC5249","SRC6858","SRC9697","SRC1740","SRC9504",
+      "SRC5923","SRC3524","SRC1226","SRC5675","SRC5374","SRC7336","SRC3016",
+      "SRC7370","SRC1088","SRC6329","SRC9443","SRC3662","SRC1561","SRC3563",
+      "SRC1259","SRC8541","SRC5129","SRC1715","SRC2033"
+    ];
+
+    // Unique account number generator
     function generateAccountNumber() {
       const prefix = "SRC";
-      const random = Math.floor(1000 + Math.random() * 9000);
-      return prefix + random;
+      let newAcc;
+      do {
+        const random = Math.floor(1000 + Math.random() * 9000);
+        newAcc = prefix + random;
+      } while (usedAccounts.includes(newAcc));
+      usedAccounts.push(newAcc); 
+      return newAcc;
     }
     document.getElementById("accountNumber").value = generateAccountNumber();
 
