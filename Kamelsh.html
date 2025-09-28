@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8" />
+<title>Agent ID Scanner (QR/Barcode)</title>
+<style>
+  body{font-family: Arial, sans-serif; padding:20px;}
+  video{width:320px;height:240px;border:1px solid #ccc;}
+  #info{margin-top:10px;padding:10px;border:1px dashed #888;min-height:60px;}
+  button{margin-top:10px;}
+</style>
+</head>
+<body>
+  <h2>Agent ID Scanner (QR/Barcode)</h2>
+  <video id="video" autoplay></video>
+  <canvas id="canvas" style="display:none;"></canvas>
+  <div>
+    <button id="startBtn">Start Camera</button>
+    <button id="stopBtn">Stop</button>
+  </div>
+  <div id="info">स्कैनेड डिटेल्स यहाँ दिखेंगी...</div>
+
+<script src="https://unpkg.com/jsqr/dist/jsQR.js"></script>
+<script>
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const info = document.getElementById('info');
+let stream, scanning=false;
+const APPSCRIPT_URL = 'https://script.google.com/macros/s/YOUR_DEPLOY_ID/exec'; // बदलें
+
+document.getElementById('startBtn').onclick = async () => {
+  if (stream) return;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+    video.srcObject = stream;
+    scanning = true;
+    scanLoop();
+  } catch (e) {
+    info.innerText = 'कैमरा एक्सेस नहीं मिला: ' + e.message;
+  }
+};
+document.getElementById('stopBtn').onclick = () => {
+  scanning = false;
+  if (stream) {
+    stream.getTracks().forEach(t=>t.stop());
+    stream = null;
+  }
+};
+
+async function scanLoop(){
+  if (!scanning) return;
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  ctx.drawImage(video,0,0,canvas.width,canvas.height);
+  const imgData = ctx.getImageData(0,0,canvas.width,canvas.height);
+  const code = jsQR(imgData.data, imgData.width, imgData.height);
+  if (code) {
+    // code.data में QR/Barcode की value आती है
+    info.innerText = 'Found: ' + code.data + '\nLooking up agent...';
+    scanning=false;
+    // Call server to lookup agent
+    try {
+      const resp = await fetch(APPSCRIPT_URL + '?action=lookup&id=' + encodeURIComponent(code.data));
+      const json = await resp.json();
+      showAgent(json);
+    } catch(err) {
+      info.innerText = 'Lookup failed: ' + err.message;
+    } finally {
+      // optionally restart scanning
+      scanning = true;
+      setTimeout(scanLoop, 800);
+    }
+  } else {
+    requestAnimationFrame(scanLoop);
+  }
+}
+
+function showAgent(data){
+  if (!data || !data.found) {
+    info.innerText = 'Agent नहीं मिला।';
+    return;
+  }
+  info.innerHTML = `<b>Agent Details:</b><br/>
+    Name: ${data.name || ''} <br/>
+    ID: ${data.id || ''} <br/>
+    Mobile: ${data.mobile || ''} <br/>
+    Role: ${data.role || ''} <br/>
+    Office: ${data.office || ''}`;
+}
+</script>
+</body>
+</html>
