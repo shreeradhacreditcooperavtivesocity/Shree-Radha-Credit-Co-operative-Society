@@ -6,11 +6,11 @@
 <title>Agent Transaction — Shree Radha CCS</title>
 <style>
   :root{--maroon:#800000;--green:#1e9e55;--light:#a55252}
-  body{font-family:Poppins,Arial,sans-serif;background:#fffaf2;color:#222;margin:0;padding:0;}
-  header{background:linear-gradient(90deg,var(--maroon),var(--light));color:white;padding:15px;text-align:center;font-size:18px;font-weight:600;}
+  body{font-family:Poppins,Arial,sans-serif;background:#fffaf2;margin:0;padding:0;color:#222}
+  header{background:linear-gradient(90deg,var(--maroon),var(--light));color:white;padding:15px;text-align:center;font-weight:600;}
   .container{max-width:700px;margin:20px auto;padding:15px;background:#fff;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.1);}
-  input,select,button{width:100%;padding:12px;margin:8px 0;border-radius:8px;border:1px solid #ccc;font-size:15px;outline:none;}
-  button{background:var(--green);color:white;border:none;cursor:pointer;font-weight:600;transition:0.3s;}
+  input,select,button{width:100%;padding:12px;margin:8px 0;border-radius:8px;border:1px solid #ccc;font-size:15px;}
+  button{background:var(--green);color:white;border:none;cursor:pointer;font-weight:600;}
   button:hover{background:#167a40;}
   table{width:100%;border-collapse:collapse;margin-top:15px;}
   th,td{padding:10px;border:1px solid #ccc;text-align:center;}
@@ -24,64 +24,45 @@
 
 <div class="container">
 
-  <!-- Agent Login -->
   <div id="agentLogin">
     <h3 style="color:var(--maroon);text-align:center;">Agent Security Login</h3>
-    <input id="aCode" placeholder="Enter Security Code" required>
+    <input id="aCode" placeholder="Enter Security Code">
     <button onclick="agentAuth()">Continue</button>
   </div>
 
-  <!-- Agent Panel -->
   <div id="agentPanel" style="display:none;">
     <h3 style="color:var(--maroon);text-align:center;">Submit Transaction</h3>
-
-    <!-- Account Number -->
-    <label>Account Number</label>
     <div style="display:flex;align-items:center;">
       <span style="padding:12px;background:#eee;border:1px solid #ccc;border-right:none;border-radius:8px 0 0 8px;font-weight:bold;">SRC</span>
-      <input id="aAccount" maxlength="4" placeholder="Enter 4 digits" style="flex:1;border-radius:0 8px 8px 0;" required>
+      <input id="aAccount" maxlength="4" placeholder="Enter 4 digits" style="flex:1;border-radius:0 8px 8px 0;">
     </div>
-
-    <!-- Amount -->
-    <input id="aAmount" type="number" placeholder="Amount" required>
-
-    <!-- Transaction Type -->
-    <select id="aType" required>
+    <input id="aAmount" type="number" placeholder="Amount">
+    <select id="aType">
       <option value="">--Select Transaction--</option>
       <option value="credit">Credit</option>
       <option value="debit">Debit</option>
     </select>
-
-    <!-- Agent ID -->
-    <select id="aID" required>
+    <select id="aID">
       <option value="SRCCS1432">SRCCS1432</option>
     </select>
-
     <button onclick="saveTransaction()">Submit</button>
     <p id="msg"></p>
 
-    <!-- Transaction History -->
     <h3 style="color:var(--maroon);text-align:center;margin-top:20px;">📋 Last Transactions</h3>
     <table>
-      <thead>
-        <tr><th>Date & Time</th><th>Account</th><th>Type</th><th>Amount</th></tr>
-      </thead>
-      <tbody id="historyTable">
-        <tr><td colspan="4">No transactions yet</td></tr>
-      </tbody>
+      <thead><tr><th>Date & Time</th><th>Account</th><th>Type</th><th>Amount</th></tr></thead>
+      <tbody id="historyTable"><tr><td colspan="4">No transactions yet</td></tr></tbody>
     </table>
   </div>
 
 </div>
 
 <script>
-const API_URL="https://script.google.com/macros/s/AKfycbweRjtE85ZUZD7unWlqjgYayGwcw2Y6cgm2d5vpQA27EXc5cEVn4bDecNWryuLaaT8CtQ/exec"; // Replace with your Apps Script URL
+const API_URL="https://script.google.com/macros/s/AKfycbxJHc0LUz2Mdm0qAH7x7gIH1fGQRzyRwRcxEhbXSKnL-el9HzCGRZCUSnsRgxWWa1t9sw/exec"; // Replace with your Apps Script Web App URL
 const SECURITY_CODE="1213";
 
-// Show Agent Panel after security code
 function agentAuth(){
   const code=document.getElementById("aCode").value.trim();
-  if(!code){alert("Enter Security Code!");return;}
   if(code===SECURITY_CODE){
     document.getElementById("agentLogin").style.display="none";
     document.getElementById("agentPanel").style.display="block";
@@ -89,24 +70,21 @@ function agentAuth(){
   } else { alert("Wrong Security Code! ❌"); }
 }
 
-// Save Transaction
 function saveTransaction(){
-  let accSuffix=document.getElementById("aAccount").value.trim();
+  let acc="SRC"+document.getElementById("aAccount").value.trim();
   let amt=document.getElementById("aAmount").value;
   let type=document.getElementById("aType").value;
   let id=document.getElementById("aID").value;
 
-  if(accSuffix.length!==4 || isNaN(accSuffix)){alert("Enter 4 digits for account!"); return;}
-  if(!amt || !type || !id){alert("Fill all fields!"); return;}
+  if(acc.length!==7 || !amt || !type || !id){alert("Fill all fields correctly!"); return;}
 
-  let acc="SRC"+accSuffix;
   let btn=document.querySelector("#agentPanel button");
-  btn.disabled=true;btn.innerText="Saving...";
+  btn.disabled=true; btn.innerText="Saving...";
 
   fetch(API_URL,{
     method:"POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({fn:"transaction",account:acc,amount:amt,type:type,agent:id})
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({fn:"transaction",account:acc,amount:amt,type:type,agent:id})
   })
   .then(res=>res.json())
   .then(data=>{
@@ -117,11 +95,10 @@ function saveTransaction(){
     loadAgentHistory(id);
     setTimeout(()=>document.getElementById("msg").innerText="",4000);
   })
-  .catch(()=>alert("Error connecting to server!"))
-  .finally(()=>{btn.disabled=false;btn.innerText="Submit";});
+  .catch(()=>alert("Server Error ❌"))
+  .finally(()=>{btn.disabled=false; btn.innerText="Submit";});
 }
 
-// Load last 10 transactions for agent
 function loadAgentHistory(agentId){
   fetch(`${API_URL}?fn=getAgentTransactions&agent=${agentId}`)
   .then(res=>res.json())
@@ -137,12 +114,10 @@ function loadAgentHistory(agentId){
     } else {
       tbody.innerHTML="<tr><td colspan='4'>No transactions yet</td></tr>";
     }
-  })
-  .catch(console.error);
+  }).catch(console.error);
 }
 
-// Refresh history when Agent ID changes
-document.getElementById("aID").addEventListener("change", e=>{
+document.getElementById("aID").addEventListener("change",e=>{
   loadAgentHistory(e.target.value);
 });
 </script>
