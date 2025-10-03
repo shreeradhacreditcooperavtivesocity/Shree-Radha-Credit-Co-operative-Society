@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Loan Calculator — Shree Radha</title>
+<style>
+body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,'Noto Sans','Helvetica Neue',Arial;background:#f7fafc;color:#111827;padding:20px}
+.card{background:#fff;border-radius:12px;box-shadow:0 6px 18px rgba(15,23,42,0.06);padding:20px;max-width:700px;margin:12px auto}
+h1{font-size:20px;margin:0 0 12px}
+label{display:block;margin-top:10px;font-size:14px}
+input, select{width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:6px;margin-top:6px;font-size:14px}
+.btn{background:#0ea5a4;color:white;border:none;padding:10px 14px;border-radius:8px;cursor:pointer;margin-top:12px}
+.results{background:#f1f5f9;border-radius:8px;padding:12px;margin-top:12px}
+table{width:100%;border-collapse:collapse;margin-top:10px}
+th,td{padding:8px;border-bottom:1px solid #e6edf3;text-align:left}
+.small{font-size:13px;color:#374151}
+
+/* Print setup */
+@media print {
+  body * { visibility: hidden; }
+  #loan-results, #loan-results * { visibility: visible; }
+  #loan-results { position: absolute; top: 0; left: 0; width: 100%; }
+}
+</style>
+</head>
+<body>
+<div class="card">
+<h1>Loan Calculator</h1>
+
+<label>Loan Type</label>
+<select id="loan-type">
+<option value="Personal">Personal Loan</option>
+<option value="Business">Business Loan</option>
+<option value="Gold">Gold Loan</option>
+<option value="Silver">Silver Loan</option>
+<option value="Education">Education Loan</option>
+<option value="Agriculture">Agriculture Loan</option>
+<option value="Dairy">Dairy Loan</option>
+</select>
+
+<label>Loan Amount (₹)</label>
+<input type="number" id="loan-amount" placeholder="उदा. 100000" />
+
+<label>Interest Rate (% per annum)</label>
+<input type="number" id="loan-rate" step="0.01" placeholder="उदा. 10" />
+
+<label>Loan Tenure</label>
+<input type="number" id="loan-tenure" placeholder="उदा. 12" />
+
+<label>Tenure Type</label>
+<select id="tenure-type">
+<option value="years">Years</option>
+<option value="months">Months</option>
+</select>
+
+<label>Repayment Frequency</label>
+<select id="repayment-type">
+<option value="monthly">Monthly</option>
+<option value="quarterly">Quarterly (हर 3 महीने)</option>
+<option value="half-yearly">Half-Yearly (हर 6 महीने)</option>
+<option value="yearly">Yearly</option>
+</select>
+
+<label>File Charge (Auto)</label>
+<input type="number" id="file-charge" placeholder="Auto calculated" readonly />
+
+<button class="btn" id="calc-loan">Calculate</button>
+<button class="btn" onclick="window.print()">Print Result</button>
+
+<div class="results" id="loan-results" style="display:none"></div>
+
+<div style="margin-top:16px" class="small">
+Formula: EMI = [P * r * (1+r)^n] / [(1+r)^n - 1] <br>
+where r = interest rate per period, n = total periods.
+</div>
+</div>
+
+<script>
+document.getElementById('calc-loan').addEventListener('click', ()=>{
+    const type = document.getElementById('loan-type').value;
+    const P = parseFloat(document.getElementById('loan-amount').value || 0);
+    const rYear = parseFloat(document.getElementById('loan-rate').value || 0);
+    const tenure = parseFloat(document.getElementById('loan-tenure').value || 0);
+    const tenureType = document.getElementById('tenure-type').value;
+    const freq = document.getElementById('repayment-type').value;
+
+    if(!(P>0 && rYear>0 && tenure>0)){
+        alert('कृपया सभी मान वैध रूप से भरें।'); return;
+    }
+
+    // Tenure calculation
+    let totalMonths = tenureType === 'years' ? tenure*12 : tenure;
+    let years = totalMonths/12;
+
+    // Repayment frequency calculation
+    let n, r;
+    if(freq==='monthly'){
+        n = totalMonths;
+        r = rYear/(12*100);
+    } else if(freq==='quarterly'){
+        n = Math.round(totalMonths/3);
+        r = rYear/(4*100);
+    } else if(freq==='half-yearly'){
+        n = Math.round(totalMonths/6);
+        r = rYear/(2*100);
+    } else {
+        n = years;
+        r = rYear/100;
+    }
+
+    // EMI calculation
+    const EMI = (P*r*Math.pow(1+r,n)) / (Math.pow(1+r,n)-1);
+    const totalPayment = EMI * n;
+    const totalInterest = totalPayment - P;
+
+    // File Charge (5.99% example)
+    const fileCharge = P * 0.0599;
+    document.getElementById('file-charge').value = fileCharge.toFixed(2);
+
+    // Show Results
+    const resultDiv = document.getElementById('loan-results');
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = `
+        <h2>${type} Loan Result</h2>
+        <strong>EMI: ₹ ${EMI.toFixed(2)} (${freq})</strong>
+        <div class="small">Total Payment: ₹ ${totalPayment.toFixed(2)} | Interest: ₹ ${totalInterest.toFixed(2)}</div>
+        <table>
+            <tr><th>Loan Amount</th><td>₹ ${P.toFixed(2)}</td></tr>
+            <tr><th>File Charge</th><td>₹ ${fileCharge.toFixed(2)}</td></tr>
+            <tr><th>Interest Rate</th><td>${rYear}% per annum</td></tr>
+            <tr><th>Tenure</th><td>${totalMonths} months (${years.toFixed(2)} years)</td></tr>
+            <tr><th>Frequency</th><td>${freq}</td></tr>
+            <tr><th>Total Payment</th><td>₹ ${totalPayment.toFixed(2)}</td></tr>
+            <tr><th>Total Interest</th><td>₹ ${totalInterest.toFixed(2)}</td></tr>
+        </table>
+    `;
+});
+</script>
+</body>
+</html>
