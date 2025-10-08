@@ -1,87 +1,190 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="hi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Profile Page</title>
+  <meta charset="utf-8">
+  <title>Shree Radha Credit Co-operative Society - Profile</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <style>
+    :root {
+      --maroon: #800000;
+      --light: #a55252;
+      --paper: #fff;
+      --muted: #666;
+    }
+
     body {
-      font-family: 'Arial', sans-serif;
-      background-color: #f4f4f9;
       margin: 0;
-      padding: 0;
+      font-family: Inter, Poppins, Arial, sans-serif;
+      background: linear-gradient(180deg, #fff, #fffaf2);
+      color: #222;
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(90deg, var(--maroon), var(--light));
+      color: white;
+      padding: 14px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      text-align: center;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .logo {
+      width: 60px;
+      height: 60px;
+      background: white;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--maroon);
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .titles h1 {
+      margin: 5px 0;
+      font-size: 16px;
+    }
+
+    .titles p {
+      margin: 3px 0;
+      font-size: 12px;
+      line-height: 1.3;
+    }
+
+    .actions {
+      font-size: 13px;
+      width: 100%;
+      text-align: center;
+      margin-top: 6px;
+      opacity: 0.9;
+    }
+
+    footer {
+      text-align: center;
+      padding: 12px;
+      background: var(--light);
+      color: white;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    /* Profile Card */
+    .profile-container {
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
+      padding: 20px 10px;
     }
 
     .profile-card {
       background-color: #fff;
-      width: 450px;
+      width: 100%;
+      max-width: 360px;
       border-radius: 10px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
       overflow: hidden;
       text-align: center;
-      padding: 20px;
+      padding: 16px;
     }
 
     .profile-card img {
-      width: 150px;
-      height: 150px;
+      width: 120px;
+      height: 120px;
       border-radius: 50%;
       object-fit: cover;
-      border: 4px solid #800000;
+      border: 3px solid var(--maroon);
     }
 
     .profile-card h1 {
-      margin: 15px 0 5px;
-      font-size: 24px;
+      margin: 12px 0 4px;
+      font-size: 18px;
       color: #333;
     }
 
     .profile-card h3 {
-      margin: 5px 0;
-      font-size: 18px;
-      color: #800000;
+      margin: 4px 0;
+      font-size: 15px;
+      color: var(--maroon);
     }
 
     .profile-card p {
-      font-size: 14px;
+      font-size: 13px;
       color: #555;
-      margin: 10px 0;
+      margin: 6px 0;
     }
 
     .profile-card a {
       display: inline-block;
-      margin: 5px;
+      margin: 4px;
       text-decoration: none;
       color: #fff;
-      background-color: #800000;
-      padding: 8px 15px;
+      background-color: var(--maroon);
+      padding: 6px 10px;
       border-radius: 5px;
+      font-size: 13px;
       transition: 0.3s;
     }
 
     .profile-card a:hover {
-      background-color: #a55252;
+      background-color: var(--light);
     }
 
     .details {
       text-align: left;
-      margin-top: 15px;
+      margin-top: 10px;
+      font-size: 13px;
     }
 
     .details p {
-      margin: 5px 0;
+      margin: 4px 0;
+      line-height: 1.3;
     }
 
+    .social-links {
+      margin-top: 8px;
+    }
+
+    @media (max-width: 420px) {
+      .titles h1 { font-size: 15px; }
+      .titles p { font-size: 11px; }
+      .profile-card { padding: 14px; }
+      .profile-card img { width: 110px; height: 110px; }
+    }
   </style>
 </head>
 <body>
 
-  <div class="profile-card">
-    <img src="Anjana.jpeg" alt="Profile Photo">
+  <header>
+    <div class="brand">
+      <div class="logo">SRCCS</div>
+      <div class="titles">
+        <h1>Shree Radha Credit Co-operative Society Ltd.</h1>
+        <p>In front of Chatrawas, Gram Panchayat Gujri — Gujri (Dhamnod), Sub district Dharmapuri, District Dhar - 454552</p>
+        <p style="font-size:11px;margin-top:5px;">
+          Reg. No: DR/DHR/151716 · ☎ +91 83700 22176 · 
+          <span style="text-decoration:underline;">Customer Digital Portal</span>
+        </p>
+      </div>
+    </div>
+    <div class="actions">Profile Page</div>
+  </header>
+
+  <div class="profile-container">
+    <div class="profile-card">
+      <img src="Anjana.jpeg" alt="Profile Photo">
     <h1>Anjana Lodhare</h1>
     <h3>Co-operative Society Receptionist</h3>
     <h3>ID Number: SRCCS1432</h3>
@@ -103,12 +206,17 @@
       <p><strong>Hobbies:</strong> Reading, Traveling, Painting</p>
     </div>
 
-    <div class="social-links">
-      <a href="#">LinkedIn</a>
-      <a href="#">GitHub</a>
-      <a href="#">Twitter</a>
+      <div class="social-links">
+        <a href="#">LinkedIn</a>
+        <a href="#">GitHub</a>
+        <a href="#">Twitter</a>
+      </div>
     </div>
   </div>
+
+  <footer>
+    © 2025 Shree Radha Credit Co-operative Society<br>Reg. No: DR/DHR/151716
+  </footer>
 
 </body>
 </html>
