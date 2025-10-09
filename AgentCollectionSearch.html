@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<title>Ledger Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+body { font-family: Arial; margin: 20px; }
+input, button { padding: 8px; margin: 5px; }
+table { border-collapse: collapse; margin-top: 20px; width: 100%; }
+th, td { border: 1px solid #999; padding: 8px; text-align: left; }
+th { background: #f2f2f2; }
+h2 { margin-top: 40px; }
+.error { color: red; }
+.success { color: green; }
+</style>
+</head>
+<body>
+
+<h2>🔍 Customer Search</h2>
+<label>Account Number: </label><input type="text" id="custAccount">
+<label>Password: </label><input type="password" id="custPass">
+<button onclick="searchCustomer()">Search</button>
+<button onclick="downloadCustomerPDF()">Download PDF</button>
+<div id="custMessage"></div>
+<table id="custTable" style="display:none;">
+<thead>
+<tr><th>Date</th><th>Type</th><th>Amount</th><th>Agent</th></tr>
+</thead>
+<tbody></tbody>
+</table>
+
+<h2>🔍 Agent Transaction Search</h2>
+<label>Agent ID: </label><input type="text" id="agentId">
+<label>From: </label><input type="date" id="agentFrom">
+<label>To: </label><input type="date" id="agentTo">
+<button onclick="searchAgent()">Search</button>
+<button onclick="downloadAgentPDF()">Download PDF</button>
+<div id="agentMessage"></div>
+<table id="agentTable" style="display:none;">
+<thead>
+<tr><th>Date</th><th>Account</th><th>Type</th><th>Amount</th></tr>
+</thead>
+<tbody></tbody>
+</table>
+
+<script>
+const scriptURL = "https://script.google.com/macros/s/AKfycbyVhvnIOdsfxY0hCoMlUIGNWtjWx1tWRIXGCcQBCfy0xyhvsmFDLF8BoyOsHjBdQ7eC/exec"; // Apps Script Web App URL डालें
+
+let custData = [];
+let agentData = [];
+
+// -------- Customer Search --------
+async function searchCustomer() {
+  const acc = document.getElementById("custAccount").value.trim();
+  const pass = document.getElementById("custPass").value.trim();
+
+  if(!acc || !pass){
+    alert("❌ Account Number और Password दोनों डालें।");
+    return;
+  }
+
+  document.getElementById("custMessage").innerHTML = "⏳ Searching...";
+  document.getElementById("custTable").style.display = "none";
+
+  try {
+    const url = `${scriptURL}?fn=getHistory&account=${encodeURIComponent(acc)}&pass=${encodeURIComponent(pass)}`;
+    const res = await fetch(url);
+    const result = await res.json();
+
+    if (result.success) {
+      custData = result.transactions;
+      const tbody = document.querySelector("#custTable tbody");
+      tbody.innerHTML = "";
+      result.transactions.forEach(r => {
+        tbody.innerHTML += `<tr>
+          <td>${r.date}</td>
+          <td>${r.type}</td>
+          <td>${r.amount}</td>
+          <td>${r.agent}</td>
+        </tr>`;
+      });
+      document.getElementById("custTable").style.display = "table";
+      document.getElementById("custMessage").innerHTML = `<span class="success">✅ Balance: ${result.balance}</span>`;
+    } else {
+      document.getElementById("custMessage").innerHTML = `<span class="error">${result.message || "Invalid Account/Password"}</span>`;
+    }
+  } catch (err) {
+    document.getElementById("custMessage").innerHTML = `<span class="error">❌ ${err}</span>`;
+  }
+}
+
+function downloadCustomerPDF() {
+  if (custData.length === 0) { alert("No customer data to export!"); return; }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  doc.text("Customer Transactions", 10, 10);
+  let y = 20;
+  doc.text("Date | Type | Amount | Agent", 10, y);
+  y += 10;
+  custData.forEach(r => {
+    doc.text(`${r.date} | ${r.type} | ${r.amount} | ${r.agent}`, 10, y);
+    y += 7;
+    if (y > 280) { doc.addPage(); y = 10; }
+  });
+  doc.save("Customer_Transactions.pdf");
+}
+
+// -------- Agent Search --------
+async function searchAgent() {
+  const agent = document.getElementById("agentId").value.trim();
+  const from = document.getElementById("agentFrom").value;
+  const to = document.getElementById("agentTo").value;
+
+  if(!agent){
+    alert("❌ Agent ID डालें।");
+    return;
+  }
+
+  document.getElementById("agentMessage").innerHTML = "⏳ Searching...";
+  document.getElementById("agentTable").style.display = "none";
+
+  try {
+    const url = `${scriptURL}?fn=getAgentTransactions&agent=${encodeURIComponent(agent)}&from=${from}&to=${to}`;
+    const res = await fetch(url);
+    const result = await res.json();
+
+    if (result.success) {
+      agentData = result.transactions;
+      const tbody = document.querySelector("#agentTable tbody");
+      tbody.innerHTML = "";
+      result.transactions.forEach(r => {
+        tbody.innerHTML += `<tr>
+          <td>${r.date}</td>
+          <td>${r.account}</td>
+          <td>${r.type}</td>
+          <td>${r.amount}</td>
+        </tr>`;
+      });
+      document.getElementById("agentTable").style.display = "table";
+      document.getElementById("agentMessage").innerHTML = `<span class="success">✅ ${result.transactions.length} transactions found</span>`;
+    } else {
+      document.getElementById("agentMessage").innerHTML = `<span class="error">${result.message || "No data found"}</span>`;
+    }
+  } catch (err) {
+    document.getElementById("agentMessage").innerHTML = `<span class="error">❌ ${err}</span>`;
+  }
+}
+
+function downloadAgentPDF() {
+  if (agentData.length === 0) { alert("No agent data to export!"); return; }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  doc.text("Agent Transactions", 10, 10);
+  let y = 20;
+  doc.text("Date | Account | Type | Amount", 10, y);
+  y += 10;
+  agentData.forEach(r => {
+    doc.text(`${r.date} | ${r.account} | ${r.type} | ${r.amount}`, 10, y);
+    y += 7;
+    if (y > 280) { doc.addPage(); y = 10; }
+  });
+  doc.save("Agent_Transactions.pdf");
+}
+</script>
+
+</body>
+</html>
