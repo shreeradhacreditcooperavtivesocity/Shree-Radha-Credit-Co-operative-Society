@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loan Approver Form — Shree Radha Credit Co-operative Society</title>
+  <style>
+    :root {
+      --maroon: #800000;
+      --light-maroon: #a55252;
+      --paper: #fff;
+      --muted: #666;
+    }
+    * { box-sizing: border-box; }
+    body { font-family: 'Arial', sans-serif; margin: 0; padding: 0; background: #f4f4f4; }
+    .container { max-width: 210mm; min-height: 297mm; margin: 10mm auto; background: var(--paper); padding: 20mm; border-radius: 6px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; gap: 20px; flex-wrap: wrap; }
+    .form-left { flex: 2; display: flex; flex-direction: column; gap: 15px; }
+    .form-right { flex: 1; display: flex; flex-direction: column; align-items: center; min-width: 180px; }
+    h2 { color: var(--maroon); text-align: center; margin-bottom: 20px; font-size: 24px; width:100%; }
+    h3 { margin-top: 10px; color: var(--maroon); border-bottom: 1px solid #ccc; padding-bottom: 5px; font-size: 18px; }
+    label { font-weight: bold; margin-bottom: 5px; display: block; font-size: 14px; }
+    input, textarea, select { width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; }
+    textarea { resize: none; }
+    .flex-row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .flex-row > div { flex: 1; }
+    .photo-preview { width: 160px; height: 160px; object-fit: cover; border-radius: 8px; border: 1px solid #ccc; display: none; margin-top: 8px; }
+    button { padding: 10px 18px; background: var(--maroon); color: #fff; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; margin-top: 10px; }
+    button:hover { background: var(--light-maroon); }
+    .summary-box { background: #f8f8f8; padding: 8px 10px; border-radius: 5px; border: 1px solid #ccc; margin-top: 5px; font-size: 13px; }
+    @media print {
+      @page { size: A4 portrait; margin: 0; }
+      body { background: #fff; margin: 0; padding: 0; }
+      .container { box-shadow: none; width: 210mm; min-height: 297mm; padding: 20mm; margin:0; border-radius:0; display:flex; flex-direction:row; gap:20px; }
+      .form-left, .form-right { page-break-inside: avoid; break-inside: avoid; }
+      button, input[type="file"] { display: none !important; }
+      input, textarea, select { border:1px solid #000; font-size:12px; background:transparent; padding:2px 4px; }
+      .summary-box { font-size:12px; }
+      #qrCode canvas { width:160px !important; height:160px !important; }
+      .photo-preview { display:block !important; border:1px solid #000; width:160px; height:160px; object-fit:cover; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Loan Approver Form</h2>
+
+  <div class="form-left">
+    <h3>Customer Details</h3>
+    <div class="flex-row">
+      <div>
+        <label for="customerName">Full Name</label>
+        <input type="text" id="customerName" required>
+      </div>
+      <div>
+        <label for="customerMobile">Mobile Number</label>
+        <input type="tel" id="customerMobile" required>
+      </div>
+    </div>
+    <div>
+      <label for="customerEmail">Email (Optional)</label>
+      <input type="email" id="customerEmail">
+    </div>
+    <div>
+      <label for="customerAddress">Address</label>
+      <textarea id="customerAddress" rows="2" required></textarea>
+    </div>
+
+    <h3>Loan Details</h3>
+    <div class="flex-row">
+      <div>
+        <label for="loanId">Loan ID (Manual)</label>
+        <input type="text" id="loanId" required>
+      </div>
+      <div>
+        <label for="accountNumber">Account Number</label>
+        <input type="text" id="accountNumber" required>
+      </div>
+    </div>
+    <div class="flex-row">
+      <div>
+        <label for="loanAmount">Loan Amount (₹)</label>
+        <input type="number" id="loanAmount" required>
+      </div>
+      <div>
+        <label for="interestRate">Interest Rate (%) per annum</label>
+        <input type="number" id="interestRate" value="24">
+      </div>
+    </div>
+    <div class="flex-row">
+      <div>
+        <label for="tenureMonths">Tenure (months)</label>
+        <input type="number" id="tenureMonths" value="6">
+      </div>
+      <div>
+        <label for="frequency">Frequency</label>
+        <input type="text" id="frequency" value="monthly" readonly>
+      </div>
+    </div>
+    <div class="summary-box" id="loanSummary">
+      EMI: ₹ 0.00 (monthly)<br>
+      Total Payment: ₹ 0.00 | Interest: ₹ 0.00<br>
+      File Charge: ₹ 0.00
+    </div>
+
+    <h3>Guarantor Details</h3>
+    <div class="flex-row">
+      <div>
+        <label for="guarantorName">Name</label>
+        <input type="text" id="guarantorName" required>
+      </div>
+      <div>
+        <label for="guarantorMobile">Mobile Number</label>
+        <input type="tel" id="guarantorMobile" required>
+      </div>
+    </div>
+    <div>
+      <label for="guarantorAddress">Address</label>
+      <textarea id="guarantorAddress" rows="2" required></textarea>
+    </div>
+  </div>
+
+  <div class="form-right">
+    <label for="customerPhoto">Customer Photo</label>
+    <input type="file" id="customerPhoto" accept="image/*">
+    <img id="customerPhotoPreview" class="photo-preview" alt="Customer Photo">
+
+    <label for="guarantorPhoto">Guarantor Photo</label>
+    <input type="file" id="guarantorPhoto" accept="image/*">
+    <img id="guarantorPhotoPreview" class="photo-preview" alt="Guarantor Photo">
+
+    <h3>QR Code</h3>
+    <div id="qrCode"></div>
+    <button type="button" onclick="generateQRCode()">Generate QR & Print</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+function setupPhotoPreview(inputId, imgId){
+  const input = document.getElementById(inputId);
+  const img = document.getElementById(imgId);
+  input.addEventListener('change', function(){
+    const file = this.files[0];
+    if(file){
+      const reader = new FileReader();
+      reader.onload = function(e){
+        img.src = e.target.result;
+        img.style.display = 'block';
+      }
+      reader.readAsDataURL(file);
+    } else {
+      img.src = '';
+      img.style.display = 'none';
+    }
+  });
+}
+setupPhotoPreview('customerPhoto', 'customerPhotoPreview');
+setupPhotoPreview('guarantorPhoto', 'guarantorPhotoPreview');
+
+const loanAmountInput = document.getElementById('loanAmount');
+const interestRateInput = document.getElementById('interestRate');
+const tenureInput = document.getElementById('tenureMonths');
+const summaryBox = document.getElementById('loanSummary');
+
+function calculateLoanDetails(){
+  const P = parseFloat(loanAmountInput.value) || 0;
+  const r = parseFloat(interestRateInput.value)/100/12;
+  const n = parseInt(tenureInput.value) || 0;
+
+  let EMI = 0;
+  if(r>0 && n>0){
+    EMI = P * r * Math.pow(1+r,n)/(Math.pow(1+r,n)-1);
+  } else if(n>0) {
+    EMI = P/n;
+  }
+  const fileCharge = P*0.0599;
+  const totalPayment = EMI * n + fileCharge;
+  const totalInterest = totalPayment - P - fileCharge;
+
+  summaryBox.innerHTML = `
+    EMI: ₹ ${EMI.toFixed(2)} (monthly)<br>
+    Total Payment: ₹ ${totalPayment.toFixed(2)} | Interest: ₹ ${totalInterest.toFixed(2)}<br>
+    Loan Amount: ₹ ${P.toFixed(2)}<br>
+    File Charge: ₹ ${fileCharge.toFixed(2)}<br>
+    Interest Rate: ${interestRateInput.value}% per annum<br>
+    Tenure: ${n} months (${(n/12).toFixed(2)} years)<br>
+    Frequency: monthly
+  `;
+}
+
+loanAmountInput.addEventListener('input', calculateLoanDetails);
+interestRateInput.addEventListener('input', calculateLoanDetails);
+tenureInput.addEventListener('input', calculateLoanDetails);
+calculateLoanDetails();
+
+function generateQRCode(){
+  const formData = {
+    customerName: document.getElementById('customerName').value,
+    customerMobile: document.getElementById('customerMobile').value,
+    customerEmail: document.getElementById('customerEmail').value,
+    customerAddress: document.getElementById('customerAddress').value,
+    loanId: document.getElementById('loanId').value,
+    accountNumber: document.getElementById('accountNumber').value,
+    loanAmount: parseFloat(loanAmountInput.value || 0).toFixed(2),
+    interestRate: parseFloat(interestRateInput.value || 0).toFixed(2),
+    tenureMonths: parseInt(tenureInput.value || 0),
+    frequency: document.getElementById('frequency').value,
+    fileCharge: (parseFloat(loanAmountInput.value || 0)*0.0599).toFixed(2),
+    EMI: summaryBox.innerHTML.match(/EMI: ₹ ([\d\.]+)/)[1],
+    totalPayment: summaryBox.innerHTML.match(/Total Payment: ₹ ([\d\.]+)/)[1],
+    totalInterest: summaryBox.innerHTML.match(/Interest: ₹ ([\d\.]+)/)[1],
+    guarantorName: document.getElementById('guarantorName').value,
+    guarantorMobile: document.getElementById('guarantorMobile').value,
+    guarantorAddress: document.getElementById('guarantorAddress').value
+  };
+
+  const qrDiv = document.getElementById('qrCode');
+  qrDiv.innerHTML = '';
+  new QRCode(qrDiv, { text: JSON.stringify(formData), width: 180, height: 180 });
+
+  setTimeout(() => { window.print(); }, 500);
+}
+</script>
+
+</body>
+</html>
