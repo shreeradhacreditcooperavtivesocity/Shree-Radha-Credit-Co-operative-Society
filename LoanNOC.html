@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Loan Clearance / NOC — Shree Radha Credit Co-operative Society</title>
+<style>
+  @page { size: A4; margin: 15mm; }
+  body { font-family: "Noto Sans Devanagari", "Mangal", Arial, sans-serif; margin:0; padding:0; background:#f5f5f5; line-height:1.4; }
+  .container { border:2px solid #222; padding:15px; max-width:800px; margin:10px auto; background:#fff; box-sizing:border-box; }
+  .header { display:flex; justify-content:space-between; margin-bottom:10px; }
+  .org h1 { margin:0; font-size:18px; }
+  .org .reg { font-size:11px; margin-top:2px; color:#333; }
+  .official-badge{ border:2px solid #b30000; color:#b30000; padding:4px 8px; font-weight:700; border-radius:4px; font-size:12px; }
+  .title { margin:10px 0 6px; font-size:16px; font-weight:700; color:#b30000; text-transform:uppercase; letter-spacing:0.5px; }
+  .content { background:#fff; padding:10px; border-radius:4px; border:1px solid #e6e6e6; color:#111; font-size:13px; }
+  .content p { margin:6px 0; font-size:13px; }
+  .field { margin-bottom:6px; }
+  .field label { font-weight:700; display:block; margin-bottom:2px; font-size:13px; }
+  .field input, .field textarea { width:100%; padding:5px 6px; font-size:13px; border:1px solid #ccc; border-radius:3px; box-sizing:border-box; }
+  ul.points-list { margin:6px 0 8px 18px; padding:0; }
+  ul.points-list li { margin:4px 0; font-size:13px; }
+  .footer { display:flex; justify-content:space-between; align-items:flex-end; margin-top:12px; }
+  .stamp { width:180px; height:70px; border:2px dashed #666; display:flex; align-items:center; justify-content:center; text-align:center; padding:4px; font-size:11px; color:#444; }
+  .signature { text-align:left; font-size:12px; }
+  .signature .name { font-weight:700; margin-top:4px; }
+  .signature .title { font-size:11px; color:#333; }
+  .btn-print { margin-top:10px; padding:6px 12px; font-size:13px; background:#b30000; color:#fff; border:none; border-radius:4px; cursor:pointer; }
+  @media print {
+    body { margin:0; }
+    .container { border:none; box-shadow:none; padding:0; }
+    .btn-print { display:none; }
+    .official-badge { border:none; color:#b30000; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container" id="nocContainer">
+  <div class="header">
+    <div class="org">
+      <h1>Shree Radha Credit Co-operative Society Limited, Gujri(Dhamnod)</h1>
+      <div class="reg">Reg. No.: DR/DHR/151716</div>
+    </div>
+    <div>
+      <div class="official-badge">OFFICIAL NOC / आधिकारिक प्रमाण पत्र</div>
+    </div>
+  </div>
+
+  <div class="title">Loan Clearance / No Objection Certificate (NOC)</div>
+
+  <div class="content">
+    <p>यह प्रमाणित किया जाता है कि / This is to certify that:</p>
+
+    <div class="field"><label>सदस्य / Member Name:</label><input type="text" id="memberName" placeholder="Enter Name"></div>
+    <div class="field"><label>पिता / पति / Father / Husband:</label><input type="text" id="fatherName" placeholder="Enter Father's / Husband's Name"></div>
+    <div class="field"><label>पता / Address:</label><textarea id="address" rows="2" placeholder="Enter Address"></textarea></div>
+    <div class="field"><label>सदस्य / खाता संख्या / Account No:</label><input type="text" id="accountNo" placeholder="Enter Account No"></div>
+    <div class="field"><label>ऋण राशि / Loan Amount:</label><input type="text" id="loanAmount" placeholder="Enter Loan Amount"></div>
+    <div class="field"><label>ऋण का उद्देश्य / Loan Purpose:</label><input type="text" id="loanPurpose" placeholder="Enter Loan Purpose"></div>
+
+    <p id="statement">उपरोक्त सदस्य ने समाज से लिया गया ऋण पूर्ण रूप से चुका दिया है। / The above member has fully repaid the loan taken from the Society.</p>
+
+    <ul class="points-list">
+      <li>कोई बकाया राशि नहीं / No outstanding dues remaining.</li>
+      <li>यह प्रमाण पत्र वित्तीय और कानूनी उद्देश्यों के लिए प्रस्तुत किया जा सकता है / This certificate can be submitted for financial and legal purposes.</li>
+      <li>सदस्य पर कोई ऋण दायित्व नहीं / The member has no pending loan obligations.</li>
+      <li>समाज के रिकॉर्ड अनुसार सभी ऋण निपटाए जा चुके हैं / According to Society records, all dues have been cleared.</li>
+      <li>यह प्रमाण पत्र सदस्य के अनुरोध पर जारी किया गया है / This certificate is issued upon the member's request.</li>
+    </ul>
+
+    <div class="field"><label>दिनांक / Date:</label><input type="date" id="date"></div>
+    <div class="field"><label>स्थान / Place:</label><input type="text" id="place" placeholder="Enter Place"></div>
+  </div>
+
+  <div class="footer">
+    <div class="stamp" title="Official Stamp / मोहर">
+      ✓ Digitally signed by<br>Date: _______<br>+05:30
+    </div>
+
+    <div class="signature">
+      <div class="name">धर्मेंद्र प्रजापत / Dharmendra Prajapat</div>
+      <div class="title">प्रबंधक / Manager</div>
+    </div>
+  </div>
+
+  <div style="margin-top:10px; font-size:11px; color:#333;">
+    <strong>जारीकर्ता / Issued by:</strong>  Shree Radha Credit Co-operative Society Limited<br>
+    <strong>Reg. No.:</strong> DR/DHR/151716
+  </div>
+</div>
+
+<button class="btn-print" onclick="printNOC()">Print NOC</button>
+
+<script>
+function printNOC() {
+  const memberName = document.getElementById('memberName').value;
+  const fatherName = document.getElementById('fatherName').value;
+  const address = document.getElementById('address').value;
+  const accountNo = document.getElementById('accountNo').value;
+  const loanAmount = document.getElementById('loanAmount').value;
+  const loanPurpose = document.getElementById('loanPurpose').value;
+  const date = document.getElementById('date').value;
+  const place = document.getElementById('place').value;
+
+  const container = document.getElementById('nocContainer');
+
+  container.querySelector('#memberName').outerHTML = `<span>${memberName}</span>`;
+  container.querySelector('#fatherName').outerHTML = `<span>${fatherName}</span>`;
+  container.querySelector('#address').outerHTML = `<span>${address}</span>`;
+  container.querySelector('#accountNo').outerHTML = `<span>${accountNo}</span>`;
+  container.querySelector('#loanAmount').outerHTML = `<span>${loanAmount}</span>`;
+  container.querySelector('#loanPurpose').outerHTML = `<span>${loanPurpose}</span>`;
+  container.querySelector('#date').outerHTML = `<span>${date}</span>`;
+  container.querySelector('#place').outerHTML = `<span>${place}</span>`;
+
+  window.print();
+}
+</script>
+
+</body>
+</html>
