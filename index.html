@@ -17,6 +17,7 @@ body {
   color: #333;
 }
 
+/* Header */
 header {
   position: fixed;
   top: 0;
@@ -140,6 +141,7 @@ footer {
 
 <div class="sidebar">
 
+  <!-- A. Account Search -->
   <div class="menu-item" onclick="toggleSubmenu('accountSearch')">
     <span><i class="ri-search-eye-line"></i> A. Account Search</span>
     <i class="ri-arrow-down-s-line"></i>
@@ -150,6 +152,7 @@ footer {
     <a href="#" onclick="openForm('CustomerDetailsSearch.html')">a3. Customer Details Search</a>
   </div>
 
+  <!-- B. Accounts -->
   <div class="menu-item" onclick="toggleSubmenu('accounts')">
     <span><i class="ri-bank-line"></i> B. Accounts</span>
     <i class="ri-arrow-down-s-line"></i>
@@ -163,6 +166,7 @@ footer {
     <a href="#" onclick="openForm('Monthly Collection Entries.html')">b6. Monthly Collection</a>
   </div>
 
+  <!-- C. Calculator -->
   <div class="menu-item" onclick="toggleSubmenu('calculator')">
     <span><i class="ri-calculator-line"></i> C. Calculator</span>
     <i class="ri-arrow-down-s-line"></i>
@@ -172,6 +176,7 @@ footer {
     <a href="#" onclick="openForm('FD Calulation.html')">c2. FD/RD Calculator</a>
   </div>
 
+  <!-- D. Loan Dashboard -->
   <div class="menu-item" onclick="toggleSubmenu('loanDashboard')">
     <span><i class="ri-money-rupee-circle-line"></i> D. Loan Dashboard</span>
     <i class="ri-arrow-down-s-line"></i>
@@ -183,6 +188,7 @@ footer {
     <a href="#" onclick="openForm('Loan rejected.html')">d4. Loan Rejection</a>
   </div>
 
+  <!-- E. Loan Account Search -->
   <div class="menu-item" onclick="toggleSubmenu('loanSearch')">
     <span><i class="ri-search-line"></i> E. Loan Account Search</span>
     <i class="ri-arrow-down-s-line"></i>
@@ -193,8 +199,21 @@ footer {
     <a href="#" onclick="openForm('LoanRejectionSearch.html')">e3. Loan Rejection Search</a>
   </div>
 
+  <!-- F. Current Loan Payment -->
   <div class="menu-item" onclick="openForm('CurrentLoanPayment.html')">
     <span><i class="ri-hand-coin-line"></i> F. Current Loan Payment / EMI</span>
+  </div>
+
+  <!-- G. Documents -->
+  <div class="menu-item" onclick="toggleSubmenu('documents')">
+    <span><i class="ri-file-list-3-line"></i> G. Documents</span>
+    <i class="ri-arrow-down-s-line"></i>
+  </div>
+  <div class="submenu" id="documents">
+    <a href="#" onclick="openForm('LoanNOC.html')">g1. Loan NOC</a>
+    <a href="#" onclick="openForm('LoanDocuments.html')">g2. Loan Documents</a>
+    <a href="#" onclick="openForm('Loan590Documents.html')">g3. 590 Loan Documents</a>
+    <a href="#" onclick="openForm('OfficeNotices.html')">g4. Office Notices</a>
   </div>
 
 </div>
@@ -237,5 +256,3 @@ function openForm(url) {
 
 </body>
 </html>
-
-
