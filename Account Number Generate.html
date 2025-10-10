@@ -41,7 +41,6 @@
     #copyBtn { background:green; color:white; margin-top:10px; display:none; }
     #successMsg { margin-top:10px; text-align:center; font-weight:bold; color:green; }
 
-    /* Security Modal */
     .overlay {
       position:fixed; inset:0; background:rgba(0,0,0,0.6);
       display:flex; justify-content:center; align-items:center;
@@ -132,11 +131,23 @@
           </div>
         </div>
 
-        <!-- Aadhaar -->
-        <div class="form-row single">
+        <!-- Aadhaar + Mobile -->
+        <div class="form-row">
           <div class="form-group">
             <label for="aadhaar">Aadhaar Number</label>
             <input type="text" id="aadhaar" name="aadhaar" pattern="\d{12}" maxlength="12" required>
+          </div>
+          <div class="form-group">
+            <label for="mobile">Mobile Number</label>
+            <input type="text" id="mobile" name="mobile" pattern="\d{10}" maxlength="10" required>
+          </div>
+        </div>
+
+        <!-- PIN Code -->
+        <div class="form-row single">
+          <div class="form-group">
+            <label for="pin">Pin Code</label>
+            <input type="text" id="pin" name="pin" pattern="\d{4}" maxlength="4" required>
           </div>
         </div>
 
@@ -150,7 +161,7 @@
 
   <script>
     const SECURITY_CODE = "R@dha9754"; 
-    const scriptURL = "https://script.google.com/macros/s/AKfycbw0XCTFcVHuwFFXUN7fK04NIECqC1FT_HPcFPTzaqpwHT16SHGAWeKEiTALZx5-dhoI/exec";
+    const scriptURL = "https://script.google.com/macros/s/AKfycbz0j6NOxvSnIvtb8BeNnHceKnQPdh-b-KKM9HOnNoVfsChNSNGyFF5UwEaFg2UngeR9/exec";
 
     const overlay=document.getElementById('securityOverlay');
     const secInput=document.getElementById('securityInput');
@@ -183,12 +194,7 @@
     }
 
     // पहले से generated account numbers
-    const usedAccounts = [
-      "SRC3578","SRC3668","SRC5249","SRC6858","SRC9697","SRC1740","SRC9504",
-      "SRC5923","SRC3524","SRC1226","SRC5675","SRC5374","SRC7336","SRC3016",
-      "SRC7370","SRC1088","SRC6329","SRC9443","SRC3662","SRC1561","SRC3563",
-      "SRC1259","SRC8541","SRC5129","SRC1715","SRC2033"
-    ];
+    const usedAccounts = [];
 
     // Unique account number generator
     function generateAccountNumber() {
@@ -210,11 +216,9 @@
 
     form.addEventListener('submit', e => {
       e.preventDefault();
-
       const submitBtn = document.getElementById('submitBtn');
       submitBtn.disabled = true;
       submitBtn.textContent = 'Submitting...';
-
       const formData = new FormData(form);
 
       fetch(scriptURL, { method: 'POST', body: formData })
@@ -251,4 +255,3 @@
   </script>
 </body>
 </html>
-
