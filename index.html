@@ -15,6 +15,7 @@ body {
   min-height: 100vh;
   background: #f0f2f5;
   color: #333;
+  overflow: hidden;
 }
 
 /* Header */
@@ -118,6 +119,63 @@ iframe {
   box-shadow: 0 4px 15px rgba(0,0,0,0.15);
 }
 
+/* Welcome screen */
+.welcome {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 82vh;
+  border-radius: 10px;
+  overflow: hidden;
+  animation: fadeIn 1.2s ease-in-out;
+}
+
+/* Animated gradient background */
+.welcome::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(135deg, #fff1f1, #ffeaea, #fff1f1, #ffeaea);
+  background-size: 400% 400%;
+  animation: moveGradient 6s infinite alternate ease-in-out;
+  z-index: 0;
+}
+@keyframes moveGradient {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(-25%, -25%); }
+}
+
+.welcome-box {
+  text-align: center;
+  z-index: 1;
+}
+.welcome-box i {
+  font-size: 80px;
+  color: #7b1113;
+  margin-bottom: 20px;
+}
+.welcome-box h2 {
+  font-size: 28px;
+  color: #444;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+.welcome-box h1 {
+  font-size: 46px;
+  color: #7b1113;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  margin-bottom: 10px;
+}
+.welcome-box p {
+  font-size: 20px;
+  color: #555;
+  letter-spacing: 0.5px;
+}
+
 /* Footer */
 footer {
   background: #7b1113;
@@ -218,8 +276,17 @@ footer {
 
 </div>
 
-<div class="content">
-  <iframe id="formFrame" src=""></iframe>
+<div class="content" id="mainContent">
+  <!-- Default welcome message -->
+  <div class="welcome" id="welcomeMessage">
+    <div class="welcome-box">
+      <i class="ri-bank-fill"></i>
+      <h2>Welcome to</h2>
+      <h1>Digital Portal — SRCCS</h1>
+      <p>Shree Radha Credit Co-operative Society Limited</p>
+    </div>
+  </div>
+  <iframe id="formFrame" src="" style="display:none;"></iframe>
 </div>
 
 <footer>
@@ -250,7 +317,10 @@ function toggleSubmenu(id) {
 }
 
 function openForm(url) {
-  document.getElementById('formFrame').src = url;
+  document.getElementById('welcomeMessage').style.display = 'none';
+  const frame = document.getElementById('formFrame');
+  frame.style.display = 'block';
+  frame.src = url;
 }
 </script>
 
