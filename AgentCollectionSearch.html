@@ -1,18 +1,20 @@
 <!DOCTYPE html>
+
 <html lang="hi">
 <head>
 <meta charset="UTF-8">
-<title>Ledger Dashboard</title>
+<title>Ledger Dashboard PDF Design</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 <style>
-body { font-family: Arial; margin: 20px; }
+body { font-family: "Noto Sans Devanagari", Mangal, Arial, sans-serif; margin: 20px; }
 input, button { padding: 8px; margin: 5px; }
 table { border-collapse: collapse; margin-top: 20px; width: 100%; }
 th, td { border: 1px solid #999; padding: 8px; text-align: left; }
 th { background: #f2f2f2; }
-h2 { margin-top: 40px; }
+h2 { margin-top: 40px; color: #b30000; }
 .error { color: red; }
-.success { color: green; }
+.success { color: green; font-weight: bold; }
 </style>
 </head>
 <body>
@@ -21,7 +23,7 @@ h2 { margin-top: 40px; }
 <label>Account Number: </label><input type="text" id="custAccount">
 <label>Password: </label><input type="password" id="custPass">
 <button onclick="searchCustomer()">Search</button>
-<button onclick="downloadCustomerPDF()">Download PDF</button>
+<button onclick="downloadCustomerPDFStyled()">Download PDF</button>
 <div id="custMessage"></div>
 <table id="custTable" style="display:none;">
 <thead>
@@ -35,7 +37,7 @@ h2 { margin-top: 40px; }
 <label>From: </label><input type="date" id="agentFrom">
 <label>To: </label><input type="date" id="agentTo">
 <button onclick="searchAgent()">Search</button>
-<button onclick="downloadAgentPDF()">Download PDF</button>
+<button onclick="downloadAgentPDFStyled()">Download PDF</button>
 <div id="agentMessage"></div>
 <table id="agentTable" style="display:none;">
 <thead>
@@ -45,122 +47,179 @@ h2 { margin-top: 40px; }
 </table>
 
 <script>
-const scriptURL = "https://script.google.com/macros/s/AKfycbyVhvnIOdsfxY0hCoMlUIGNWtjWx1tWRIXGCcQBCfy0xyhvsmFDLF8BoyOsHjBdQ7eC/exec"; // Apps Script Web App URL डालें
-
+const scriptURL = "https://script.google.com/macros/s/AKfycbyVhvnIOdsfxY0hCoMlUIGNWtjWx1tWRIXGCcQBCfy0xyhvsmFDLF8BoyOsHjBdQ7eC/exec";
 let custData = [];
 let agentData = [];
 
-// -------- Customer Search --------
 async function searchCustomer() {
   const acc = document.getElementById("custAccount").value.trim();
   const pass = document.getElementById("custPass").value.trim();
-
-  if(!acc || !pass){
-    alert("❌ Account Number और Password दोनों डालें।");
-    return;
-  }
-
+  if(!acc || !pass){ alert("❌ Account Number और Password दोनों डालें।"); return; }
   document.getElementById("custMessage").innerHTML = "⏳ Searching...";
   document.getElementById("custTable").style.display = "none";
-
   try {
     const url = `${scriptURL}?fn=getHistory&account=${encodeURIComponent(acc)}&pass=${encodeURIComponent(pass)}`;
     const res = await fetch(url);
     const result = await res.json();
-
-    if (result.success) {
+    if(result.success){
       custData = result.transactions;
       const tbody = document.querySelector("#custTable tbody");
       tbody.innerHTML = "";
-      result.transactions.forEach(r => {
-        tbody.innerHTML += `<tr>
-          <td>${r.date}</td>
-          <td>${r.type}</td>
-          <td>${r.amount}</td>
-          <td>${r.agent}</td>
-        </tr>`;
+      result.transactions.forEach(r=>{
+        tbody.innerHTML += `<tr><td>${r.date}</td><td>${r.type}</td><td>${r.amount}</td><td>${r.agent}</td></tr>`;
       });
-      document.getElementById("custTable").style.display = "table";
-      document.getElementById("custMessage").innerHTML = `<span class="success">✅ Balance: ${result.balance}</span>`;
+      document.getElementById("custTable").style.display="table";
+      document.getElementById("custMessage").innerHTML=`<span class="success">✅ Balance: ${result.balance}</span>`;
     } else {
-      document.getElementById("custMessage").innerHTML = `<span class="error">${result.message || "Invalid Account/Password"}</span>`;
+      document.getElementById("custMessage").innerHTML=`<span class="error">${result.message||"Invalid Account/Password"}</span>`;
     }
-  } catch (err) {
-    document.getElementById("custMessage").innerHTML = `<span class="error">❌ ${err}</span>`;
+  } catch(err){
+    document.getElementById("custMessage").innerHTML=`<span class="error">❌ ${err}</span>`;
   }
 }
 
-function downloadCustomerPDF() {
-  if (custData.length === 0) { alert("No customer data to export!"); return; }
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  doc.text("Customer Transactions", 10, 10);
-  let y = 20;
-  doc.text("Date | Type | Amount | Agent", 10, y);
-  y += 10;
-  custData.forEach(r => {
-    doc.text(`${r.date} | ${r.type} | ${r.amount} | ${r.agent}`, 10, y);
-    y += 7;
-    if (y > 280) { doc.addPage(); y = 10; }
-  });
-  doc.save("Customer_Transactions.pdf");
-}
-
-// -------- Agent Search --------
-async function searchAgent() {
+async function searchAgent(){
   const agent = document.getElementById("agentId").value.trim();
   const from = document.getElementById("agentFrom").value;
   const to = document.getElementById("agentTo").value;
-
-  if(!agent){
-    alert("❌ Agent ID डालें।");
-    return;
-  }
-
+  if(!agent){ alert("❌ Agent ID डालें।"); return; }
   document.getElementById("agentMessage").innerHTML = "⏳ Searching...";
   document.getElementById("agentTable").style.display = "none";
-
-  try {
+  try{
     const url = `${scriptURL}?fn=getAgentTransactions&agent=${encodeURIComponent(agent)}&from=${from}&to=${to}`;
     const res = await fetch(url);
     const result = await res.json();
-
-    if (result.success) {
+    if(result.success){
       agentData = result.transactions;
-      const tbody = document.querySelector("#agentTable tbody");
-      tbody.innerHTML = "";
-      result.transactions.forEach(r => {
-        tbody.innerHTML += `<tr>
-          <td>${r.date}</td>
-          <td>${r.account}</td>
-          <td>${r.type}</td>
-          <td>${r.amount}</td>
-        </tr>`;
+      const tbody=document.querySelector("#agentTable tbody");
+      tbody.innerHTML="";
+      let totalAmount=0;
+      result.transactions.forEach(r=>{
+        const amt=parseFloat(r.amount)||0;
+        totalAmount+=amt;
+        tbody.innerHTML+=`<tr><td>${r.date}</td><td>${r.account}</td><td>${r.type}</td><td>${amt.toFixed(2)}</td></tr>`;
       });
-      document.getElementById("agentTable").style.display = "table";
-      document.getElementById("agentMessage").innerHTML = `<span class="success">✅ ${result.transactions.length} transactions found</span>`;
-    } else {
-      document.getElementById("agentMessage").innerHTML = `<span class="error">${result.message || "No data found"}</span>`;
+      document.getElementById("agentTable").style.display="table";
+      document.getElementById("agentMessage").innerHTML=`<span class="success">✅ ${result.transactions.length} transactions — 💰 Total: ₹${totalAmount.toFixed(2)}</span>`;
+    } else{
+      document.getElementById("agentMessage").innerHTML=`<span class="error">${result.message||"No data found"}</span>`;
     }
-  } catch (err) {
-    document.getElementById("agentMessage").innerHTML = `<span class="error">❌ ${err}</span>`;
+  } catch(err){
+    document.getElementById("agentMessage").innerHTML=`<span class="error">❌ ${err}</span>`;
   }
 }
 
-function downloadAgentPDF() {
-  if (agentData.length === 0) { alert("No agent data to export!"); return; }
+// ================= Styled PDF functions =================
+function downloadCustomerPDFStyled() {
+  if(custData.length===0){ alert("No customer data!"); return; }
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  doc.text("Agent Transactions", 10, 10);
-  let y = 20;
-  doc.text("Date | Account | Type | Amount", 10, y);
-  y += 10;
-  agentData.forEach(r => {
-    doc.text(`${r.date} | ${r.account} | ${r.type} | ${r.amount}`, 10, y);
-    y += 7;
-    if (y > 280) { doc.addPage(); y = 10; }
+  const doc = new jsPDF({unit:'mm', format:'a4'});
+  
+  const redColor = [179,0,0];
+  const grayColor = [100,100,100];
+  
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(16);
+  doc.setTextColor(...redColor);
+  doc.text("Shree Radha Credit Co-operative Society Ltd., Gujri (Dhamnod)", 105, 15, {align:"center"});
+  
+  doc.setFontSize(11);
+  doc.setTextColor(0,0,0);
+  doc.setFont("helvetica","normal");
+  doc.text("Reg. No.: DR/DHR/151716 · Phone: +91 83700 22176; 8889137464", 105, 21, {align:"center"});
+  doc.text("In front of Chatrawas, Gram Panchayat Gujri — Dhamnod, Sub District Dharmapuri, District Dhar - 454552", 105, 26, {align:"center"});
+  
+  doc.setDrawColor(...redColor);
+  doc.setLineWidth(0.5);
+  doc.line(14, 28, 196, 28);
+  
+  doc.setFontSize(14);
+  doc.setFont("helvetica","bold");
+  doc.setTextColor(...redColor);
+  doc.text("Customer Transactions Report", 105, 35, {align:"center"});
+  
+  doc.setFontSize(11);
+  doc.setFont("helvetica","normal");
+  doc.setTextColor(0,0,0);
+  doc.text(`Account Number: ${document.getElementById("custAccount").value}`, 14, 42);
+  
+  doc.autoTable({
+    startY: 48,
+    head:[['Date','Type','Amount','Agent']],
+    body: custData.map(r=>[r.date,r.type,r.amount,r.agent]),
+    styles:{fontSize:10, cellPadding:2, font:"helvetica"},
+    headStyles:{fillColor:[245,245,245], textColor:[0,0,0], fontStyle:"bold"},
+    alternateRowStyles:{fillColor:[250,250,250]},
+    margin:{left:14, right:14},
+    didDrawPage: function(data){
+      const page=doc.getCurrentPageInfo().pageNumber;
+      doc.setFontSize(10);
+      doc.setTextColor(...grayColor);
+      doc.text(`Page ${page}`, data.settings.margin.left, 287);
+    }
   });
-  doc.save("Agent_Transactions.pdf");
+  
+  doc.save("Customer_Transactions_Styled.pdf");
+}
+
+function downloadAgentPDFStyled() {
+  if(agentData.length===0){ alert("No agent data!"); return; }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({unit:'mm', format:'a4'});
+
+  const redColor = [179,0,0];
+  const grayColor = [100,100,100];
+
+  doc.setFont("helvetica","bold");
+  doc.setFontSize(16);
+  doc.setTextColor(...redColor);
+  doc.text("Shree Radha Credit Co-operative Society Ltd., Gujri (Dhamnod)", 105, 15, {align:"center"});
+  
+  doc.setFontSize(11);
+  doc.setFont("helvetica","normal");
+  doc.setTextColor(0,0,0);
+  doc.text("Reg. No.: DR/DHR/151716 · Phone: +91 83700 22176; 8889137464", 105, 21, {align:"center"});
+  doc.text("In front of Chatrawas, Gram Panchayat Gujri — Dhamnod, Sub District Dharmapuri, District Dhar - 454552", 105, 26, {align:"center"});
+  
+  doc.setDrawColor(...redColor);
+  doc.setLineWidth(0.5);
+  doc.line(14, 28, 196, 28);
+
+  doc.setFontSize(14);
+  doc.setFont("helvetica","bold");
+  doc.setTextColor(...redColor);
+  doc.text("Agent Transactions Report", 105, 35, {align:"center"});
+
+  doc.setFontSize(11);
+  doc.setFont("helvetica","normal");
+  doc.setTextColor(0,0,0);
+  doc.text(`Agent ID: ${document.getElementById("agentId").value}`, 14, 42);
+  doc.text(`From: ${document.getElementById("agentFrom").value}  To: ${document.getElementById("agentTo").value}`, 14, 48);
+
+  const body = agentData.map(r=>[r.date,r.account,r.type,r.amount]);
+  doc.autoTable({
+    startY: 53,
+    head:[['Date','Account','Type','Amount']],
+    body: body,
+    styles:{fontSize:10, cellPadding:2, font:"helvetica"},
+    headStyles:{fillColor:[245,245,245], textColor:[0,0,0], fontStyle:"bold"},
+    alternateRowStyles:{fillColor:[250,250,250]},
+    margin:{left:14, right:14},
+    didDrawPage:function(data){
+      const page=doc.getCurrentPageInfo().pageNumber;
+      doc.setFontSize(10);
+      doc.setTextColor(...grayColor);
+      doc.text(`Page ${page}`, data.settings.margin.left, 287);
+    }
+  });
+
+  const total = agentData.reduce((sum,r)=>sum+(parseFloat(r.amount)||0),0);
+  doc.setFontSize(12);
+  doc.setFont("helvetica","bold");
+  doc.setTextColor(...redColor);
+  doc.text(`Total Amount: ₹${total.toFixed(2)}`, 14, doc.lastAutoTable.finalY + 10);
+
+  doc.save("Agent_Transactions_Styled.pdf");
 }
 </script>
 
