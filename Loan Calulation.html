@@ -43,7 +43,7 @@ th,td{padding:8px;border-bottom:1px solid #e6edf3;text-align:left}
 <input type="number" id="loan-amount" placeholder="उदा. 100000" />
 
 <label>Interest Rate (% per annum)</label>
-<input type="number" id="loan-rate" step="0.01" placeholder="उदा. 10" />
+<input type="number" id="loan-rate" step="0.01" placeholder="उदा. 18" />
 
 <label>Loan Tenure</label>
 <input type="number" id="loan-tenure" placeholder="उदा. 12" />
@@ -70,14 +70,11 @@ th,td{padding:8px;border-bottom:1px solid #e6edf3;text-align:left}
 
 <div class="results" id="loan-results" style="display:none"></div>
 
-<div style="margin-top:16px" class="small">
-Formula: EMI = [P * r * (1+r)^n] / [(1+r)^n - 1] <br>
-where r = interest rate per period, n = total periods.
-</div>
 </div>
 
 <script>
 document.getElementById('calc-loan').addEventListener('click', ()=>{
+
     const type = document.getElementById('loan-type').value;
     const P = parseFloat(document.getElementById('loan-amount').value || 0);
     const rYear = parseFloat(document.getElementById('loan-rate').value || 0);
@@ -86,56 +83,63 @@ document.getElementById('calc-loan').addEventListener('click', ()=>{
     const freq = document.getElementById('repayment-type').value;
 
     if(!(P>0 && rYear>0 && tenure>0)){
-        alert('कृपया सभी मान वैध रूप से भरें।'); return;
+        alert('कृपया सभी मान वैध रूप से भरें।'); 
+        return;
     }
 
-    // Tenure calculation
-    let totalMonths = tenureType === 'years' ? tenure*12 : tenure;
-    let years = totalMonths/12;
+    // Total Tenure (months)
+    let totalMonths = tenureType === 'years' ? tenure * 12 : tenure;
+    let years = totalMonths / 12;
 
-    // Repayment frequency calculation
-    let n, r;
-    if(freq==='monthly'){
-        n = totalMonths;
-        r = rYear/(12*100);
-    } else if(freq==='quarterly'){
-        n = Math.round(totalMonths/3);
-        r = rYear/(4*100);
-    } else if(freq==='half-yearly'){
-        n = Math.round(totalMonths/6);
-        r = rYear/(2*100);
-    } else {
-        n = years;
-        r = rYear/100;
-    }
+    // FIXED SIMPLE INTEREST
+    const totalInterest = (P * rYear) / 100;        // Example: 100000 * 18% = 18000
+    const totalPayment = P + totalInterest;         // Example: 118000
 
-    // EMI calculation
-    const EMI = (P*r*Math.pow(1+r,n)) / (Math.pow(1+r,n)-1);
-    const totalPayment = EMI * n;
-    const totalInterest = totalPayment - P;
-
-    // File Charge (5.99% example)
+    // File Charge (Auto 5.99%)
     const fileCharge = P * 0.0599;
     document.getElementById('file-charge').value = fileCharge.toFixed(2);
 
-    // Show Results
+    // EMI only monthly (fixed system)
+    let EMI;
+
+    if(freq === 'monthly'){
+        EMI = totalPayment / totalMonths;
+    } else if(freq === 'quarterly'){
+        EMI = totalPayment / Math.round(totalMonths/3);
+    } 
+    else if(freq === 'half-yearly'){
+        EMI = totalPayment / Math.round(totalMonths/6);
+    }
+    else {
+        EMI = totalPayment / years;
+    }
+
     const resultDiv = document.getElementById('loan-results');
     resultDiv.style.display = 'block';
+
     resultDiv.innerHTML = `
-        <h2>${type} Loan Result</h2>
+        <h2>${type} Loan Result (Fixed Interest)</h2>
+
         <strong>EMI: ₹ ${EMI.toFixed(2)} (${freq})</strong>
-        <div class="small">Total Payment: ₹ ${totalPayment.toFixed(2)} | Interest: ₹ ${totalInterest.toFixed(2)}</div>
+
+        <div class="small">
+            Total Payment: ₹ ${totalPayment.toFixed(2)} | 
+            Interest: ₹ ${totalInterest.toFixed(2)}
+        </div>
+
         <table>
             <tr><th>Loan Amount</th><td>₹ ${P.toFixed(2)}</td></tr>
             <tr><th>File Charge</th><td>₹ ${fileCharge.toFixed(2)}</td></tr>
-            <tr><th>Interest Rate</th><td>${rYear}% per annum</td></tr>
+            <tr><th>Interest Rate</th><td>${rYear}% (Fixed)</td></tr>
+            <tr><th>Total Interest</th><td>₹ ${totalInterest.toFixed(2)}</td></tr>
+            <tr><th>Total Payable</th><td><strong>₹ ${totalPayment.toFixed(2)}</strong></td></tr>
             <tr><th>Tenure</th><td>${totalMonths} months (${years.toFixed(2)} years)</td></tr>
             <tr><th>Frequency</th><td>${freq}</td></tr>
-            <tr><th>Total Payment</th><td>₹ ${totalPayment.toFixed(2)}</td></tr>
-            <tr><th>Total Interest</th><td>₹ ${totalInterest.toFixed(2)}</td></tr>
         </table>
     `;
+
 });
 </script>
+
 </body>
 </html>
