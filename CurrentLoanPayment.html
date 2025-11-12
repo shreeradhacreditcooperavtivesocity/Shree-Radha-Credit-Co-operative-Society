@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>SRCCS — Loan Dashboard (Online)</title>
+<style>
+  @page{ size:A4; margin:10mm; }
+  :root{
+    --ink:#111827; --muted:#6b7280; --line:#e5e7eb;
+    --head:#800000; --head2:#a64b4b; --paper:#fff; --accent:#0ea5a4;
+  }
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:#f5f7fb; color:var(--ink);
+    font-family:"Inter","Noto Sans Devanagari","Segoe UI",Arial,sans-serif;
+  }
+
+  /* Header removed */
+  .titlebar{ display:none; }
+
+  .wrap{ max-width:1200px; margin:18px auto; display:grid;
+    grid-template-columns:1fr; gap:16px; }
+
+  .card{
+    background:var(--paper); border:none; border-radius:10px;
+    box-shadow:0 3px 10px rgba(0,0,0,.04); padding:16px;
+  }
+  h2,h3{ color:var(--head); margin:0 0 10px; }
+  label{ font-size:13px; color:var(--muted); font-weight:700; display:block; margin-bottom:6px; }
+  input,select,textarea{
+    width:100%; padding:8px 10px; border:1px solid var(--line);
+    border-radius:8px; font-size:14px; background:#fff;
+  }
+
+  button{
+    background:var(--head); color:#fff; border:none; border-radius:8px;
+    padding:8px 12px; font-weight:700; cursor:pointer; transition:opacity .2s;
+  }
+  button:hover{ opacity:.9; }
+  button.secondary{ background:var(--accent); }
+  button.gray{ background:#6b7280; }
+
+  .muted{ color:var(--muted); font-size:13px; }
+
+  table{ width:100%; border-collapse:collapse; font-size:13px; }
+  th,td{ padding:8px 6px; border-bottom:none; text-align:left; }
+  th{ background:transparent; color:var(--head); position:sticky; top:0; z-index:5; }
+
+  .top-buttons{ display:flex; gap:10px; flex-wrap:wrap; }
+  .toggle-card{ display:none; }
+
+  .alert-box{ background:#fff3f3; border:none;
+    padding:10px; border-radius:8px; color:var(--head);
+    margin-bottom:10px; font-weight:600; cursor:pointer;
+  }
+
+  .modal{ display:none; position:fixed; inset:0; background:rgba(0,0,0,.55);
+    justify-content:center; align-items:center; z-index:9999;
+  }
+  .modal-content{
+    background:#fff; padding:20px; border-radius:10px;
+    max-width:850px; width:95%; max-height:85%; overflow:auto;
+    position:relative; box-shadow:0 8px 30px rgba(0,0,0,.3);
+  }
+  .modal-close{ position:absolute; top:10px; right:14px;
+    font-size:20px; font-weight:700; cursor:pointer; color:var(--head);
+  }
+
+  /* Security Overlay */
+  .overlay{ position:fixed; inset:0; background:rgba(0,0,0,.55);
+    display:flex; align-items:center; justify-content:center; z-index:10000; }
+  .modal-auth{
+    background:#fff; padding:20px; border-radius:10px; width:320px;
+    text-align:center; box-shadow:0 8px 30px rgba(0,0,0,.3);
+  }
+  .modal-auth h3{ color:var(--head); margin:0 0 8px; }
+  #secMsg{ margin-top:8px; color:#c62828; font-weight:700; }
+
+  @media(max-width:900px){ .top-buttons{ flex-direction:column; } }
+</style>
+</head>
+<body>
+
+<!-- 🔐 Security -->
+<div id="securityOverlay" class="overlay">
+  <div class="modal-auth">
+    <h3>🔐 Security Code</h3>
+    <p class="muted">Loan Dashboard खोलने के लिए कोड दर्ज करें</p>
+    <input id="securityInput" type="password" placeholder="Security Code"
+      style="width:100%;padding:8px;border-radius:6px;border:1.4px solid #ddd;">
+    <div style="margin-top:10px;"><button id="verifyBtn">Verify</button></div>
+    <div id="secMsg"></div>
+  </div>
+</div>
+
+<!-- Main UI -->
+<div id="mainUI" style="display:none;">
+
+  <!-- Titlebar Removed -->
+
+  <main class="wrap">
+    <div id="alertArea"></div>
+
+    <div id="loanSummary" class="card">
+      <h3>📊 Loan Summary</h3>
+      <div style="display:flex;gap:20px;flex-wrap:wrap">
+        <div><b>Total Loans:</b> <span id="totalLoans">0</span></div>
+        <div><b>Active Loans:</b> <span id="activeLoans">0</span></div>
+        <div><b>Total Principal:</b> <span id="totalPrincipal">₹0</span></div>
+        <div><b>Total Paid EMI:</b> <span id="totalPaid">₹0</span></div>
+        <div><b>Total Outstanding:</b> <span id="totalOutstanding">₹0</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="top-buttons">
+        <button onclick="toggleForm('loanFormCard')">➕ नया लोन</button>
+        <button onclick="toggleForm('emiFormCard')" class="secondary">💰 EMI Payment</button>
+        <button onclick="toggleForm('penaltyFormCard')" class="gray">⚠️ Penalty Entry</button>
+      </div>
+    </div>
+
+    <div id="loanFormCard" class="card toggle-card">
+      <h3>नया लोन दर्ज करें</h3>
+      <form id="loanForm" onsubmit="return false">
+        <label>Loan ID</label><input id="loanId" required>
+        <label>नाम</label><input id="name" required>
+        <label>खाता नंबर</label><input id="account" required>
+        <label>लोन राशि (₹)</label><input id="principal" type="number" min="0" required>
+        <label>सालाना ब्याज दर (%)</label><input id="rate" type="number" value="12">
+        <label>अवधि (महीनों में)</label><input id="tenure" type="number" value="12">
+        <div style="display:flex;gap:10px;margin-top:10px;">
+          <button id="calcBtn" type="button">📈 EMI Calculate</button>
+          <button id="addLoan" type="button" class="secondary">💾 Save Loan</button>
+        </div>
+        <div class="muted" style="margin-top:8px;">Calculated EMI</div>
+        <div id="emiResult" style="font-weight:700;font-size:16px;">—</div>
+      </form>
+    </div>
+
+    <div id="emiFormCard" class="card toggle-card">
+      <h3>💳 EMI Payment</h3>
+      <form id="emiForm" onsubmit="return false">
+        <label>Loan ID</label><input id="emiLoanId" required>
+        <label>Paid EMI (₹)</label><input id="emiAmount" type="number" min="0" required>
+        <label>Payment Date</label><input id="emiDate" type="date" required>
+        <button id="payEmi" type="button">✅ Submit EMI</button>
+      </form>
+    </div>
+
+    <div id="penaltyFormCard" class="card toggle-card">
+      <h3>⚠️ Penalty Entry</h3>
+      <form id="penaltyForm" onsubmit="return false">
+        <label>Loan ID</label><input id="penaltyLoanId" required>
+        <label>Penalty (₹)</label><input id="penaltyAmount" type="number" min="0" required>
+        <label>Payment Date</label><input id="penaltyDate" type="date" required>
+        <button id="addPenalty" type="button">➕ Add Penalty</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <h3 style="margin:0;">Loan Register & List</h3>
+        <input id="search" placeholder="खोज: नाम / खाता / Loan ID"
+          style="width:250px;padding:8px;border-radius:8px;border:1px solid var(--line)">
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Loan ID</th><th>Name</th><th>Account</th><th>Principal</th>
+            <th>Rate%</th><th>Tenure</th><th>EMI</th><th>Paid</th>
+            <th>Penalty</th><th>Outstanding</th><th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="loansTbody"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <div id="historyModal" class="modal">
+    <div class="modal-content print-area">
+      <span class="modal-close" onclick="closeModal()">×</span>
+      <h3>📋 EMI History & Schedule</h3>
+      <div><b>Loan ID:</b> <span id="modalLoanId"></span> · <b>Name:</b> <span id="modalName"></span></div>
+      <table id="historyTable" style="width:100%;border-collapse:collapse;margin-top:10px;">
+        <thead>
+          <tr>
+            <th>Month</th><th>Due Date</th><th>EMI (₹)</th>
+            <th>Paid (₹)</th><th>Penalty (₹)</th><th>Outstanding (₹)</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div style="text-align:center;padding:10px;color:var(--muted);font-size:12px;">
+    © SRCCS — Loan Management Panel · Powered by Google Sheets
+  </div>
+</div>
+
+<script>
+const SECURITY_CODE = "R@dha9754";
+const WEB_APP_URL="https://script.google.com/macros/s/AKfycbyh7hCU6r6B36nxusfYri9cENVmPqv_lnyIGv-5pwK33bJE_CPcAZXpH1YcLCHdugm7dg/exec";
+
+const overlay=document.getElementById('securityOverlay');
+const mainUI=document.getElementById('mainUI');
+const verifyBtn=document.getElementById('verifyBtn');
+const secInput=document.getElementById('securityInput');
+const secMsg=document.getElementById('secMsg');
+
+verifyBtn.onclick=()=>{
+  if(secInput.value===SECURITY_CODE){
+    overlay.style.display='none';
+    mainUI.style.display='block';
+    fetchLoans();
+  } else {
+    secMsg.textContent="❌ गलत कोड!";
+  }
+};
+
+let loans=[];
+function toggleForm(id){
+  document.querySelectorAll('.toggle-card').forEach(c=>c.style.display='none');
+  const el=document.getElementById(id); el.style.display='block';
+}
+function rupee(x){return '₹'+Number(x||0).toLocaleString('en-IN')}
+function calcEMI(P,r,n){P=+P;r=+r/1200;n=+n;return r?P*r*(Math.pow(1+r,n)/(Math.pow(1+r,n)-1)):P/n;}
+
+async function fetchLoans(){
+  try{
+    const res=await fetch(WEB_APP_URL+'?action=getLoans');
+    const data=await res.json();
+    loans=data.map(l=>({...l,"EMI History":l["EMI History"]||'[]'}));
+    refreshList();
+  }catch(e){console.error(e);}
+}
+
+function refreshList(filter=''){
+  const tb=document.getElementById('loansTbody'); tb.innerHTML='';
+  const q=filter.trim().toLowerCase();
+  let totalLoans=0,active=0,TP=0,TPaid=0,TOut=0;
+  loans.forEach((l,i)=>{
+    const text=[l["Loan ID"],l["Name"],l["Account"]].join(' ').toLowerCase();
+    if(q && !text.includes(q)) return;
+    totalLoans++; TP+=+l.Principal; TPaid+=+l["Paid EMI"]; TOut+=+l["Outstanding"];
+    if(+l["Outstanding"]>0) active++;
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${l["Loan ID"]}</td><td>${l["Name"]}</td><td>${l["Account"]}</td>
+    <td>${rupee(l["Principal"])}</td><td>${l["Rate"]}</td><td>${l["Tenure"]}</td>
+    <td>${rupee(l["EMI"])}</td><td>${rupee(l["Paid EMI"])}</td>
+    <td>${rupee(l["Penalty"])}</td><td>${rupee(l["Outstanding"])}</td>
+    <td><button class="view" data-idx="${i}">View</button></td>`;
+    tb.appendChild(tr);
+  });
+  document.getElementById('totalLoans').textContent=totalLoans;
+  document.getElementById('activeLoans').textContent=active;
+  document.getElementById('totalPrincipal').textContent=rupee(TP);
+  document.getElementById('totalPaid').textContent=rupee(TPaid);
+  document.getElementById('totalOutstanding').textContent=rupee(TOut);
+}
+
+document.getElementById('loansTbody').addEventListener('click',e=>{
+  if(!e.target.classList.contains('view')) return;
+  openEMIModal(loans[e.target.dataset.idx]);
+});
+function openEMIModal(l){
+  document.getElementById('modalLoanId').textContent=l["Loan ID"];
+  document.getElementById('modalName').textContent=l["Name"];
+  const tb=document.querySelector("#historyTable tbody");
+  tb.innerHTML='';
+  const start=new Date(l.StartDate);
+  const hist=JSON.parse(l["EMI History"]||'[]');
+  let out=l.Principal;
+  for(let i=0;i<l.Tenure;i++){
+    const due=new Date(start); due.setMonth(start.getMonth()+i);
+    const paid=hist.filter(h=>h.type==="emi"&&new Date(h.date).getMonth()===due.getMonth()).reduce((a,h)=>a+h.amount,0);
+    const pen=hist.filter(h=>h.type==="penalty"&&new Date(h.date).getMonth()===due.getMonth()).reduce((a,h)=>a+h.amount,0);
+    out=out-paid+pen;
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${i+1}</td><td>${due.toISOString().split('T')[0]}</td>
+    <td>${rupee(l.EMI)}</td><td>${rupee(paid)}</td>
+    <td>${rupee(pen)}</td><td>${rupee(out>0?out.toFixed(0):0)}</td>`;
+    tb.appendChild(tr);
+  }
+  document.getElementById('historyModal').style.display='flex';
+}
+function closeModal(){document.getElementById('historyModal').style.display='none';}
+
+document.getElementById('search').addEventListener('input',e=>refreshList(e.target.value));
+
+document.getElementById('calcBtn').onclick=()=>{
+  const P=document.getElementById('principal').value;
+  const r=document.getElementById('rate').value;
+  const n=document.getElementById('tenure').value;
+  const emi=calcEMI(P,r,n);
+  document.getElementById('emiResult').textContent=emi?rupee(emi.toFixed(0)):'—';
+};
+
+document.getElementById('addLoan').onclick=async()=>{
+  const loanId=loanId.value.trim(),name=name.value.trim(),account=account.value.trim();
+  const principal=+principal.value||0,rate=+rate.value||0,tenure=+tenure.value||0;
+  if(!loanId||!name||!account||principal<=0){alert("Loan ID, Name, Account, Principal आवश्यक हैं");return;}
+  const emi=calcEMI(principal,rate,tenure).toFixed(0);
+  const startDate=new Date().toISOString().split('T')[0];
+  await fetch(WEB_APP_URL,{method:"POST",body:JSON.stringify({action:"addLoan",loanId,name,account,principal,rate,tenure,emi,startDate})});
+  alert("✅ Loan Saved"); fetchLoans();
+  document.getElementById('loanForm').reset(); document.getElementById('emiResult').textContent='—';
+};
+
+document.getElementById('payEmi').onclick=async()=>{
+  const id=document.getElementById('emiLoanId').value.trim();
+  const amt=+document.getElementById('emiAmount').value||0;
+  const dt=document.getElementById('emiDate').value;
+  if(!id||amt<=0){alert("Valid Loan ID & Amount required");return;}
+  await fetch(WEB_APP_URL,{method:"POST",body:JSON.stringify({action:"payEmi",loanId:id,amount:amt,date:dt})});
+  alert("EMI Updated"); fetchLoans();
+};
+
+document.getElementById('addPenalty').onclick=async()=>{
+  const id=document.getElementById('penaltyLoanId').value.trim();
+  const amt=+document.getElementById('penaltyAmount').value||0;
+  const dt=document.getElementById('penaltyDate').value;
+  if(!id||amt<=0){alert("Valid Loan ID & Penalty required");return;}
+  await fetch(WEB_APP_URL,{method:"POST",body:JSON.stringify({action:"addPenalty",loanId:id,amount:amt,date:dt})});
+  alert("Penalty Added"); fetchLoans();
+};
+</script>
+</body>
+</html>

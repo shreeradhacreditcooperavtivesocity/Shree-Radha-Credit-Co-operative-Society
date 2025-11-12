@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>SRCCS — Customer, Agent & Account Manager</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+<style>
+  @page{ size:A4; margin:10mm; }
+  :root{
+    --ink:#111827; --muted:#6b7280; --line:#e5e7eb;
+    --head:#800000; --head2:#a64b4b; --accent:#0ea5a4; --paper:#fff;
+  }
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:#f5f7fb; color:var(--ink);
+    font-family:"Inter","Noto Sans Devanagari","Segoe UI",Arial,sans-serif; }
+
+  /* 🔹 (Titlebar Removed) */
+  .titlebar{ display:none; }
+
+  /* layout for both sections */
+  .section{
+    max-width:1200px; margin:20px auto; display:grid;
+    grid-template-columns:1fr 1fr; gap:16px; align-items:start;
+  }
+  @media(max-width:900px){ .section{ grid-template-columns:1fr; } }
+
+  .card{
+    background:var(--paper); border:none; border-radius:10px;
+    box-shadow:0 3px 10px rgba(0,0,0,.05); padding:16px;
+  }
+  h2{ color:var(--head); font-size:17px; margin:0 0 10px 0; }
+  label{ font-size:13px; color:var(--muted); font-weight:700; display:block; margin-bottom:4px; }
+  input, button, select{
+    padding:8px 10px; border:1px solid var(--line); border-radius:8px; font-size:14px;
+  }
+  input{ width:100%; }
+  .row{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
+  .col{ flex:1; }
+
+  button{ background:var(--head); color:#fff; border:none;
+    border-radius:8px; font-weight:700; cursor:pointer; transition:opacity .2s; }
+  button:hover{ opacity:.9; }
+  button.secondary{ background:var(--accent); }
+
+  .msg{ font-size:13px; margin:8px 0; }
+  .error{ color:#c62828; }
+  .success{ color:#2e7d32; font-weight:700; }
+
+  table{ width:100%; border-collapse:collapse; font-size:13px; margin-top:10px; }
+  th,td{ padding:8px 6px; border-bottom:none; text-align:left; }
+  th{ background:#f3f4f6; color:var(--head); position:sticky; top:0; z-index:5; }
+
+  .footer{ text-align:center; padding:10px; color:var(--muted); font-size:12px; margin-top:20px; border-top:none; }
+
+  .section-account{
+    max-width:1200px; margin:30px auto; display:grid;
+    grid-template-columns:1fr 420px; gap:16px; align-items:start;
+  }
+  @media(max-width:900px){ .section-account{ grid-template-columns:1fr; } }
+
+  .norec{ padding:12px; color:var(--muted); text-align:center; font-style:italic; }
+  .controls{ display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap; align-items:center; }
+  .search{ flex:1; min-width:220px; }
+</style>
+</head>
+<body>
+
+<!-- 🔹 HEADER BAR Removed -->
+
+<!-- 🔹 TOP SECTION — Customer & Agent Search -->
+<div class="section">
+  <div class="card">
+    <h2>🔍 Customer Search</h2>
+    <div class="row">
+      <div class="col"><label>Account Number</label><input id="custAccount"></div>
+      <div class="col"><label>Password</label><input type="password" id="custPass"></div>
+    </div>
+    <div class="row">
+      <button onclick="searchCustomer()">🔎 Search</button>
+      <button class="secondary" onclick="downloadCustomerPDFStyled()">⬇️ PDF</button>
+    </div>
+    <div id="custMessage" class="msg"></div>
+    <div style="max-height:350px;overflow:auto;">
+      <table id="custTable" style="display:none;">
+        <thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Agent</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🧾 Agent Transaction Search</h2>
+    <div class="row">
+      <div class="col"><label>Agent ID</label><input id="agentId"></div>
+      <div class="col"><label>From Date</label><input type="date" id="agentFrom"></div>
+      <div class="col"><label>To Date</label><input type="date" id="agentTo"></div>
+    </div>
+    <div class="row">
+      <button onclick="searchAgent()">🔎 Search</button>
+      <button class="secondary" onclick="downloadAgentPDFStyled()">⬇️ PDF</button>
+    </div>
+    <div id="agentMessage" class="msg"></div>
+    <div style="max-height:350px;overflow:auto;">
+      <table id="agentTable" style="display:none;">
+        <thead><tr><th>Date</th><th>Account</th><th>Type</th><th>Amount</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- 🔹 SECOND SECTION — ACCOUNT MANAGER -->
+<div class="section-account">
+  <div class="card">
+    <h2>Account Opening Form</h2>
+    <form id="accountForm">
+      <div class="row">
+        <div class="col">
+          <label>Account Number</label><input id="accountNumber" readonly />
+        </div>
+        <div class="col">
+          <label>Prefix</label>
+          <select id="prefix"><option value="">Select</option><option>Mr.</option><option>Mrs.</option></select>
+        </div>
+      </div>
+
+      <div class="row"><div class="col"><label>Full Name</label><input id="name" required /></div></div>
+
+      <div class="row">
+        <div class="col"><label>Aadhaar</label><input id="aadhaar" maxlength="12" required /></div>
+        <div class="col"><label>Mobile</label><input id="mobile" maxlength="10" required /></div>
+      </div>
+
+      <div class="row">
+        <div class="col"><label>Pin Code</label><input id="pin" maxlength="6" /></div>
+        <div class="col" style="align-self:end;"><button type="submit">💾 Submit</button></div>
+      </div>
+
+      <div id="formMsg" class="muted"></div>
+    </form>
+    <hr style="margin:16px 0;">
+    <h2>Search / Export</h2>
+    <div class="controls">
+      <input id="searchBox" class="search" placeholder="Search by Name / Account / Mobile / Aadhaar / Pin..." />
+      <button id="filterBtn">🔍 Search</button>
+      <button id="exportCsv" class="secondary">⬇️ Export CSV</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Accounts List</h2>
+    <div style="max-height:600px; overflow:auto;">
+      <table id="accountsTable">
+        <thead>
+          <tr><th>Acc #</th><th>Name</th><th>Mobile</th><th>Aadhaar</th><th>Pin</th><th>Date</th></tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <div id="noRecords" class="norec">No records found.</div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  © SRCCS — Data Linked with Google Sheets · Powered by Shree Radha Credit Co-op Society
+</div>
+
+<script>
+const scriptURL_CustAgent = "https://script.google.com/macros/s/AKfycbyVhvnIOdsfxY0hCoMlUIGNWtjWx1tWRIXGCcQBCfy0xyhvsmFDLF8BoyOsHjBdQ7eC/exec";
+const scriptURL_Account = "https://script.google.com/macros/s/AKfycbzMdOaMCR-D9yyoHJSKJBJ7fN-2_XUQS200KEHy9QxFyjxE3oPx2SnMGSIujSarcVSM/exec";
+
+let custData=[], agentData=[];
+
+/* Search functions same as before */
+async function searchCustomer(){
+  const acc=document.getElementById("custAccount").value.trim();
+  const pass=document.getElementById("custPass").value.trim();
+  const msg=document.getElementById("custMessage");
+  if(!acc||!pass){ alert("❌ Account Number और Password दोनों डालें।"); return; }
+  msg.innerHTML="⏳ Searching...";
+  document.getElementById("custTable").style.display="none";
+  try{
+    const res=await fetch(`${scriptURL_CustAgent}?fn=getHistory&account=${acc}&pass=${pass}`);
+    const data=await res.json();
+    if(data.success){
+      custData=data.transactions;
+      const tbody=document.querySelector("#custTable tbody");
+      tbody.innerHTML="";
+      data.transactions.forEach(r=>{
+        tbody.innerHTML+=`<tr><td>${r.date}</td><td>${r.type}</td><td>${r.amount}</td><td>${r.agent}</td></tr>`;
+      });
+      document.getElementById("custTable").style.display="table";
+      msg.innerHTML=`<span class="success">✅ Balance: ₹${data.balance}</span>`;
+    } else msg.innerHTML=`<span class="error">${data.message||"Invalid Account/Password"}</span>`;
+  }catch(e){ msg.innerHTML=`<span class="error">❌ ${e}</span>`; }
+}
+
+async function searchAgent(){
+  const id=document.getElementById("agentId").value.trim();
+  const from=document.getElementById("agentFrom").value;
+  const to=document.getElementById("agentTo").value;
+  const msg=document.getElementById("agentMessage");
+  if(!id){ alert("❌ Agent ID डालें।"); return; }
+  msg.innerHTML="⏳ Searching...";
+  document.getElementById("agentTable").style.display="none";
+  try{
+    const res=await fetch(`${scriptURL_CustAgent}?fn=getAgentTransactions&agent=${id}&from=${from}&to=${to}`);
+    const data=await res.json();
+    if(data.success){
+      agentData=data.transactions;
+      const tbody=document.querySelector("#agentTable tbody");
+      tbody.innerHTML="";
+      let total=0;
+      data.transactions.forEach(r=>{
+        const amt=parseFloat(r.amount)||0; total+=amt;
+        tbody.innerHTML+=`<tr><td>${r.date}</td><td>${r.account}</td><td>${r.type}</td><td>${amt.toFixed(2)}</td></tr>`;
+      });
+      document.getElementById("agentTable").style.display="table";
+      msg.innerHTML=`<span class="success">✅ ${data.transactions.length} records — 💰 Total ₹${total.toFixed(2)}</span>`;
+    } else msg.innerHTML=`<span class="error">${data.message||"No records found"}</span>`;
+  }catch(e){ msg.innerHTML=`<span class="error">❌ ${e}</span>`; }
+}
+
+/* Account Form Functions same as before */
+const accountNumber=document.getElementById('accountNumber');
+const tbody=document.getElementById('tbody');
+const msg=document.getElementById('formMsg');
+const form=document.getElementById('accountForm');
+const searchBox=document.getElementById('searchBox');
+
+function genAcc(){ accountNumber.value="SRC"+Math.floor(1000+Math.random()*9000); }
+genAcc();
+
+form.onsubmit=async e=>{
+  e.preventDefault();
+  const rec={ accountNumber:accountNumber.value, prefix:document.getElementById('prefix').value,
+    name:document.getElementById('name').value, aadhaar:document.getElementById('aadhaar').value,
+    mobile:document.getElementById('mobile').value, pin:document.getElementById('pin').value };
+  msg.textContent="⏳ Saving...";
+  const fd=new FormData(); for(let k in rec) fd.append(k,rec[k]);
+  try{
+    const res=await fetch(scriptURL_Account,{method:'POST',body:fd});
+    const js=await res.json();
+    msg.textContent=js.message;
+    msg.style.color=js.status==='success'?'#2e7d32':'#c62828';
+    if(js.status==='success'){ form.reset(); genAcc(); loadAll(); }
+  }catch(err){ msg.textContent="⚠️ Server error."; msg.style.color='#c62828'; }
+};
+
+async function loadAll(q=""){
+  tbody.innerHTML="";
+  const res=await fetch(scriptURL_Account+"?action=fetchAll");
+  const js=await res.json();
+  let arr=js.records||[];
+  if(q) arr=arr.filter(r=>(r.name+r.accountNumber+r.mobile+r.aadhaar+r.pin).toLowerCase().includes(q.toLowerCase()));
+  if(arr.length===0){ document.getElementById('noRecords').style.display='block'; return; }
+  document.getElementById('noRecords').style.display='none';
+  arr.forEach(r=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${r.accountNumber}</td><td>${r.name}</td><td>${r.mobile}</td><td>${r.aadhaar}</td><td>${r.pin||''}</td><td>${r.timestamp?r.timestamp.split('T')[0]:''}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+loadAll();
+
+document.getElementById('filterBtn').onclick=()=>loadAll(searchBox.value);
+document.getElementById('exportCsv').onclick=async()=>{
+  const res=await fetch(scriptURL_Account+"?action=exportCsv");
+  const csv=await res.text();
+  const blob=new Blob([csv],{type:"text/csv"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download="SRCCS_Accounts.csv"; a.click();
+};
+</script>
+</body>
+</html>

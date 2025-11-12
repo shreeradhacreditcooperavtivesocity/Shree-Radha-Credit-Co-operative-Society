@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bill / Agent Report — Shree Radha</title>
+  <style>
+    :root{ --brand:#063970; --accent1:#0ea5a4; --accent2:#0284c7; --muted:#6b7280; --paper:#fff; }
+    body{font-family: 'Noto Sans Devanagari', 'Poppins', Arial, sans-serif; background:#f3f4f6; padding:20px; color:#0f172a}
+    .container{max-width:980px; margin:0 auto}
+    .card{background:var(--paper); padding:18px; border-radius:10px; box-shadow:0 6px 18px rgba(2,6,23,0.06)}
+
+    h1{margin:0 0 8px 0; color:var(--brand)}
+    label{font-size:13px; color:#374151; margin-bottom:6px; display:block}
+    input[type=text], input[type=number], select, textarea{padding:8px 10px; border-radius:8px; border:1px solid #e6e7ea; width:100%; box-sizing:border-box}
+    .row{display:flex; gap:12px}
+    .col{flex:1}
+    .small{width:120px}
+    .actions{display:flex; gap:8px; margin-top:10px}
+    button{background:var(--brand); color:#fff; border:0; padding:10px 12px; border-radius:8px; cursor:pointer}
+    button.ghost{background:transparent; color:var(--brand); border:1px solid rgba(2,6,23,0.06)}
+
+    /* form layout */
+    .form-grid{display:grid; grid-template-columns:1fr 360px; gap:16px}
+    .panel{background:#fff; padding:12px; border-radius:8px; border:1px solid rgba(2,6,23,0.04)}
+
+    table{width:100%; border-collapse:collapse}
+    th, td{padding:8px 10px; text-align:left; border-bottom:1px solid #eef2f7}
+    th{background:#fbfbfb; font-weight:700}
+    td.right{text-align:right}
+
+    .totals{margin-top:12px}
+    .totals .line{display:flex; justify-content:space-between; padding:6px 0}
+    .muted{color:var(--muted)}
+
+    /* Invoice / Print styling (hidden on screen) */
+    .invoice{display:none}
+    @media print{
+      body{background:#fff; padding:0}
+      .form-view{display:none}
+      .invoice{display:block}
+    }
+
+    /* Digital invoice look (based on provided example) */
+    .inv-wrap{max-width:820px; margin:0 auto;}
+    .inv-card{background:linear-gradient(180deg,#ffffffcc 0%, #f8fafb 100%); border-radius:14px; overflow:hidden; border:1px solid rgba(2,6,23,0.06); box-shadow:0 8px 30px rgba(8,15,52,0.06)}
+    .inv-head{display:flex; justify-content:space-between; align-items:center; gap:16px; padding:20px 28px; background:linear-gradient(90deg,var(--accent1),var(--accent2)); color:#fff}
+    .brand{display:flex; gap:14px; align-items:center}
+    .logo{width:64px; height:64px; border-radius:10px; background:rgba(255,255,255,0.15); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:18px}
+    .brand h1{margin:0; font-size:18px}
+    .brand p{margin:0; font-size:12px; opacity:0.95}
+    .meta{text-align:right}
+    .inv-body{padding:20px 28px}
+    .grid{display:flex; gap:18px; flex-wrap:wrap}
+    .box{background:#fff; border-radius:10px; padding:14px; flex:1 1 240px; border:1px solid rgba(2,6,23,0.04)}
+    .box h3{margin:0 0 8px 0; font-size:13px}
+    .tx-table{width:100%; border-collapse:collapse; margin-top:18px; background:#fff; border-radius:8px; overflow:hidden; border:1px solid rgba(2,6,23,0.05)}
+    .tx-table th, .tx-table td{padding:12px 14px; font-size:14px; border-bottom:1px solid rgba(2,6,23,0.04)}
+    .totals-summary{display:flex; justify-content:flex-end; margin-top:18px}
+    .summary{background:linear-gradient(180deg,#ffffff,#fbfbff); padding:14px 18px; border-radius:10px; border:1px solid rgba(2,6,23,0.05); min-width:260px}
+    .summary .row{display:flex; justify-content:space-between; margin-bottom:8px}
+    .summary .row.total{font-weight:800; font-size:16px; color:var(--brand)}
+    .inv-foot{display:flex; justify-content:space-between; align-items:center; padding:20px 28px}
+    .sigbox{width:220px; height:64px; border-top:2px dashed rgba(2,6,23,0.08); margin-top:6px; text-align:center; padding-top:8px; font-size:12px; color:rgba(2,6,23,0.7)}
+
+    /* responsive */
+    @media (max-width:900px){ .form-grid{grid-template-columns:1fr} }
+  </style>
+</head>
+<body>
+  <div class="container form-view">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:8px">
+        <h1>बिल / एजेंट रिपोर्ट जेनरेटर</h1>
+        <div style="display:flex; gap:8px; align-items:center">
+          <label style="margin:0">रिपोर्ट प्रकार:</label>
+          <select id="reportType" onchange="onReportTypeChange()">
+            <option value="bill">Bill Report</option>
+            <option value="agent">Agent Report</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div>
+          <div class="panel">
+            <div class="row" style="margin-bottom:8px">
+              <div class="col">
+                <label>बिल नंबर / रिपोर्ट ID</label>
+                <input type="text" id="invoiceNo" value="INV-" />
+              </div>
+              <div class="col small">
+                <label>तारीख</label>
+                <input type="text" id="date" />
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col">
+                <label>ग्राहक / एजेंट का नाम</label>
+                <input type="text" id="customerName" placeholder="नाम" />
+              </div>
+              <div class="col">
+                <label>खाता / पता / मोबाइल</label>
+                <input type="text" id="customerAddr" placeholder="पता / मोबाइल" />
+              </div>
+            </div>
+
+            <div style="display:flex; gap:12px; margin-top:8px">
+              <div style="flex:1">
+                <label>लोगो अपलोड</label>
+                <input type="file" id="logoInput" accept="image/*" />
+              </div>
+              <div style="width:140px">
+                <label>GST दर (%)</label>
+                <input type="number" id="gstRate" value="0" min="0" />
+              </div>
+            </div>
+
+            <div style="margin-top:10px">
+              <label>नोट / विवरण</label>
+              <textarea id="note" rows="2" placeholder="यदि कोई विशेष निर्देश हों"></textarea>
+            </div>
+
+            <div style="margin-top:12px">
+              <table id="itemsTable">
+                <thead>
+                  <tr><th style="width:6%">#</th><th>विवरण</th><th style="width:12%">मात्रा</th><th style="width:18%">रेट (₹)</th><th style="width:18%">रकम (₹)</th><th style="width:10%">हटाएँ</th></tr>
+                </thead>
+                <tbody id="itemsBody"></tbody>
+              </table>
+
+              <div class="actions" style="margin-top:8px">
+                <button type="button" onclick="addRow()">नया आइटम जोड़ें</button>
+                <button type="button" class="ghost" onclick="resetForm()">रीसेट</button>
+                <button type="button" onclick="generateInvoicePreview()">Preview / Print</button>
+                <button type="button" class="ghost" onclick="exportJSON()">Download JSON</button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="panel">
+            <h3 style="margin-top:0">Summary</h3>
+            <div class="totals">
+              <div class="line"><div class="muted">सब-टोटल</div><div id="subTotal">₹0.00</div></div>
+              <div class="line"><div class="muted">GST (<span id="gstPercent">0</span>%)</div><div id="gstAmount">₹0.00</div></div>
+              <div class="line"><div class="muted">छूट</div><div><input id="discount" type="number" value="0" min="0" style="width:120px" oninput="updateTotals()"/></div></div>
+              <div id="agentSection" style="display:none; margin-top:8px">
+                <div class="line"><div class="muted">कमीशन (%)</div><div><input id="commissionRate" type="number" value="2" min="0" style="width:120px" oninput="updateTotals()"/></div></div>
+                <div class="line"><div class="muted">कमीशन राशि</div><div id="commissionAmount">₹0.00</div></div>
+              </div>
+              <div class="line" style="font-weight:700; border-top:1px solid #eef2f7; padding-top:8px"><div>कुल</div><div id="grandTotal">₹0.00</div></div>
+              <div class="line"><div class="muted">कुल (शब्दों में)</div><div id="inWords" class="muted">Zero Rupees Only</div></div>
+
+              <div style="margin-top:12px">
+                <button onclick="generateInvoicePreview()">Print / PDF</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- DIGITAL INVOICE (hidden on screen, shown on print) -->
+  <div class="invoice" id="invoicePrint">
+    <div class="inv-wrap">
+      <div class="inv-card">
+        <div class="inv-head">
+          <div class="brand">
+            <div class="logo">SRCCS</div>
+            <div>
+              <h1>Shree Radha Credit Co-operative Society Ltd., Gujri (Dhamnod)</h1>
+              <p>Reg. No.: DR/DHR/151716 · Phone: +91 83700 22176; 8889137464<br>In front of Chatrawas, Gram Panchayat Gujri — Dhamnod, District Dhar - 454552</p>
+            </div>
+          </div>
+
+          <div class="meta">
+            <div class="title">Digital Bill / Report</div>
+            <div style="margin-top:6px">Bill No: <strong id="p_billno">--</strong></div>
+            <div style="margin-top:4px">Date: <strong id="p_date">--</strong></div>
+          </div>
+        </div>
+
+        <div class="inv-body">
+          <div class="grid">
+            <div class="box">
+              <h3>बिल विवरण (Bill Details)</h3>
+              <p><strong>नाम :</strong> <span id="p_name">--</span></p>
+              <p><strong>रसीद प्रकार :</strong> <span id="p_type">--</span></p>
+              <p><strong>नोट :</strong> <span id="p_note">--</span></p>
+            </div>
+
+            <div class="box">
+              <h3>ग्राहक / प्राप्तकर्ता</h3>
+              <p><strong>नाम :</strong> <span id="p_customer">--</span></p>
+              <p><strong>खाता / पता :</strong> <span id="p_address">--</span></p>
+            </div>
+
+            <div class="box">
+              <h3>रिव्यू</h3>
+              <p><strong>आइटम्स:</strong> <span id="p_items_count">0</span></p>
+              <p><strong>कुल मात्रा:</strong> <span id="p_total_qty">0</span></p>
+            </div>
+          </div>
+
+          <table class="tx-table" aria-describedby="transactions">
+            <thead>
+              <tr><th>#</th><th>विवरण</th><th>मात्रा</th><th>दर (₹)</th><th>रकम (₹)</th></tr>
+            </thead>
+            <tbody id="p_txbody"></tbody>
+          </table>
+
+          <div class="totals-summary">
+            <div class="summary">
+              <div class="row"><span>Subtotal</span><span id="p_subtotal">₹0.00</span></div>
+              <div class="row"><span>GST</span><span id="p_gst">₹0.00</span></div>
+              <div class="row" id="p_comm_row" style="display:none"><span>Commission</span><span id="p_commission">₹0.00</span></div>
+              <div class="row total"><span>Total</span><span id="p_total">₹0.00</span></div>
+              <div style="margin-top:8px; font-size:13px; opacity:0.9;"><strong>Amount (in words):</strong><div id="p_amount_words" style="margin-top:6px">Zero Rupees Only</div></div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="inv-foot">
+          <div>
+            <div style="font-size:13px; opacity:0.9">Generated by Shree Radha Credit Co-operative Society Ltd.</div>
+            <div style="margin-top:6px; font-size:12px; color:var(--muted)">This is a computer generated bill and does not require signature.</div>
+          </div>
+          <div class="sign">
+            <div>
+              <div class="sigbox">Manager Signature</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div style="text-align:center; margin-top:10px">
+        <button class="ghost" onclick="window.print()">Print / Save as PDF</button>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // init
+    document.getElementById('date').value = new Date().toLocaleDateString('hi-IN');
+    document.getElementById('gstRate').addEventListener('input', updateTotals);
+    document.getElementById('logoInput').addEventListener('change', handleLogoUpload);
+    document.getElementById('discount').addEventListener('input', updateTotals);
+    document.getElementById('commissionRate').addEventListener('input', updateTotals);
+
+    function onReportTypeChange(){
+      const type = document.getElementById('reportType').value;
+      document.getElementById('agentSection').style.display = (type === 'agent') ? 'block' : 'none';
+      updateTotals();
+    }
+
+    function resetForm(){
+      document.getElementById('invoiceNo').value = 'INV-';
+      document.getElementById('date').value = new Date().toLocaleDateString('hi-IN');
+      document.getElementById('customerName').value = '';
+      document.getElementById('customerAddr').value = '';
+      document.getElementById('gstRate').value = 0;
+      document.getElementById('discount').value = 0;
+      document.getElementById('itemsBody').innerHTML = '';
+      addRow('सदस्यता शुल्क',1,0);
+      updateTotals();
+    }
+
+    function handleLogoUpload(e){
+      // logo preview not used in invoice header (static SRCCS shown) but keep preview in form if wanted
+      const file = e.target.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = function(){
+        // optional: show small preview near logo (not used in printed invoice header)
+        console.log('logo loaded');
+      }
+      reader.readAsDataURL(file);
+    }
+
+    function addRow(desc='', qty=1, rate=0){
+      const tbody = document.getElementById('itemsBody');
+      const tr = document.createElement('tr');
+      const idx = tbody.querySelectorAll('tr').length + 1;
+      tr.innerHTML = `\
+        <td>${idx}</td>\
+        <td><input type='text' class='desc' value='${desc}' style='width:100%'/></td>\
+        <td><input type='number' class='qty' value='${qty}' min='0' style='width:80px'/></td>\
+        <td><input type='number' class='rate' value='${rate}' min='0' style='width:120px'/></td>\
+        <td class='right'><span class='amount'>0.00</span></td>\
+        <td><button type='button' onclick='removeRow(this)'>हटाएँ</button></td>\
+      `;
+      tbody.appendChild(tr);
+      tr.querySelectorAll('input').forEach(i => i.addEventListener('input', updateTotals));
+      updateTotals();
+    }
+
+    function removeRow(btn){
+      const tr = btn.closest('tr');
+      tr.remove();
+      // re-index
+      Array.from(document.querySelectorAll('#itemsBody tr')).forEach((r,i)=>{ r.children[0].textContent = i+1; });
+      updateTotals();
+    }
+
+    function updateTotals(){
+      const rows = Array.from(document.querySelectorAll('#itemsBody tr'));
+      let subtotal = 0; let totalQty = 0;
+      rows.forEach(r => {
+        const q = parseFloat(r.querySelector('.qty').value) || 0;
+        const rate = parseFloat(r.querySelector('.rate').value) || 0;
+        const amt = q * rate;
+        r.querySelector('.amount').textContent = amt.toFixed(2);
+        subtotal += amt;
+        totalQty += q;
+      });
+      const gstRate = parseFloat(document.getElementById('gstRate').value) || 0;
+      const discount = parseFloat(document.getElementById('discount').value) || 0;
+      const gstAmount = +(subtotal * gstRate / 100).toFixed(2);
+      const type = document.getElementById('reportType').value;
+      let commission = 0;
+      if(type === 'agent'){
+        const rate = parseFloat(document.getElementById('commissionRate').value) || 0;
+        commission = +(subtotal * rate / 100).toFixed(2);
+        document.getElementById('commissionAmount').textContent = '₹' + commission.toFixed(2);
+      }
+      const total = +(subtotal + gstAmount - discount - commission).toFixed(2);
+
+      document.getElementById('subTotal').textContent = '₹' + subtotal.toFixed(2);
+      document.getElementById('gstAmount').textContent = '₹' + gstAmount.toFixed(2);
+      document.getElementById('grandTotal').textContent = '₹' + total.toFixed(2);
+      document.getElementById('gstPercent').textContent = gstRate;
+      document.getElementById('inWords').textContent = numberToWordsIndian(total);
+    }
+
+    // number to words (Indian) - simple implementation
+    function numberToWordsIndian(num){
+      if(isNaN(num)) return '';
+      const isNegative = num < 0;
+      num = Math.abs(Math.round(num));
+      if(num === 0) return 'Zero Rupees Only';
+      const a = ['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'];
+      const b = ['', '', 'Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
+      function inWords(n){
+        let str='';
+        if(n>19) str += b[Math.floor(n/10)] + (n%10? ' ' + a[n%10] : '');
+        else str += a[n];
+        return str;
+      }
+      let words = '';
+      const crore = Math.floor(num/10000000); num = num%10000000;
+      const lakh = Math.floor(num/100000); num = num%100000;
+      const thousand = Math.floor(num/1000); num = num%1000;
+      const hundred = Math.floor(num/100); const rest = num%100;
+      if(crore) words += inWords(crore) + ' Crore ';
+      if(lakh) words += inWords(lakh) + ' Lakh ';
+      if(thousand) words += inWords(thousand) + ' Thousand ';
+      if(hundred) words += a[hundred] + ' Hundred ';
+      if(rest) words += (words? 'and ' : '') + inWords(rest) + ' ';
+      return (isNegative? 'Minus ' : '') + words + 'Rupees Only';
+    }
+
+    function generateInvoicePreview(){
+      // ensure totals updated
+      updateTotals();
+      // populate print invoice
+      const type = document.getElementById('reportType').value;
+      document.getElementById('p_type').textContent = (type === 'agent') ? 'Agent Report' : 'Bill Report';
+      document.getElementById('p_name').textContent = document.getElementById('customerName').value || '-';
+      document.getElementById('p_customer').textContent = document.getElementById('customerName').value || '-';
+      document.getElementById('p_address').textContent = document.getElementById('customerAddr').value || '-';
+      document.getElementById('p_note').textContent = document.getElementById('note').value || '-';
+      document.getElementById('p_billno').textContent = document.getElementById('invoiceNo').value || ('B-' + Date.now());
+      document.getElementById('p_date').textContent = document.getElementById('date').value || new Date().toLocaleDateString('hi-IN');
+
+      const tbody = document.getElementById('p_txbody'); tbody.innerHTML = '';
+      const rows = Array.from(document.querySelectorAll('#itemsBody tr'));
+      let subtotal = 0; let totalQty = 0;
+      rows.forEach((r,i)=>{
+        const desc = r.querySelector('.desc').value || '';
+        const q = parseFloat(r.querySelector('.qty').value) || 0;
+        const rate = parseFloat(r.querySelector('.rate').value) || 0;
+        const amt = +(q * rate).toFixed(2);
+        subtotal += amt; totalQty += q;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${i+1}</td><td>${desc}</td><td>${q}</td><td>₹${rate.toFixed(2)}</td><td>₹${amt.toFixed(2)}</td>`;
+        tbody.appendChild(tr);
+      });
+
+      const gstRate = parseFloat(document.getElementById('gstRate').value) || 0;
+      const discount = parseFloat(document.getElementById('discount').value) || 0;
+      const gstAmount = +(subtotal * gstRate / 100).toFixed(2);
+      let commission = 0;
+      if(type === 'agent'){
+        const cr = parseFloat(document.getElementById('commissionRate').value) || 0;
+        commission = +(subtotal * cr / 100).toFixed(2);
+        document.getElementById('p_comm_row').style.display = 'flex';
+        document.getElementById('p_commission').textContent = '₹' + commission.toFixed(2);
+      } else {
+        document.getElementById('p_comm_row').style.display = 'none';
+      }
+
+      const total = +(subtotal + gstAmount - discount - commission).toFixed(2);
+      document.getElementById('p_subtotal').textContent = '₹' + subtotal.toFixed(2);
+      document.getElementById('p_gst').textContent = '₹' + gstAmount.toFixed(2);
+      document.getElementById('p_total').textContent = '₹' + total.toFixed(2);
+      document.getElementById('p_items_count').textContent = rows.length;
+      document.getElementById('p_total_qty').textContent = totalQty;
+      document.getElementById('p_amount_words').textContent = numberToWordsIndian(total);
+
+      // open print dialog (preview will switch to invoice via CSS)
+      setTimeout(()=> window.print(), 300);
+    }
+
+    function exportJSON(){
+      const rows = Array.from(document.querySelectorAll('#itemsBody tr'));
+      const items = rows.map((r,i)=>({desc: r.querySelector('.desc').value, qty: +r.querySelector('.qty').value, rate: +r.querySelector('.rate').value, amount: +r.querySelector('.amount').textContent}));
+      const payload = {
+        invoice: document.getElementById('invoiceNo').value,
+        date: document.getElementById('date').value,
+        reportType: document.getElementById('reportType').value,
+        customer: document.getElementById('customerName').value,
+        address: document.getElementById('customerAddr').value,
+        items, gst: +document.getElementById('gstRate').value, discount: +document.getElementById('discount').value,
+        commissionRate: +document.getElementById('commissionRate').value,
+        total: document.getElementById('grandTotal').textContent
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = (payload.invoice || 'bill') + '.json'; a.click(); URL.revokeObjectURL(url);
+    }
+
+    // initial setup
+    addRow('सदस्यता शुल्क',1,0);
+    onReportTypeChange();
+
+    // keyboard shortcuts
+    document.addEventListener('keydown', (e)=>{
+      if(e.key === 'F2') addRow();
+      if(e.key === 'F9') generateInvoicePreview();
+    });
+  </script>
+</body>
+</html>

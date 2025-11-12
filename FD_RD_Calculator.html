@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FD & RD Calculator — Shree Radha</title>
+  <style>
+    body{font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans', 'Helvetica Neue', Arial; background:#f7fafc; color:#111827; padding:20px}
+    .card{background:#fff; border-radius:12px; box-shadow:0 6px 18px rgba(15,23,42,0.06); padding:20px; max-width:900px; margin:12px auto}
+    h1{font-size:20px;margin:0 0 12px}
+    label{display:block;margin-top:10px;font-size:14px}
+    input, select{width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:6px;margin-top:6px;font-size:14px}
+    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    .btn{background:#0ea5a4;color:white;border:none;padding:10px 14px;border-radius:8px;cursor:pointer;margin-top:12px}
+    .results{background:#f1f5f9;border-radius:8px;padding:12px;margin-top:12px}
+    .tabs{display:flex;gap:8px;margin-bottom:12px}
+    .tab{padding:8px 12px;border-radius:8px;cursor:pointer}
+    .tab.active{background:#0ea5a4;color:white}
+    .small{font-size:13px;color:#374151}
+    table{width:100%;border-collapse:collapse;margin-top:10px}
+    th,td{padding:8px;border-bottom:1px solid #e6edf3;text-align:left}
+    .muted{color:#6b7280}
+    @media(max-width:700px){.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>FD (Fixed Deposit) & RD (Recurring Deposit) Calculator</h1>
+    <div class="tabs">
+      <div class="tab active" id="tab-fd">FD Calculator</div>
+      <div class="tab" id="tab-rd">RD Calculator</div>
+    </div>
+
+    <!-- FD -->
+    <div id="fd-panel">
+      <div class="grid">
+        <div>
+          <label>राशि (Principal / ₹)</label>
+          <input type="number" id="fd-principal" placeholder="उदा. 100000" />
+        </div>
+        <div>
+          <label>वार्षिक ब्याज दर (%)</label>
+          <input type="number" id="fd-rate" step="0.01" placeholder="उदा. 6.5" />
+        </div>
+        <div>
+          <label>अवधि — महीनों में</label>
+          <input type="number" id="fd-months" placeholder="उदा. 36" />
+        </div>
+        <div>
+          <label>कम्पाउंडिंग फ्रिक्वेंसी</label>
+          <select id="fd-frequency">
+            <option value="1">सालाना (1)</option>
+            <option value="2">छमाही (2)</option>
+            <option value="4">त्रैमासिक (4)</option>
+            <option value="12" selected>मासिक (12)</option>
+            <option value="365">दैनिक (365)</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn" id="calc-fd">Calculate FD</button>
+      <div class="results" id="fd-results" style="display:none"></div>
+    </div>
+
+    <!-- RD -->
+    <div id="rd-panel" style="display:none">
+      <div class="grid">
+        <div>
+          <label>मासिक जमा (Monthly Installment / ₹)</label>
+          <input type="number" id="rd-deposit" placeholder="उदा. 2000" />
+        </div>
+        <div>
+          <label>वार्षिक ब्याज दर (%)</label>
+          <input type="number" id="rd-rate" step="0.01" placeholder="उदा. 5.5" />
+        </div>
+        <div>
+          <label>अवधि — महीनों में</label>
+          <input type="number" id="rd-months" placeholder="उदा. 60" />
+        </div>
+        <div>
+          <label>जमा कब किया जाता है?</label>
+          <select id="rd-timing">
+            <option value="end" selected>महीने के अंत में (End of month)</option>
+            <option value="begin">महीने की शुरुआत में (Beginning of month)</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn" id="calc-rd">Calculate RD</button>
+      <div class="results" id="rd-results" style="display:none"></div>
+    </div>
+
+    <div style="margin-top:16px" class="small muted">Formulas: FD: A = P * (1 + r/(100*m))^(m*t) where t = months/12. RD (monthly compounding): i = r/(100*12), n = months. If deposit at month end: M = EMI * ((1+i)^n - 1) / i. If at beginning: multiply by (1+i).</div>
+  </div>
+
+  <script>
+    // Tabs
+    const tabFd = document.getElementById('tab-fd');
+    const tabRd = document.getElementById('tab-rd');
+    const fdPanel = document.getElementById('fd-panel');
+    const rdPanel = document.getElementById('rd-panel');
+    tabFd.addEventListener('click', ()=>{tabFd.classList.add('active');tabRd.classList.remove('active');fdPanel.style.display='block';rdPanel.style.display='none'});
+    tabRd.addEventListener('click', ()=>{tabRd.classList.add('active');tabFd.classList.remove('active');fdPanel.style.display='none';rdPanel.style.display='block'});
+
+    // FD Calculation
+    document.getElementById('calc-fd').addEventListener('click', ()=>{
+      const P = parseFloat(document.getElementById('fd-principal').value || 0);
+      const r = parseFloat(document.getElementById('fd-rate').value || 0);
+      const months = parseInt(document.getElementById('fd-months').value || 0,10);
+      const m = parseInt(document.getElementById('fd-frequency').value,10);
+      if(!(P>0 && r>0 && months>0)){
+        alert('कृपया सभी मान वैध रूप से भरें।'); return;
+      }
+      const t = months/12;
+      const A = P * Math.pow(1 + (r/100)/m, m * t);
+      const interest = A - P;
+      const resultDiv = document.getElementById('fd-results');
+      resultDiv.style.display = 'block';
+      resultDiv.innerHTML = `
+        <strong>मिलकर राशि (Maturity Amount): ₹ ${A.toFixed(2)}</strong>
+        <div class="small">ब्याज (Interest earned): ₹ ${interest.toFixed(2)}</div>
+        <table>
+          <tr><th>Principal</th><td>₹ ${P.toFixed(2)}</td></tr>
+          <tr><th>Rate (annual)</th><td>${r}%</td></tr>
+          <tr><th>Duration</th><td>${months} months (${t.toFixed(2)} years)</td></tr>
+          <tr><th>Compounding</th><td>${m} times/year</td></tr>
+        </table>
+      `;
+    });
+
+    // RD Calculation
+    document.getElementById('calc-rd').addEventListener('click', ()=>{
+      const EMI = parseFloat(document.getElementById('rd-deposit').value || 0);
+      const r = parseFloat(document.getElementById('rd-rate').value || 0);
+      const n = parseInt(document.getElementById('rd-months').value || 0,10);
+      const timing = document.getElementById('rd-timing').value;
+      if(!(EMI>0 && r>0 && n>0)){
+        alert('कृपया सभी मान वैध रूप से भरें।'); return;
+      }
+      const i = r/(100*12);
+      const factor = (Math.pow(1+i, n) - 1) / i;
+      let M = EMI * factor;
+      if(timing === 'begin') M = M * (1 + i);
+      const totalDeposits = EMI * n;
+      const interest = M - totalDeposits;
+      const resultDiv = document.getElementById('rd-results');
+      resultDiv.style.display = 'block';
+      resultDiv.innerHTML = `
+        <strong>मिलकर राशि (Maturity Amount): ₹ ${M.toFixed(2)}</strong>
+        <div class="small">ब्याज (Interest earned): ₹ ${interest.toFixed(2)}</div>
+        <table>
+          <tr><th>Monthly deposit</th><td>₹ ${EMI.toFixed(2)}</td></tr>
+          <tr><th>Rate (annual)</th><td>${r}%</td></tr>
+          <tr><th>Duration</th><td>${n} months (${(n/12).toFixed(2)} years)</td></tr>
+          <tr><th>Total Deposits</th><td>₹ ${totalDeposits.toFixed(2)}</td></tr>
+        </table>
+      `;
+    });
+  </script>
+</body>
+</html>

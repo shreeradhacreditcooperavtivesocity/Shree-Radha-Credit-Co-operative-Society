@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>श्री राधा साख सहकारी संस्था मर्यादित — सदस्यता हेतु आवेदन फॉर्म</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{ --ink:#111; --muted:#555; --line:#1f2937; }
+  html,body{ margin:0; background:#f3f4f6; color:var(--ink);
+    font-family:"Noto Sans Devanagari", system-ui, sans-serif;
+  }
+  .sheet{
+    width:210mm; background:#fff;
+    margin:auto; padding:8mm 10mm; box-sizing:border-box;
+    box-shadow:0 8px 25px rgba(0,0,0,.08);
+    font-size:14px; line-height:1.5;
+  }
+  .topline{ display:flex; align-items:flex-start; gap:10px; }
+  #logo{ width:26mm; height:26mm; object-fit:contain; }
+  .hdr{ flex:1; text-align:center; }
+  .title{ font-weight:700; font-size:20px; color:#800000; }
+  .subline{ font-size:13px; color:var(--muted); margin-top:2px; }
+  .reg{ font-size:12px; text-align:right; margin-top:2px; }
+
+  .strip{ border:1.2px solid var(--line); padding:3px 10px;
+    display:inline-block; font-weight:700; margin:8px 0; font-size:15px;
+  }
+
+  .search-bar{
+    width:210mm; margin:10px auto; text-align:center;
+  }
+  .search-bar input{
+    padding:8px 10px; width:60%; font-size:14px;
+    border:1px solid #ccc; border-radius:5px; outline:none;
+  }
+  .search-bar button{
+    padding:8px 14px; font-size:14px; background:#800000; color:#fff;
+    border:none; border-radius:5px; cursor:pointer; margin-left:6px;
+  }
+
+  .photo-wrap{
+    width:36mm; height:45mm; border:1.2px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    font-size:12px; text-align:center;
+  }
+  .photo-wrap img{ width:100%; height:100%; object-fit:cover; display:none; }
+  .photo-note{ font-size:11px; text-align:center; margin-top:4px; }
+
+  .header-row{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+  .uline{ border-bottom:1px dotted #555; display:inline-block; min-width:60px; padding:0 4px; position:relative; flex:1; }
+  .uline input{
+    width:100%; border:0; outline:0; background:transparent;
+    position:absolute; left:0; bottom:0; font-size:14px;
+    text-align:left; color:#000;
+  }
+
+  .field{ display:flex; gap:6px; font-size:14px; margin:4px 0; align-items:flex-end; flex-wrap:wrap; }
+  .num{ width:16px; }
+  .label{ min-width:90px; font-weight:500; }
+  .dash{ flex:1; border-bottom:1px dotted #777; min-height:20px; position:relative; }
+  .dash input{ width:100%; border:0; outline:0; background:transparent; font-size:14px; }
+
+  .boxes{ display:grid; gap:2px; }
+  .boxes.b12{ grid-template-columns:repeat(12, 17px); }
+  .boxes.b10{ grid-template-columns:repeat(10, 17px); }
+  .boxes.b8{ grid-template-columns:repeat(8, 17px); }
+  .box{ width:17px; height:19px; border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .box input{ width:100%; height:100%; border:0; outline:0;
+    text-align:center; font-size:12px; background:transparent;
+  }
+
+  .sigline{ border-bottom:1px dotted #777; min-height:20px; }
+  .section-title{ text-align:center; font-weight:700; margin:8px 0 4px; font-size:15px; color:#800000; }
+  .cut{ border-top:1.2px dashed #333; margin:10px 0; }
+
+  .controls{ display:flex; gap:8px; margin-top:10px; }
+  button{ padding:8px 12px; border:0; background:#800000; color:#fff;
+    border-radius:5px; font-weight:700; cursor:pointer; font-size:14px;
+  }
+  .light{ background:#6b7280; }
+
+  @media print{
+    body{ background:#fff; margin:0; padding:0; }
+    .sheet{ margin:0; box-shadow:none; height:auto; page-break-inside:avoid; }
+    .controls, .photo-note, #photoInput, .search-bar { display:none !important; }
+    @page{ size:A4; margin:8mm; }
+  }
+</style>
+</head>
+
+<body>
+
+<!-- 🔍 SEARCH BAR -->
+<div class="search-bar">
+  <input type="text" id="searchInput" placeholder="सदस्य का नाम या मोबाइल नंबर दर्ज करें..." />
+  <button id="searchBtn">खोजें</button>
+</div>
+
+<!-- FORM -->
+<div class="sheet" id="sheet">
+  <div>
+    <div class="topline">
+      <img id="logo" src="logo.jpeg" alt="Logo" />
+      <div class="hdr">
+        <div class="title">श्री राधा साख सहकारी संस्था मर्यादित, गुजरी (धामनोद)</div>
+        <div class="subline">गुजरी पंचायत के सामने (समय: सुबह 11 से शाम 5 बजे तक)</div>
+      </div>
+      <div class="reg">Reg. No.: DR/DHR/151716</div>
+    </div>
+
+    <div style="display:flex; justify-content:space-between; margin-top:6px;">
+      <div>क्रमांक : <span class="uline"><input type="text" /></span></div>
+      <div>दिनांक : <span class="uline"><input type="text" /></span></div>
+    </div>
+
+    <div style="text-align:center;"><span class="strip">सदस्यता हेतु आवेदन फॉर्म</span></div>
+
+    <div class="header-row">
+      <div style="flex:1; font-size:14px; line-height:1.6;">
+        प्रति,<br>
+        श्रीमान प्रबंधक/अध्यक्ष महोदय,<br>
+        <strong>श्री राधा साख सहकारी संस्था मर्यादित, गुजरी (धामनोद)</strong><br><br>
+        मैं आपकी संस्था का सदस्य बनना चाहता/चाहती हूँ, मुझे संस्था के उद्देश्यों एवं अनुशासन स्वीकार है।<br>
+        मैं प्रवेश शुल्क रु. <span class="uline"><input type="text"></span> कुल रु.
+        <span class="uline"><input type="text"></span> जमा कर रहा/रही हूँ।<br>
+        कृपया मुझे सिर्फ “ब” वर्ग का सदस्य बनाकर अनुज्ञापित करें।<br>
+        मेरा सम्पूर्ण विवरण निम्नानुसार है—
+      </div>
+
+      <div style="width:40mm; text-align:center;">
+        <div class="photo-wrap" id="photoBox">
+          <span>नवीन पासपोर्ट<br>फोटो</span>
+          <img id="photoPreview" alt="">
+        </div>
+        <div class="photo-note">फोटो अपलोड करें</div>
+        <input type="file" id="photoInput" accept="image/*" style="font-size:11px; width:100%; margin-top:3px;">
+      </div>
+    </div>
+
+    <!-- INPUT FIELDS -->
+    <div class="field"><div class="num">1.</div><div class="label">नाम</div><div class="uline"><input type="text" id="name"></div><div class="label" style="min-width:70px;">पिता/पति श्री</div><div class="uline"><input type="text" id="father"></div></div>
+    <div class="field"><div class="num">2.</div><div class="label">आधार नं.</div><div class="boxes b12" id="aadhaarBoxes"></div></div>
+    <div class="field"><div class="num">3.</div><div class="label">पैन नं.</div><div class="boxes b10" id="panBoxes"></div></div>
+    <div class="field"><div class="num">4.</div><div class="label">आयु / जन्म तिथि</div><div class="boxes b8" id="dobBoxes"></div>
+      <div style="width:35px; text-align:center;">वर्ष</div><div class="boxes" id="ageBoxes" style="grid-template-columns:repeat(2,17px);"></div></div>
+    <div class="field"><div class="num">5.</div><div class="label">जाति एवं वर्ग</div><div class="dash"><input id="caste" type="text"></div><div class="label" style="min-width:50px;">श्रेणी</div><div class="dash"><input id="category" type="text"></div></div>
+    <div class="field"><div class="num">6.</div><div class="label">व्यवसाय</div><div class="dash"><input id="occupation" type="text"></div></div>
+    <div class="field"><div class="num">7.</div><div class="label">शासकीय सेवा में हो तो पद</div><div class="dash"><input id="govpost" type="text"></div></div>
+    <div class="field"><div class="num">8.</div><div class="label">स्थायी पता</div><div class="dash"><input id="permanent" type="text"></div></div>
+    <div class="field"><div class="num">9.</div><div class="label">फोन / मोबाइल नं.</div><div class="boxes b10" id="mobileBoxes"></div></div>
+    <div class="field"><div class="num">10.</div><div class="label">स्थानीय पता</div><div class="dash"><input id="local" type="text"></div></div>
+    <div class="field"><div class="num">11.</div><div class="label">उत्तराधिकारी (नामिक का नाम)</div><div class="dash"><input id="nominee" type="text"></div><div class="label" style="min-width:50px;">संबंध</div><div class="dash"><input id="relation" type="text"></div></div>
+
+    <div style="display:flex; justify-content:space-between; margin-top:10px;">
+      <div style="width:48%;">
+        पहचानकर्ता के हस्ताक्षर<div class="sigline"></div>
+        नाम<div class="sigline"></div>
+        दिनांक<div class="sigline"></div>
+      </div>
+      <div style="width:48%; text-align:right;">
+        भवदीय<br><br>
+        <div style="width:60%; float:right;">
+          <div class="sigline"></div>
+          <div style="text-align:center;">हस्ताक्षर आवेदक</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cut"></div>
+
+    <div class="section-title">* केवल कार्यालय उपयोग हेतु *</div>
+    <div class="field">श्री/श्रीमती/कुमारी <div class="sigline" style="flex:1;"></div> की सदस्यता स्वीकृत की जाती है।</div>
+    <div class="field">सदस्यता क्र. <div class="sigline" style="flex:1;"></div> रुपये <div class="sigline" style="flex:1;"></div></div>
+    <div class="field">रसीद क्रमांक <div class="sigline" style="flex:1;"></div> दिनांक <div class="sigline" style="flex:1;"></div></div>
+    <div style="text-align:right; margin-top:10px;">
+      <div style="width:40%; float:right;">
+        <div class="sigline"></div>
+        <div style="text-align:center;">प्रबंधक</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="light" id="btnPrint">Print</button>
+    <button id="btnSave">Save</button>
+  </div>
+</div>
+
+<script>
+/* Helper: make boxes for Aadhaar/PAN/mobile/DOB */
+function buildBoxes(el, count){
+  for(let i=0;i<count;i++){
+    const b=document.createElement('div');
+    b.className='box';
+    const inp=document.createElement('input');
+    inp.maxLength=1;
+    b.appendChild(inp);
+    el.appendChild(b);
+  }
+}
+buildBoxes(document.getElementById('aadhaarBoxes'),12);
+buildBoxes(document.getElementById('panBoxes'),10);
+buildBoxes(document.getElementById('mobileBoxes'),10);
+buildBoxes(document.getElementById('dobBoxes'),8);
+buildBoxes(document.getElementById('ageBoxes'),2);
+
+/* Photo preview */
+let photoBase64 = "";
+const photoInput = document.getElementById('photoInput');
+const photoPreview = document.getElementById('photoPreview');
+const photoBox = document.getElementById('photoBox');
+
+photoInput.addEventListener('change', e=>{
+  const f = e.target.files[0];
+  if(!f) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    photoPreview.src = ev.target.result;
+    photoPreview.style.display = 'block';
+    if(photoBox.firstElementChild) photoBox.firstElementChild.style.display = 'none';
+    photoBase64 = ev.target.result;
+  };
+  r.readAsDataURL(f);
+});
+
+/* Script URL */
+const scriptURL = "https://script.google.com/macros/s/AKfycbwSmo3eytqPEsqB-Jz5pAbz4_zIrXC95zSAjqHJcoNof7DCDJOfdu47HgnLxRoeiAeZ/exec";
+
+/* Read values */
+function getBoxValue(id) {
+  return Array.from(document.querySelectorAll(`#${id} input`)).map(i=>i.value).join('');
+}
+
+/* Save to sheet */
+async function saveToSheet() {
+  const payload = {
+    name: document.getElementById('name').value || "",
+    father: document.getElementById('father').value || "",
+    aadhaar: getBoxValue('aadhaarBoxes'),
+    pan: getBoxValue('panBoxes'),
+    dob: getBoxValue('dobBoxes'),
+    age: getBoxValue('ageBoxes'),
+    caste: document.getElementById('caste').value || "",
+    category: document.getElementById('category').value || "",
+    occupation: document.getElementById('occupation').value || "",
+    govpost: document.getElementById('govpost').value || "",
+    permanent: document.getElementById('permanent').value || "",
+    mobile: getBoxValue('mobileBoxes'),
+    local: document.getElementById('local').value || "",
+    nominee: document.getElementById('nominee').value || "",
+    relation: document.getElementById('relation').value || "",
+    photoBase64
+  };
+
+  try {
+    await fetch(scriptURL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    alert("✅ डेटा सफलतापूर्वक सेव हो गया!");
+  } catch (err) {
+    alert("❌ त्रुटि: " + err.message);
+  }
+}
+
+/* SEARCH function */
+document.getElementById('searchBtn').addEventListener('click', async ()=>{
+  const searchValue = document.getElementById('searchInput').value.trim();
+  if(!searchValue){ alert("कृपया नाम या मोबाइल नंबर दर्ज करें!"); return; }
+
+  try{
+    const res = await fetch(scriptURL + "?search=" + encodeURIComponent(searchValue));
+    const data = await res.json();
+    if(!data || !data.name){ alert("❌ रिकॉर्ड नहीं मिला!"); return; }
+
+    // Fill data
+    document.getElementById('name').value = data.name;
+    document.getElementById('father').value = data.father;
+    document.getElementById('caste').value = data.caste;
+    document.getElementById('category').value = data.category;
+    document.getElementById('occupation').value = data.occupation;
+    document.getElementById('govpost').value = data.govpost;
+    document.getElementById('permanent').value = data.permanent;
+    document.getElementById('local').value = data.local;
+    document.getElementById('nominee').value = data.nominee;
+    document.getElementById('relation').value = data.relation;
+
+    if(data.photoUrl){
+      photoPreview.src = data.photoUrl;
+      photoPreview.style.display='block';
+      if(photoBox.firstElementChild) photoBox.firstElementChild.style.display='none';
+    }
+  }catch(err){
+    alert("❌ खोज त्रुटि: "+err.message);
+  }
+});
+
+/* Bind buttons */
+document.getElementById('btnSave').addEventListener('click', e=>{
+  e.preventDefault();
+  saveToSheet();
+});
+document.getElementById('btnPrint').addEventListener('click', e=>{
+  e.preventDefault();
+  window.print();
+});
+</script>
+</body>
+</html>

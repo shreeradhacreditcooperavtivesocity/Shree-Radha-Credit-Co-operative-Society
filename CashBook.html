@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Category Wise Cash Book — SRCCS</title>
+  <style>
+    :root{ 
+      --bg:#f7f7fb; 
+      --card:#ffffff; 
+      --ink:#111827; 
+      --muted:#6b7280; 
+      --accent:#7c2d12; 
+      --brand:#800000;
+    }
+    *{box-sizing:border-box;font-family:Segoe UI,Roboto,Noto Sans,system-ui,sans-serif}
+    body{background:var(--bg);color:var(--ink);padding:18px}
+    .container{max-width:1100px;margin:0 auto}
+
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:12px;
+      border-bottom:2px solid var(--brand);
+      padding-bottom:6px;
+    }
+    header .left{display:flex;align-items:center;gap:10px;}
+    header img{height:60px;width:60px;object-fit:contain;}
+    header .info strong{color:var(--brand);font-size:1.1rem;}
+    header .info small{display:block;font-size:12px;color:#444;}
+    header .right{text-align:right;font-size:12px;color:#444;}
+
+    .card{background:var(--card);padding:14px;border-radius:10px;box-shadow:0 6px 18px rgba(15,23,42,0.06);margin-bottom:14px}
+    form.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    form .full{grid-column:1/-1}
+    label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+    input[type="text"],input[type="date"],select,input[type="number"]{
+      width:100%;padding:8px;border:1px solid #e6e9ee;border-radius:6px;font-size:14px
+    }
+    .actions{display:flex;gap:8px;align-items:center}
+    button{background:var(--accent);color:white;padding:8px 12px;border-radius:8px;border:none;cursor:pointer}
+    button.secondary{background:#374151}
+    button.ghost{background:transparent;color:var(--muted);border:1px solid #e6e9ee}
+    .controls{display:flex;gap:8px;align-items:center}
+    .controls select,.controls input{padding:6px;border-radius:6px;border:1px solid #e6e9ee}
+    table{width:100%;border-collapse:collapse;margin-top:10px}
+    table thead th{background:#fbfbfd;padding:10px;text-align:left;border-bottom:2px solid #eef2f7;font-size:13px;color:var(--muted)}
+    table tbody td{padding:9px;border-bottom:1px solid #f1f5f9;font-size:14px}
+    .right{text-align:right}
+    .summary{display:flex;gap:12px;justify-content:flex-end;margin-top:8px}
+    .pill{background:#f8fafc;padding:8px 12px;border-radius:8px;border:1px solid #eef2f7;font-weight:600}
+    .muted{color:var(--muted);font-size:13px}
+
+    /* Print Styling */
+    @media print{
+      body{padding:0;background:white;}
+      .card form,.controls,.no-print{display:none!important;}
+      header{
+        border-bottom:2px solid #800000;
+        padding-bottom:6px;
+        margin-bottom:10px;
+      }
+      header img{height:70px;width:70px;}
+      header .info strong{font-size:18px;}
+      header .info small{font-size:12px;}
+      header .right{text-align:right;font-size:12px;}
+      .print-area{box-shadow:none;border-radius:0;margin:0}
+      @page{size:A4;margin:12mm}
+    }
+
+    @media (max-width:800px){form.grid{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:460px){form.grid{grid-template-columns:1fr}.summary{flex-direction:column;align-items:stretch}}
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- 🔹 Header: visible on both screen & print -->
+    <header>
+      <div class="left">
+        <img src="logo.jpeg" alt="Logo">
+        <div class="info">
+          <strong>Shree Radha Credit Co-operative Society Ltd., Gujri (Dhamnod)</strong>
+          <small>Reg. No.: DR/DHR/151716</small>
+          <small>Category Wise Cash Book</small>
+        </div>
+      </div>
+      <div class="right">
+        <div><b>Mob:</b> +91 83700 22176, 8889137464</div>
+        <div><b>Address:</b> In front of Chatrawas, Gram <br>Panchayat Gujri,Sub District Dharmapuri, District Dhar - 454552</div>
+      </div>
+    </header>
+
+    <section class="card">
+      <form id="entryForm" class="grid" onsubmit="return false">
+        <div>
+          <label>तारीख (Date)</label>
+          <input type="date" id="date" required>
+        </div>
+        <div>
+          <label>श्रेणी (Category)</label>
+          <select id="category">
+            <option value="Income">Income</option>
+            <option value="Saving">Saving</option>
+            <option value="Loan">Loan</option>
+            <option value="Expense">Expense</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div>
+          <label>प्रकार (Type)</label>
+          <select id="type">
+            <option value="Credit">Credit (आय)</option>
+            <option value="Debit">Debit (भुगतान)</option>
+          </select>
+        </div>
+        <div>
+          <label>Voucher / Ref</label>
+          <input type="text" id="voucher" placeholder="(ऐच्छिक)">
+        </div>
+        <div class="full">
+          <label>विवरण (Particulars)</label>
+          <input type="text" id="particulars" placeholder="उदाहरण: सदस्य जमा, बिजली बिल ..." required>
+        </div>
+        <div>
+          <label>राशि (Amount)</label>
+          <input type="number" id="amount" min="0" step="0.01" required>
+        </div>
+        <div style="display:flex;align-items:end;gap:8px">
+          <button id="addEntry">एंट्री जोड़ें</button>
+          <button class="secondary" id="clearForm" type="button">Clear</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card no-print" style="display:flex;justify-content:space-between;align-items:center">
+      <div class="controls">
+        <label class="muted">Filter</label>
+        <select id="filterCategory">
+          <option value="all">All Categories</option>
+          <option value="Income">Income</option>
+          <option value="Saving">Saving</option>
+          <option value="Loan">Loan</option>
+          <option value="Expense">Expense</option>
+          <option value="Other">Other</option>
+        </select>
+        <label class="muted">From</label>
+        <input type="date" id="fromDate">
+        <label class="muted">To</label>
+        <input type="date" id="toDate">
+        <button class="ghost" id="applyFilter">Apply</button>
+        <button class="ghost" id="resetFilter">Reset</button>
+      </div>
+
+      <div class="actions">
+        <button id="printBtn" class="no-print">Print</button>
+        <button id="clearAll" class="no-print">Clear All</button>
+      </div>
+    </section>
+
+    <section id="printArea" class="card print-area">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div>
+        
+          
+        </div>
+        <div class="muted">Generated: <span id="generatedAt"></span></div>
+      </div>
+
+      <div style="overflow:auto">
+        <table id="entriesTable">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Category</th>
+              <th>Voucher</th>
+              <th>Particulars</th>
+              <th class="right">Credit</th>
+              <th class="right">Debit</th>
+              <th class="right">Balance</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="summary">
+        <div class="pill">Total Credit: ₹ <span id="totalCredit">0.00</span></div>
+        <div class="pill">Total Debit: ₹ <span id="totalDebit">0.00</span></div>
+        <div class="pill">Closing Balance: ₹ <span id="closingBalance">0.00</span></div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbz0Yd1syVG2U42jpyqf17sRl6wAKf5Ae3h7LsLD7-Ww0B9naMuzX52W4Y4MogH6UHYu/exec"; 
+
+    const entriesKey = 'srccs_cashbook_entries_v1';
+    let entries = [];
+    let sheetEntries = [];
+
+    function formatAmount(x){ return Number(x).toLocaleString('en-IN',{minimumFractionDigits:2}); }
+
+    async function loadSheetData(){
+      try{
+        const res = await fetch(GOOGLE_SHEET_URL + "?read=true");
+        const data = await res.json();
+        sheetEntries = data.map(r=>({
+          id:r.id || Date.now(),
+          date:r.date,
+          category:r.category,
+          type:r.type,
+          voucher:r.voucher,
+          particulars:r.particulars,
+          amount:parseFloat(r.amount||0)
+        }));
+      }catch(err){ console.error("Sheet fetch error:",err); sheetEntries=[]; }
+    }
+
+    function mergeEntries(){
+      const local = JSON.parse(localStorage.getItem(entriesKey)||"[]");
+      entries = [...sheetEntries, ...local];
+      entries.sort((a,b)=> new Date(a.date)-new Date(b.date));
+    }
+
+    function saveLocal(local){ localStorage.setItem(entriesKey, JSON.stringify(local)); }
+
+    function applyFilterAndRender(){
+      const cat = filterCategory.value;
+      const from = fromDate.value;
+      const to = toDate.value;
+      let filtered = entries;
+
+      if(cat!=="all") filtered = filtered.filter(e=>e.category===cat);
+      if(from) filtered = filtered.filter(e=> new Date(e.date)>=new Date(from));
+      if(to) filtered = filtered.filter(e=> new Date(e.date)<=new Date(to));
+      render(filtered);
+    }
+
+    function render(list = entries){
+      const tbody = document.querySelector('#entriesTable tbody');
+      tbody.innerHTML="";
+      let bal=0,cr=0,dr=0;
+      list.forEach(e=>{
+        const credit = e.type==="Credit"?e.amount:0;
+        const debit  = e.type==="Debit"?e.amount:0;
+        bal += credit-debit;
+        cr += credit; dr += debit;
+        tbody.innerHTML += `
+          <tr>
+            <td>${e.date}</td>
+            <td>${e.category}</td>
+            <td>${e.voucher||""}</td>
+            <td>${e.particulars}</td>
+            <td class='right'>${credit?formatAmount(credit):""}</td>
+            <td class='right'>${debit?formatAmount(debit):""}</td>
+            <td class='right'>${formatAmount(bal)}</td>
+          </tr>`;
+      });
+      totalCredit.textContent=formatAmount(cr);
+      totalDebit.textContent=formatAmount(dr);
+      closingBalance.textContent=formatAmount(bal);
+      generatedAt.textContent=new Date().toLocaleString('hi-IN');
+    }
+
+    addEntry.onclick = ()=>{
+      const entry = {
+        id:Date.now(),
+        date:date.value,
+        category:category.value,
+        type:type.value,
+        voucher:voucher.value.trim(),
+        particulars:particulars.value.trim(),
+        amount:parseFloat(amount.value)
+      };
+      if(!entry.date||!entry.amount){alert("डेटा पूरा भरे");return;}
+
+      const local = JSON.parse(localStorage.getItem(entriesKey)||"[]");
+      local.push(entry); saveLocal(local);
+      entries.push(entry); render();
+
+      fetch(GOOGLE_SHEET_URL,{
+        method:"POST",mode:"no-cors",
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(entry)
+      });
+      voucher.value=""; particulars.value=""; amount.value="";
+    };
+
+    clearForm.onclick = ()=>{voucher.value=""; particulars.value=""; amount.value=""; date.value=new Date().toISOString().slice(0,10);};
+
+    applyFilter.onclick = applyFilterAndRender;
+    resetFilter.onclick = ()=>{filterCategory.value="all"; fromDate.value=""; toDate.value=""; render();};
+    clearAll.onclick = ()=>{ if(confirm("सभी Local डेटा हटेगा?")){ localStorage.removeItem(entriesKey); mergeEntries(); render(); } };
+    printBtn.onclick = ()=>window.print();
+
+    (async function(){
+      await loadSheetData();
+      mergeEntries();
+      date.value=new Date().toISOString().slice(0,10);
+      render();
+    })();
+  </script>
+</body>
+</html>

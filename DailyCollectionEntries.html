@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>SRCCS — Agent Daily/Monthly Saving Form (Online)</title>
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+<style>
+  @page{ size:A4; margin:10mm; }
+  :root{
+    --ink:#111827; --muted:#6b7280; --line:#e5e7eb;
+    --head:#800000; --head2:#a64b4b; --paper:#fff; --accent:#0ea5a4;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0; background:#f5f7fb; color:var(--ink);
+    font-family:"Inter","Noto Sans Devanagari","Segoe UI",Arial,sans-serif;
+  }
+
+  /* titlebar removed */
+  .titlebar{ display:none; }
+
+  .wrap{ max-width:1200px; margin:18px auto;
+    display:grid; grid-template-columns:420px 1fr;
+    gap:16px; align-items:start;
+  }
+  .card{
+    background:var(--paper); border: none; /* removed visible border */
+    border-radius:10px; box-shadow:0 3px 10px rgba(0,0,0,.04);
+    padding:16px;
+  }
+  h2{ color:var(--head); font-size:17px; margin:0 0 10px; }
+  label{ font-size:13px; color:var(--muted); font-weight:700; margin-bottom:4px; display:block; }
+  input, select{
+    width:100%; padding:8px 10px; border:1px solid var(--line);
+    border-radius:8px; font-size:14px;
+    background: #ffffff;
+  }
+  .row{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
+  .col{ flex:1; }
+
+  button{
+    background:var(--head); color:#fff; border:none; border-radius:8px;
+    padding:8px 12px; font-weight:700; cursor:pointer; transition:opacity .2s;
+  }
+  button:hover{ opacity:.9; }
+  button.secondary{ background:var(--accent); }
+  button.gray{ background:#6b7280; }
+
+  .total-box{
+    background:#fff9f9; border:0px; /* removed dashed border */
+    padding:10px; border-radius:8px; text-align:center;
+    font-weight:700; font-size:16px; color:var(--head);
+    margin-bottom:10px;
+  }
+
+  .controls{ display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap; }
+  .controls input{ flex:1; }
+
+  table{ width:100%; border-collapse:collapse; font-size:13px; background:transparent; }
+  th,td{ padding:8px 6px; border-bottom: none; text-align:left; } /* removed bottom borders */
+  th{ background:transparent; color:var(--head); position:sticky; top:0; z-index:5; font-weight:700; }
+  .norec{ padding:12px; color:var(--muted); text-align:center; font-style:italic; }
+
+  #successMsg{ color:#2e7d32; font-weight:700; margin-top:8px; display:none; }
+
+  @media(max-width:900px){ .wrap{ grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+
+<!-- titlebar intentionally removed -->
+
+<div class="wrap">
+  <!-- Left: Form -->
+  <div class="card">
+    <h2>Deposit Entry</h2>
+    <div class="total-box" id="totalAmount">Total: ₹ —</div>
+
+    <form id="savingForm">
+      <div class="row">
+        <div class="col">
+          <label>Agent Name</label>
+          <input type="text" name="agentName" required>
+        </div>
+        <div class="col">
+          <label>Agent ID</label>
+          <input type="text" name="agentId" required>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <label>Amount (₹)</label>
+          <input type="number" name="amount" required>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <label>Office / Operator Name</label>
+          <input type="text" name="operatorName" required>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <button type="submit">💾 Submit</button>
+        <button type="button" id="printBtn" class="secondary">🖨️ PDF</button>
+        <button type="button" id="showAllBtn" class="gray">📋 Show All</button>
+      </div>
+
+      <div id="successMsg">✅ सफलतापूर्वक सबमिट किया गया!</div>
+      <div id="qrcode" style="margin-top:10px;"></div>
+    </form>
+  </div>
+
+  <!-- Right: Data Table -->
+  <div class="card" id="printArea">
+    <h2>Agent Collection Records</h2>
+
+    <div class="controls">
+      <input id="searchInput" placeholder="Search Agent Name / ID">
+      <input id="fromDate" type="date">
+      <input id="toDate" type="date">
+      <button id="filterBtn" class="secondary">🔍 Filter</button>
+      <button id="clearFilter" class="gray">Clear</button>
+    </div>
+
+    <div style="max-height:600px;overflow:auto;">
+      <table id="resultsTable" aria-describedby="noRecords">
+        <thead>
+          <tr>
+            <th>Date & Time</th>
+            <th>Agent Name</th>
+            <th>Agent ID</th>
+            <th>Amount (₹)</th>
+            <th>Operator</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3" style="text-align:right;font-weight:700;">Page Total:</td>
+            <td id="pageTotal" style="font-weight:700;"></td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+      <div id="noRecords" class="norec">No records found.</div>
+    </div>
+  </div>
+</div>
+
+<div style="text-align:center;padding:10px;color:var(--muted);font-size:12px;">
+  © SRCCS — Agent Collection · Powered by Google Sheets
+</div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwJJEV2lMSJbKOfoz0tpnftxIePjvinFwX6pI1zIS0IjsTbQz9SN8Sb0GLkDwze8MpO/exec";
+const $ = s => document.querySelector(s);
+const form = $('#savingForm');
+const resultsTbody = $('#resultsTable tbody');
+const totalAmountBox = $('#totalAmount');
+const pageTotalEl = $('#pageTotal');
+
+/* show current date (India) in console area if needed - kept but not visible */
+document.addEventListener('DOMContentLoaded', ()=> {
+  // optional: you can show date somewhere if needed
+});
+
+async function loadEntries() {
+  const name = $('#searchInput').value.trim();
+  const from = $('#fromDate').value;
+  const to = $('#toDate').value;
+  let url = `${SCRIPT_URL}?action=list`;
+  if (name || from || to)
+    url = `${SCRIPT_URL}?action=filter&name=${encodeURIComponent(name)}&from=${from}&to=${to}`;
+  try{
+    const res = await fetch(url);
+    const data = await res.json();
+    renderTable(data.rows || []);
+  }catch(err){
+    renderTable([]);
+  }
+}
+
+function renderTable(rows){
+  resultsTbody.innerHTML = "";
+  let total = 0;
+  if(rows.length===0){ document.getElementById('noRecords').style.display='block'; pageTotalEl.textContent='₹ 0'; return; }
+  document.getElementById('noRecords').style.display='none';
+  rows.forEach(r=>{
+    const amt = Number(r['Amount'] || 0);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${r['Date & Time']}</td>
+                    <td>${r['Agent Name']}</td>
+                    <td>${r['Agent ID']}</td>
+                    <td>${amt.toLocaleString('en-IN')}</td>
+                    <td>${r['Office / Operator Name']}</td>`;
+    resultsTbody.appendChild(tr);
+    total += amt;
+  });
+  pageTotalEl.textContent = `₹ ${total.toLocaleString('en-IN')}`;
+}
+
+form.addEventListener('submit', async e=>{
+  e.preventDefault();
+  const data = {
+    "Agent Name": form.agentName.value.trim(),
+    "Agent ID": form.agentId.value.trim(),
+    "Amount": form.amount.value.trim(),
+    "Office / Operator Name": form.operatorName.value.trim(),
+    "Date & Time": new Date().toLocaleString('en-IN',{timeZone:'Asia/Kolkata'})
+  };
+  // send to sheets (no-cors to avoid CORS blocking on simple webhook style)
+  try{
+    await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',body:JSON.stringify(data)});
+  }catch(e){
+    // ignore network errors for no-cors mode
+  }
+  form.reset();
+  $('#successMsg').style.display='block';
+  setTimeout(()=>$('#successMsg').style.display='none',2000);
+  loadEntries(); loadTotal();
+});
+
+$('#filterBtn').onclick = ()=> loadEntries();
+$('#clearFilter').onclick = ()=>{ $('#searchInput').value=''; $('#fromDate').value=''; $('#toDate').value=''; loadEntries(); };
+$('#showAllBtn').onclick = ()=> loadEntries();
+
+$('#printBtn').onclick = ()=>{
+  const opt = {
+    margin:0.4,
+    filename:`Agent_Statement_${new Date().toISOString().slice(0,10)}.pdf`,
+    image:{type:'jpeg',quality:0.98},
+    html2canvas:{scale:2},
+    jsPDF:{unit:'in',format:'a4',orientation:'portrait'}
+  };
+  html2pdf().set(opt).from(document.getElementById('printArea')).save();
+};
+
+async function loadTotal(){
+  try{
+    const res = await fetch(`${SCRIPT_URL}?action=total`);
+    const data = await res.json();
+    totalAmountBox.textContent = `Total: ₹ ${Number(data.total||0).toLocaleString('en-IN')}`;
+  }catch{
+    totalAmountBox.textContent = 'Total: ₹ —';
+  }
+}
+
+loadTotal(); loadEntries();
+</script>
+</body>
+</html>

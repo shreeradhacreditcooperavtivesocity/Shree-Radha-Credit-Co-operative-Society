@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SRCCS — Loan Dashboard (Online)</title>
+<style>
+@page { size:A4; margin:10mm; }
+:root{
+  --head:#800000; --head2:#a64b4b; --ink:#111827; --muted:#6b7280;
+  --line:#e5e7eb; --paper:#fff; --accent:#0ea5a4;
+}
+*{box-sizing:border-box;}
+body{margin:0;background:#f5f7fb;color:var(--ink);
+  font-family:"Inter","Noto Sans Devanagari","Segoe UI",Arial,sans-serif;}
+
+/* Header Removed */
+.titlebar{ display:none; }
+
+/* Layout */
+.wrap{max-width:1200px;margin:20px auto;display:grid;gap:16px;}
+.card{
+  background:var(--paper);
+  border:none;
+  border-radius:10px;
+  box-shadow:0 3px 10px rgba(0,0,0,.04);
+  padding:16px;
+}
+h2,h3{color:var(--head);margin:0 0 10px;}
+label{font-size:13px;color:var(--muted);font-weight:700;margin-bottom:4px;display:block;}
+input,select{
+  width:100%;padding:8px 10px;border:1px solid var(--line);
+  border-radius:8px;font-size:14px;
+}
+button{
+  background:var(--head);color:#fff;border:none;border-radius:8px;
+  padding:8px 12px;font-weight:700;cursor:pointer;transition:opacity .2s;
+}
+button:hover{opacity:.9;}
+button.secondary{background:var(--accent);}
+button.gray{background:#6b7280;}
+button.green{background:#28a745;}
+button.red{background:#dc3545;}
+
+.table-container{overflow:auto;max-height:600px;}
+table{width:100%;border-collapse:collapse;font-size:13px;background:transparent;}
+th,td{padding:8px 6px;border-bottom:none;text-align:left;}
+th{background:transparent;color:var(--head);position:sticky;top:0;z-index:5;}
+tr:hover{background:#fafafa;}
+.search-bar{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
+
+/* Security Overlay */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);
+  display:flex;align-items:center;justify-content:center;z-index:10000;}
+.modal-auth{
+  background:#fff;padding:20px;border-radius:10px;width:320px;text-align:center;
+  box-shadow:0 8px 30px rgba(0,0,0,.3);
+}
+.modal-auth h3{color:var(--head);margin:0 0 8px;}
+#secMsg{margin-top:8px;color:#c62828;font-weight:700;}
+
+@media(max-width:900px){.wrap{padding:10px;}}
+</style>
+</head>
+<body>
+
+<!-- 🔐 Security -->
+<div id="securityOverlay" class="overlay">
+  <div class="modal-auth">
+    <h3>🔐 Security Code</h3>
+    <p class="muted">Loan Dashboard खोलने के लिए कोड दर्ज करें</p>
+    <input id="securityInput" type="password" placeholder="Security Code"
+      style="width:100%;padding:8px;border-radius:6px;border:1.4px solid #ddd;">
+    <div style="margin-top:10px;"><button id="verifyBtn">Verify</button></div>
+    <div id="secMsg"></div>
+  </div>
+</div>
+
+<!-- Main -->
+<div id="mainUI" style="display:none;">
+
+  <!-- Titlebar removed -->
+  
+  <main class="wrap">
+
+    <!-- Loan Form -->
+    <div class="card">
+      <h2>📋 Loan Registration</h2>
+      <button id="toggleFormBtn" class="secondary">➕ नया लोन दर्ज करें</button>
+
+      <form id="loanForm" style="display:none;margin-top:12px;">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <div style="flex:1;"><label>Full Name</label><input id="name" required></div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <div style="flex:1;"><label>Aadhaar</label><input id="aadhaar" maxlength="12" required></div>
+          <div style="flex:1;"><label>Mobile</label><input id="mobile" maxlength="10" required></div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <div style="flex:1;"><label>Guarantor Name</label><input id="guarantorName" required></div>
+          <div style="flex:1;"><label>Guarantor Mobile</label><input id="guarantorMobile" maxlength="10" required></div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <div style="flex:1;"><label>Loan Amount (₹)</label><input type="number" id="loanAmount" required></div>
+          <div style="flex:1;"><label>Loan Fees (₹)</label><input type="number" id="loanFees" required></div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <div style="flex:1;"><label>Email</label><input type="email" id="email"></div>
+          <div style="flex:1;"><label>Account No.</label><input id="accountNumber" placeholder="SRC1234" required></div>
+        </div>
+        <div style="margin-top:10px;">
+          <button type="submit" class="green">💾 Register Loan</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Loan History -->
+    <div class="card">
+      <h2>📊 Loan Records</h2>
+      <div class="search-bar">
+        <input id="searchInput" placeholder="Search by Name / Mobile / Loan ID" />
+      </div>
+
+      <div class="table-container">
+        <table id="loanTable">
+          <thead>
+            <tr>
+              <th>Loan ID</th><th>Timestamp</th><th>Name</th><th>Aadhaar</th><th>Mobile</th>
+              <th>Guarantor</th><th>Guarantor Mobile</th><th>Loan Amount</th>
+              <th>Loan Fees</th><th>Email</th><th>Account</th><th>Status</th><th>Action</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <div style="text-align:center;padding:10px;color:var(--muted);font-size:12px;">
+    © SRCCS — Loan Management · Powered by Google Sheets
+  </div>
+</div>
+
+<script>
+const SECURITY_CODE="R@dha9754";
+const overlay=document.getElementById('securityOverlay');
+const mainUI=document.getElementById('mainUI');
+const verifyBtn=document.getElementById('verifyBtn');
+const secInput=document.getElementById('securityInput');
+const secMsg=document.getElementById('secMsg');
+
+verifyBtn.onclick=()=>{
+  if(secInput.value===SECURITY_CODE){
+    overlay.style.display='none';
+    mainUI.style.display='block';
+    loadData();
+  }else{secMsg.textContent="❌ गलत कोड!";}
+};
+
+const form=document.getElementById('loanForm');
+const tableBody=document.querySelector('#loanTable tbody');
+const toggleBtn=document.getElementById('toggleFormBtn');
+const searchInput=document.getElementById('searchInput');
+const WEB_APP_URL="https://script.google.com/macros/s/AKfycbwP8CYDgp0KpkdiBANCmpbJDrFVWuncaa5F95rzIiHbCl-Zr3RyBeFuuTRMHbPaqdT4/exec";
+let allLoans=[];
+
+// Toggle Form
+toggleBtn.onclick=()=>form.style.display=form.style.display==="none"?"block":"none";
+
+// Register Loan
+form.onsubmit=async e=>{
+  e.preventDefault();
+  const data={
+    name:name.value,aadhaar:aadhaar.value,mobile:mobile.value,
+    guarantorName:guarantorName.value,guarantorMobile:guarantorMobile.value,
+    loanAmount:loanAmount.value,loanFees:loanFees.value,
+    email:email.value,accountNumber:accountNumber.value
+  };
+  const fd=new URLSearchParams();fd.append("action","register");
+  for(let k in data) fd.append(k,data[k]);
+  const res=await fetch(WEB_APP_URL,{method:'POST',body:fd});
+  const r=await res.json();alert(r.message);
+  form.reset();form.style.display="none";loadData();
+};
+
+// Load Data
+async function loadData(){
+  try{
+    const res=await fetch(WEB_APP_URL+"?action=get");
+    let data=await res.json();
+    if(data.records) data=data.records;
+    if(typeof data==="string") data=JSON.parse(data);
+    if(!Array.isArray(data)) data=[];
+    allLoans=data;
+    renderTable(allLoans);
+  }catch(e){console.error("Fetch Error:",e);}
+}
+
+// Render Table
+function renderTable(data){
+  tableBody.innerHTML='';
+  if(!data.length){
+    tableBody.innerHTML='<tr><td colspan="13" style="text-align:center;color:#888;">No Records Found</td></tr>';
+    return;
+  }
+  data.forEach((r,i)=>{
+    const tr=document.createElement('tr');
+    let bg='';
+    if(r.Status){
+      const s=r.Status.toLowerCase();
+      if(s==='pending')bg='#fff4ce';
+      if(s==='approved')bg='#eafbea';
+      if(s==='rejected')bg='#fdeaea';
+    }
+    tr.style.background=bg;
+    tr.innerHTML=`<td>${r.LoanID||''}</td><td>${r.Timestamp||''}</td>
+    <td>${r.Name||''}</td><td>${r.Aadhaar||''}</td><td>${r.Mobile||''}</td>
+    <td>${r.GuarantorName||''}</td><td>${r.GuarantorMobile||''}</td>
+    <td>${r.LoanAmount||''}</td><td>${r.LoanFees||''}</td><td>${r.Email||''}</td>
+    <td>${r.AccountNumber||''}</td><td>${r.Status||''}</td>
+    <td>${r.Status&&r.Status.toLowerCase()==='pending'
+      ?`<button class="green" onclick="updateStatus(${i},'approve')">Approve</button>
+         <button class="red" onclick="updateStatus(${i},'reject')">Reject</button>`:''}</td>`;
+    tableBody.appendChild(tr);
+  });
+}
+
+// Update Status
+async function updateStatus(i,a){
+  const fd=new URLSearchParams();
+  fd.append("action",a);
+  fd.append("rowIndex",i);
+  const res=await fetch(WEB_APP_URL,{method:'POST',body:fd});
+  const r=await res.json();
+  alert(r.message);
+  loadData();
+}
+
+// Live Search
+searchInput.addEventListener('input',()=>{
+  const term=searchInput.value.trim().toLowerCase();
+  if(!term){renderTable(allLoans);return;}
+  const f=allLoans.filter(r=>{
+    return (r.Name||'').toLowerCase().includes(term) ||
+           (r.Mobile||'').includes(term) ||
+           (r.LoanID||'').toLowerCase().includes(term) ||
+           (r.AccountNumber||'').toLowerCase().includes(term);
+  });
+  renderTable(f);
+});
+
+// Initial Load
+loadData();
+</script>
+</body>
+</html>

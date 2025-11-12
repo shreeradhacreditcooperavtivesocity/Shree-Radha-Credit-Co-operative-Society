@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SRCCS — Agent Transaction & Dashboard</title>
+
+<style>
+  @page { size:A4; margin:10mm; }
+  :root {
+    --ink:#111827; --muted:#6b7280; --line:#e5e7eb;
+    --head:#800000; --head2:#a64b4b; --accent:#0ea5a4; --paper:#fff;
+  }
+  *{box-sizing:border-box;}
+  body {
+    margin:0; background:#f5f7fb; color:var(--ink);
+    font-family:"Inter","Noto Sans Devanagari","Segoe UI",Arial,sans-serif;
+  }
+
+  /* SECTION CARD */
+  .section {
+    max-width:1200px; margin:20px auto; background:var(--paper);
+    border:1px solid var(--line); border-radius:10px;
+    box-shadow:0 3px 10px rgba(0,0,0,.05); padding:16px;
+  }
+  h2 { color:var(--head); font-size:18px; margin-top:0; text-align:center; }
+
+  label { display:block; font-size:13px; color:var(--muted); font-weight:700; margin-bottom:4px; }
+  input, select, button {
+    width:100%; padding:10px 12px; border:1px solid var(--line);
+    border-radius:8px; font-size:14px; font-family:inherit;
+  }
+  input:focus, select:focus { outline:2px solid var(--accent); border-color:var(--accent); }
+
+  button {
+    background:var(--head); color:#fff; border:none;
+    border-radius:8px; font-weight:700; cursor:pointer; transition:opacity .2s;
+  }
+  button:hover { opacity:.9; }
+  button.secondary { background:var(--accent); }
+
+  .msg { text-align:center; margin-top:10px; font-weight:600; font-size:13px; }
+  .success{ color:#2e7d32; } .error{ color:#c62828; }
+
+  /* DASHBOARD TABLE */
+  .flex { display:flex; flex-wrap:wrap; gap:16px; align-items:center; margin-bottom:12px; }
+  .stat { flex:1; min-width:120px; }
+  .stat h1, .stat h2 { margin:0; }
+  .stat small { color:var(--muted); font-size:13px; }
+
+  table { width:100%; border-collapse:collapse; font-size:13px; margin-top:10px; }
+  th, td { padding:8px 6px; border-bottom:1px solid var(--line); text-align:left; }
+  th { background:#f3f4f6; color:var(--head); position:sticky; top:0; z-index:2; }
+
+  .controls {
+    display:flex; gap:10px; align-items:center; margin:10px 0; flex-wrap:nowrap;
+  }
+  .controls input, .controls select { width:auto; }
+  .muted { color:var(--muted); font-size:13px; }
+
+  .footer {
+    text-align:center; padding:10px; color:var(--muted);
+    font-size:12px; margin-top:20px; border-top:1px solid var(--line);
+  }
+
+  /* AGENT TRANSACTION ROW STYLE */
+  .agent-row {
+    display:flex; flex-wrap:wrap; gap:10px; align-items:end; justify-content:space-between;
+  }
+  .agent-row > div { flex:1; min-width:180px; }
+  .agent-prefix {
+    display:flex; align-items:center;
+  }
+  .agent-prefix span {
+    padding:10px 12px; background:#f3f4f6; border:1px solid var(--line);
+    border-right:none; border-radius:8px 0 0 8px; font-weight:700;
+  }
+  .agent-prefix input {
+    flex:1; border-radius:0 8px 8px 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- 🔹 AGENT TRANSACTION SECTION -->
+<div class="section" id="agentPanel">
+  <h2>💼 Agent Transaction Entry</h2>
+
+  <div class="agent-row">
+    <div>
+      <label>Account Number</label>
+      <div class="agent-prefix">
+        <span>SRC</span>
+        <input id="aAccount" maxlength="4" pattern="[0-9]{4}" placeholder="Enter 4 digits" required>
+      </div>
+    </div>
+
+    <div>
+      <label>Amount</label>
+      <input id="aAmount" type="number" placeholder="Enter amount" required>
+    </div>
+
+    <div>
+      <label>Transaction Type</label>
+      <select id="aType" required>
+        <option value="">--Select Type--</option>
+        <option value="credit">Credit</option>
+        <option value="debit">Debit</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Agent ID</label>
+      <select id="aID" required>
+        <option value="">--Select Agent ID--</option>
+        <option value="SH7333">SH7333</option>
+        <option value="KA4564">KA4564</option>
+        <option value="JE2659">JE2659</option>
+        <option value="SRCCS1432">SRCCS1432</option>
+      </select>
+    </div>
+  </div>
+
+  <button style="margin-top:15px;" onclick="saveTransaction()">💾 Submit Transaction</button>
+  <div id="msg" class="msg"></div>
+</div>
+
+<!-- 🔹 DASHBOARD SECTION -->
+<div class="section">
+  <h2>📊 Accounts Activity Overview</h2>
+
+  <div class="flex" style="background:#f9fafb;padding:10px;border-radius:8px;border:1px solid var(--line);margin-bottom:16px;">
+    <div class="stat"><small>Today's Credit</small><h2 style="color:#15803d;">₹<span id="creditToday">—</span></h2></div>
+    <div class="stat"><small>Today's Debit</small><h2 style="color:#b91c1c;">₹<span id="debitToday">—</span></h2></div>
+    <div class="stat"><small>Total Account Balance</small><h2 style="color:#0ea5a4;">₹<span id="totalBalance">—</span></h2></div>
+  </div>
+
+  <div class="flex">
+    <div class="stat"><small>Total Accounts</small><h1 id="total">—</h1></div>
+    <div class="stat"><small>Active</small><h2 id="active">—</h2></div>
+    <div class="stat"><small>Inactive</small><h2 id="inactive">—</h2></div>
+    <div class="stat" style="margin-left:auto;text-align:right;">
+      <small>Days Threshold</small><br><input id="days" type="number" value="90" style="width:80px;">
+    </div>
+  </div>
+
+  <div class="controls">
+    <input id="search" type="search" placeholder="🔍 Search Account...">
+    <select id="filter">
+      <option value="all">All</option>
+      <option value="active">Active</option>
+      <option value="inactive">Inactive</option>
+    </select>
+    <button id="refresh">🔄 Refresh</button>
+    <button id="export" class="secondary">⬇️ Export CSV</button>
+    <div style="margin-left:auto" class="muted">⚙️ Data auto-fetched from Google Sheets</div>
+  </div>
+
+  <div style="max-height:550px;overflow:auto;">
+    <table>
+      <thead>
+        <tr>
+          <th>Account</th><th>Created</th><th>Balance</th>
+          <th>Last Payment</th><th>Last Amount</th><th>Tx Count</th><th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="footer">
+  © SRCCS — Data Synced with Google Sheets
+</div>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbyNgpjiGxsdawUqPPVwsclM0x3AOlFPSK-VsgpH937HLf4A7XrhuncW8M0F0UcNKWmT/exec";
+const DEPLOY_URL = "https://script.google.com/macros/s/AKfycbyuHzq1IBru6FSSpoiLcojOXZV2AAyASvr5m_njh0VZ1EVX_arFGvcd4MU6b5AJiX5t/exec";
+
+async function saveTransaction(){
+  const accSuffix=document.getElementById("aAccount").value.trim();
+  const amt=document.getElementById("aAmount").value.trim();
+  const type=document.getElementById("aType").value.trim();
+  const id=document.getElementById("aID").value.trim();
+  const msg=document.getElementById("msg");
+  if(accSuffix.length!==4||isNaN(accSuffix)){alert("⚠️ कृपया 4 अंकों का मान्य खाता नंबर दर्ज करें!");return;}
+  if(!amt||!type||!id){alert("⚠️ सभी फ़ील्ड भरें!");return;}
+  const acc="SRC"+accSuffix;
+  const btn=document.querySelector("button[onclick='saveTransaction()']");
+  btn.disabled=true; btn.innerText="⏳ Saving..."; msg.textContent="";
+  try{
+    const res=await fetch(API_URL,{method:"POST",body:JSON.stringify({fn:"transaction",account:acc,amount:amt,type:type,agent:id})});
+    const data=await res.json();
+    msg.textContent=data.message||"✅ Transaction Saved";
+    msg.className="msg success";
+    document.getElementById("aAccount").value="";
+    document.getElementById("aAmount").value="";
+    document.getElementById("aType").value="";
+    document.getElementById("aID").value="";
+  }catch(e){
+    msg.textContent="⚠️ Server Error!";
+    msg.className="msg error";
+  }finally{
+    btn.disabled=false; btn.innerText="💾 Submit Transaction";
+    setTimeout(()=>msg.textContent="",4000);
+  }
+}
+
+async function fetchStatus(days=90){const u=new URL(DEPLOY_URL);u.searchParams.set('fn','getAccountsStatus');u.searchParams.set('days',days);const r=await fetch(u);return r.json();}
+async function fetchTotals(){const u=new URL(DEPLOY_URL);u.searchParams.set('fn','getTodayTotals');const r=await fetch(u);return r.json();}
+function renderTable(a){const t=document.getElementById('tbody');t.innerHTML='';a.forEach(r=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${r.account}</td><td>${r.createdDate||'-'}</td><td>₹${r.balance}</td><td>${r.lastPaymentDate||'-'}</td><td>${r.lastPaymentAmount||'-'}</td><td>${r.transactionsCount||0}</td><td>${r.active?'<span style="color:#2e7d32">Active</span>':'<span style="color:#888">Inactive</span>'}</td>`;t.appendChild(tr);});}
+async function load(){const d=parseInt(document.getElementById('days').value,10)||90;const[resp,tot]=await Promise.all([fetchStatus(d),fetchTotals()]);if(!resp||!resp.success){alert('⚠️ Error fetching data.');return;}
+document.getElementById('total').textContent=resp.total;
+document.getElementById('active').textContent=resp.activeCount;
+document.getElementById('inactive').textContent=resp.inactiveCount;
+window._accountsList=resp.accounts||[];applyFilters();
+if(tot&&tot.success){document.getElementById('creditToday').textContent=tot.creditToday||0;
+document.getElementById('debitToday').textContent=tot.debitToday||0;
+document.getElementById('totalBalance').textContent=tot.totalBalance||0;}}
+function applyFilters(){const s=(document.getElementById('search').value||'').toLowerCase(),f=document.getElementById('filter').value;let d=window._accountsList||[];if(f==='active')d=d.filter(x=>x.active);if(f==='inactive')d=d.filter(x=>!x.active);if(s)d=d.filter(x=>(x.account||'').toLowerCase().includes(s));renderTable(d);}
+function exportCSV(){const d=window._accountsList||[],rows=[['Account','Created','Balance','LastPayment','LastAmount','TxCount','Active']];d.forEach(r=>rows.push([r.account,r.createdDate||'',r.balance,r.lastPaymentDate||'',r.lastPaymentAmount||'',r.transactionsCount||0,r.active?'Active':'Inactive']));const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');const blob=new Blob([csv],{type:'text/csv'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='accounts_status.csv';a.click();URL.revokeObjectURL(url);}
+document.getElementById('refresh').addEventListener('click',load);
+document.getElementById('search').addEventListener('input',applyFilters);
+document.getElementById('filter').addEventListener('change',applyFilters);
+document.getElementById('export').addEventListener('click',exportCSV);
+load();
+</script>
+</body>
+</html>
