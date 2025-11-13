@@ -18,7 +18,6 @@
     font-family:"Inter","Noto Sans Devanagari","Segoe UI",Arial,sans-serif;
   }
 
-  /* titlebar removed */
   .titlebar{ display:none; }
 
   .wrap{ max-width:1200px; margin:18px auto;
@@ -26,7 +25,7 @@
     gap:16px; align-items:start;
   }
   .card{
-    background:var(--paper); border: none; /* removed visible border */
+    background:var(--paper); border: none;
     border-radius:10px; box-shadow:0 3px 10px rgba(0,0,0,.04);
     padding:16px;
   }
@@ -35,7 +34,7 @@
   input, select{
     width:100%; padding:8px 10px; border:1px solid var(--line);
     border-radius:8px; font-size:14px;
-    background: #ffffff;
+    background: #ffffff; color:var(--ink);
   }
   .row{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
   .col{ flex:1; }
@@ -49,7 +48,7 @@
   button.gray{ background:#6b7280; }
 
   .total-box{
-    background:#fff9f9; border:0px; /* removed dashed border */
+    background:#fff9f9; border:0px;
     padding:10px; border-radius:8px; text-align:center;
     font-weight:700; font-size:16px; color:var(--head);
     margin-bottom:10px;
@@ -58,8 +57,8 @@
   .controls{ display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap; }
   .controls input{ flex:1; }
 
-  table{ width:100%; border-collapse:collapse; font-size:13px; background:transparent; }
-  th,td{ padding:8px 6px; border-bottom: none; text-align:left; } /* removed bottom borders */
+  table{ width:100%; border-collapse:collapse; font-size:13px; background:transparent; color:var(--ink); }
+  th,td{ padding:8px 6px; border-bottom: none; text-align:left; vertical-align:top; }
   th{ background:transparent; color:var(--head); position:sticky; top:0; z-index:5; font-weight:700; }
   .norec{ padding:12px; color:var(--muted); text-align:center; font-style:italic; }
 
@@ -69,8 +68,6 @@
 </style>
 </head>
 <body>
-
-<!-- titlebar intentionally removed -->
 
 <div class="wrap">
   <!-- Left: Form -->
@@ -140,7 +137,7 @@
         <tfoot>
           <tr>
             <td colspan="3" style="text-align:right;font-weight:700;">Page Total:</td>
-            <td id="pageTotal" style="font-weight:700;"></td>
+            <td id="pageTotal" style="font-weight:700;">₹ 0</td>
             <td></td>
           </tr>
         </tfoot>
@@ -161,11 +158,37 @@ const form = $('#savingForm');
 const resultsTbody = $('#resultsTable tbody');
 const totalAmountBox = $('#totalAmount');
 const pageTotalEl = $('#pageTotal');
+const noRecordsEl = $('#noRecords');
 
-/* show current date (India) in console area if needed - kept but not visible */
-document.addEventListener('DOMContentLoaded', ()=> {
-  // optional: you can show date somewhere if needed
-});
+/** Helper to safely get field (handles different header name variants) */
+function getField(obj, candidates){
+  if(!obj) return "";
+  for(const k of candidates){
+    if(Object.prototype.hasOwnProperty.call(obj,k) && obj[k] !== undefined && obj[k] !== null && String(obj[k]).trim() !== ""){
+      return String(obj[k]);
+    }
+    // try lowercase keys
+    const lowerKey = Object.keys(obj).find(x=>x.toLowerCase().trim() === (k+'').toLowerCase().trim());
+    if(lowerKey) return String(obj[lowerKey]===null? '': obj[lowerKey]);
+  }
+  return "";
+}
+
+/** Friendly date parse/format to India timezone */
+function formatDateForDisplay(dateStr){
+  if(!dateStr) return '-';
+  // try parse
+  let d = new Date(dateStr);
+  if(isNaN(d.getTime())){
+    // try treating as Excel serial or alternative formats - fallback to original string
+    return dateStr;
+  }
+  try{
+    return d.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+  }catch(e){
+    return d.toString();
+  }
+}
 
 async function loadEntries() {
   const name = $('#searchInput').value.trim();
@@ -179,6 +202,7 @@ async function loadEntries() {
     const data = await res.json();
     renderTable(data.rows || []);
   }catch(err){
+    console.error('Load entries error', err);
     renderTable([]);
   }
 }
@@ -186,19 +210,35 @@ async function loadEntries() {
 function renderTable(rows){
   resultsTbody.innerHTML = "";
   let total = 0;
-  if(rows.length===0){ document.getElementById('noRecords').style.display='block'; pageTotalEl.textContent='₹ 0'; return; }
-  document.getElementById('noRecords').style.display='none';
+  if(!rows || rows.length===0){
+    noRecordsEl.style.display='block';
+    pageTotalEl.textContent='₹ 0';
+    return;
+  }
+  noRecordsEl.style.display='none';
+
+  // iterate rows
   rows.forEach(r=>{
-    const amt = Number(r['Amount'] || 0);
+    // robust key lookup with fallbacks
+    const dateVal = getField(r, ['Date & Time','Date','date','DateTime','Timestamp','DateTime']);
+    const nameVal = getField(r, ['Agent Name','Name','agentname','agent name','agent']);
+    const idVal = getField(r, ['Agent ID','AgentID','ID','Account Number','Agent Id','agent id']);
+    const amtRaw = getField(r, ['Amount','amount','Amt','AMOUNT']);
+    const opVal = getField(r, ['Office / Operator Name','Office','Operator','Operator Name','Office / Operator Name','Office/Operator','Office/Operator Name']);
+
+    // parse amount number safely
+    const amtNum = Number(String(amtRaw).replace(/[^0-9.-]+/g,'')) || 0;
+
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${r['Date & Time']}</td>
-                    <td>${r['Agent Name']}</td>
-                    <td>${r['Agent ID']}</td>
-                    <td>${amt.toLocaleString('en-IN')}</td>
-                    <td>${r['Office / Operator Name']}</td>`;
+    tr.innerHTML = `<td>${formatDateForDisplay(dateVal)}</td>
+                    <td>${nameVal || '-'}</td>
+                    <td>${idVal || '-'}</td>
+                    <td>${amtNum ? amtNum.toLocaleString('en-IN') : '-'}</td>
+                    <td>${opVal || '-'}</td>`;
     resultsTbody.appendChild(tr);
-    total += amt;
+    total += amtNum;
   });
+
   pageTotalEl.textContent = `₹ ${total.toLocaleString('en-IN')}`;
 }
 
@@ -211,15 +251,16 @@ form.addEventListener('submit', async e=>{
     "Office / Operator Name": form.operatorName.value.trim(),
     "Date & Time": new Date().toLocaleString('en-IN',{timeZone:'Asia/Kolkata'})
   };
-  // send to sheets (no-cors to avoid CORS blocking on simple webhook style)
   try{
     await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',body:JSON.stringify(data)});
   }catch(e){
-    // ignore network errors for no-cors mode
+    // ignore network errors for no-cors
+    console.warn('POST (no-cors) ignored', e);
   }
   form.reset();
   $('#successMsg').style.display='block';
   setTimeout(()=>$('#successMsg').style.display='none',2000);
+  // refresh
   loadEntries(); loadTotal();
 });
 
@@ -243,7 +284,8 @@ async function loadTotal(){
     const res = await fetch(`${SCRIPT_URL}?action=total`);
     const data = await res.json();
     totalAmountBox.textContent = `Total: ₹ ${Number(data.total||0).toLocaleString('en-IN')}`;
-  }catch{
+  }catch(err){
+    console.warn('total load failed', err);
     totalAmountBox.textContent = 'Total: ₹ —';
   }
 }
