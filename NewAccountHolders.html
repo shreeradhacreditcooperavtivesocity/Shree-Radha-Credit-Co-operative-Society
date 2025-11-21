@@ -94,7 +94,7 @@
 
 <body>
 
-<!-- 🔍 SEARCH BAR -->
+<!-- SEARCH BAR -->
 <div class="search-bar">
   <input type="text" id="searchInput" placeholder="सदस्य का नाम या मोबाइल नंबर दर्ज करें..." />
   <button id="searchBtn">खोजें</button>
@@ -128,7 +128,7 @@
         मैं प्रवेश शुल्क रु. <span class="uline"><input type="text"></span> कुल रु.
         <span class="uline"><input type="text"></span> जमा कर रहा/रही हूँ।<br>
         कृपया मुझे सिर्फ “ब” वर्ग का सदस्य बनाकर अनुज्ञापित करें।<br>
-        मेरा सम्पूर्ण विवरण निम्नानुसार है—
+        मेरा सम्पूर्ण विवरण निम्नानुसार है— 
       </div>
 
       <div style="width:40mm; text-align:center;">
@@ -191,7 +191,30 @@
 </div>
 
 <script>
-/* Helper: make boxes for Aadhaar/PAN/mobile/DOB */
+
+/* AUTO JUMP IN BOXES */
+document.addEventListener("input", e => {
+  const inp = e.target;
+  if (inp.tagName === "INPUT" && inp.maxLength === 1) {
+    if (inp.value.length === 1) {
+      let next = inp.parentElement.nextElementSibling;
+      if (next && next.querySelector("input")) next.querySelector("input").focus();
+    }
+  }
+});
+
+/* AUTO BACKSPACE TO PREVIOUS BOX */
+document.addEventListener("keydown", e => {
+  const inp = e.target;
+  if (inp.tagName === "INPUT" && inp.maxLength === 1) {
+    if (e.key === "Backspace" && inp.value === "") {
+      let prev = inp.parentElement.previousElementSibling;
+      if (prev && prev.querySelector("input")) prev.querySelector("input").focus();
+    }
+  }
+});
+
+/* Helper: make boxes */
 function buildBoxes(el, count){
   for(let i=0;i<count;i++){
     const b=document.createElement('div');
@@ -228,9 +251,9 @@ photoInput.addEventListener('change', e=>{
 });
 
 /* Script URL */
-const scriptURL = "https://script.google.com/macros/s/AKfycbwSmo3eytqPEsqB-Jz5pAbz4_zIrXC95zSAjqHJcoNof7DCDJOfdu47HgnLxRoeiAeZ/exec";
+const scriptURL = "https://script.google.com/macros/s/AKfycbxAv_9M29Uc0TRYf5JedRIzBpvawe4d7BtBiNathXEP2tvw0XRUGusXlj5m1kW5iruPiQ/exec";
 
-/* Read values */
+/* Get box values */
 function getBoxValue(id) {
   return Array.from(document.querySelectorAll(`#${id} input`)).map(i=>i.value).join('');
 }
@@ -238,38 +261,38 @@ function getBoxValue(id) {
 /* Save to sheet */
 async function saveToSheet() {
   const payload = {
-    name: document.getElementById('name').value || "",
-    father: document.getElementById('father').value || "",
+    name: document.getElementById('name').value,
+    father: document.getElementById('father').value,
     aadhaar: getBoxValue('aadhaarBoxes'),
     pan: getBoxValue('panBoxes'),
     dob: getBoxValue('dobBoxes'),
     age: getBoxValue('ageBoxes'),
-    caste: document.getElementById('caste').value || "",
-    category: document.getElementById('category').value || "",
-    occupation: document.getElementById('occupation').value || "",
-    govpost: document.getElementById('govpost').value || "",
-    permanent: document.getElementById('permanent').value || "",
+    caste: document.getElementById('caste').value,
+    category: document.getElementById('category').value,
+    occupation: document.getElementById('occupation').value,
+    govpost: document.getElementById('govpost').value,
+    permanent: document.getElementById('permanent').value,
     mobile: getBoxValue('mobileBoxes'),
-    local: document.getElementById('local').value || "",
-    nominee: document.getElementById('nominee').value || "",
-    relation: document.getElementById('relation').value || "",
+    local: document.getElementById('local').value,
+    nominee: document.getElementById('nominee').value,
+    relation: document.getElementById('relation').value,
     photoBase64
   };
 
   try {
     await fetch(scriptURL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+      method:"POST",
+      mode:"no-cors",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(payload)
     });
-    alert("✅ डेटा सफलतापूर्वक सेव हो गया!");
+    alert("✔ डेटा सेव हो गया!");
   } catch (err) {
-    alert("❌ त्रुटि: " + err.message);
+    alert("त्रुटि: " + err.message);
   }
 }
 
-/* SEARCH function */
+/* Search */
 document.getElementById('searchBtn').addEventListener('click', async ()=>{
   const searchValue = document.getElementById('searchInput').value.trim();
   if(!searchValue){ alert("कृपया नाम या मोबाइल नंबर दर्ज करें!"); return; }
@@ -277,9 +300,8 @@ document.getElementById('searchBtn').addEventListener('click', async ()=>{
   try{
     const res = await fetch(scriptURL + "?search=" + encodeURIComponent(searchValue));
     const data = await res.json();
-    if(!data || !data.name){ alert("❌ रिकॉर्ड नहीं मिला!"); return; }
+    if(!data || !data.name){ alert("रिकॉर्ड नहीं मिला!"); return; }
 
-    // Fill data
     document.getElementById('name').value = data.name;
     document.getElementById('father').value = data.father;
     document.getElementById('caste').value = data.caste;
@@ -291,17 +313,11 @@ document.getElementById('searchBtn').addEventListener('click', async ()=>{
     document.getElementById('nominee').value = data.nominee;
     document.getElementById('relation').value = data.relation;
 
-    if(data.photoUrl){
-      photoPreview.src = data.photoUrl;
-      photoPreview.style.display='block';
-      if(photoBox.firstElementChild) photoBox.firstElementChild.style.display='none';
-    }
   }catch(err){
-    alert("❌ खोज त्रुटि: "+err.message);
+    alert("खोज त्रुटि: "+err.message);
   }
 });
 
-/* Bind buttons */
 document.getElementById('btnSave').addEventListener('click', e=>{
   e.preventDefault();
   saveToSheet();
@@ -311,5 +327,6 @@ document.getElementById('btnPrint').addEventListener('click', e=>{
   window.print();
 });
 </script>
+
 </body>
 </html>
