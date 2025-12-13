@@ -3,296 +3,613 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Loan Dashboard — Shree Radha Credit Co-operative Society</title>
+<title>SRCCS — Ultra Pro Loan Dashboard (Final - FIC)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600&display=swap" rel="stylesheet">
 <style>
-:root{--maroon:#800000;--light:#a55252;--paper:#fff;--muted:#666}
-*{box-sizing:border-box}
-body{font-family:Inter, system-ui, Arial; margin:0; background:#f6f7fb; color:#222}
-
-.wrap{max-width:1200px;margin:18px auto;padding:18px}
-.card{background:var(--paper);border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,0.06);padding:16px;margin-bottom:16px}
-label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
-input,select,textarea{width:100%;padding:10px;border:1px solid #e5e7eb;border-radius:8px}
-button{background:var(--maroon);color:white;border:0;padding:10px 14px;border-radius:8px;cursor:pointer}
-.muted{color:var(--muted);font-size:13px}
-table{width:100%;border-collapse:collapse}
-th,td{padding:10px;border-bottom:1px solid #f0f0f0;text-align:left;font-size:14px}
-th{background:#fafafa}
-.top-buttons{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px}
-.toggle-card{display:none;margin-bottom:16px}
-.alert-box{background:#ffe4e1;color:#800000;padding:10px 14px;border-radius:8px;margin-bottom:10px;font-weight:600;border:1px solid #f5c2c2;cursor:pointer}
-.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);justify-content:center;align-items:center;z-index:1000}
-.modal-content{background:#fff;padding:20px;border-radius:8px;max-width:800px;width:95%;max-height:80%;overflow:auto;position:relative}
-.modal-close{position:absolute;top:8px;right:12px;font-size:20px;font-weight:bold;cursor:pointer}
-@media(max-width:900px){.top-buttons{flex-direction:column}}
-@media print{
-  body *{visibility:hidden}
-  .print-area, .print-area *{visibility:visible}
-  .print-area{position:fixed;left:0;top:0;width:100%}
+:root{
+  --bg:#0b1220; --card:#0f172a; --muted:#9aa4b2; --accent:#800000; --accent2:#0ea5a4; --text:#e6eef6; --glass-border: rgba(255,255,255,0.06);
+  --success:#22c55e; --danger:#ff4d4d;
 }
+*{box-sizing:border-box;margin:0;padding:0;font-family:Inter,'Noto Sans Devanagari',system-ui,sans-serif}
+html,body{height:100%}
+body{
+  background: radial-gradient(circle at 10% 10%, #0d162c 0%, #020612 30%, #000 100%);
+  color:var(--text);padding:18px;-webkit-font-smoothing:antialiased;
+}
+.header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;gap:12px}
+.brand{display:flex;flex-direction:column}
+.badge{display:inline-flex;align-items:center;gap:8px;padding:4px 10px;font-size:12px;background:rgba(128,0,0,0.12);border:1px solid rgba(128,0,0,0.25);color:#ffcfcf;border-radius:999px}
+.badge-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px rgba(255,0,0,0.2)}
+.title h1{font-size:18px;margin-top:8px}
+.subtitle{font-size:13px;color:var(--muted);margin-top:6px}
+
+/* layout */
+.container{max-width:1250px;margin:0 auto;display:grid;grid-template-columns:1fr 420px;gap:18px;align-items:start}
+@media(max-width:1100px){ .container{grid-template-columns:1fr} }
+
+/* left card */
+.main-card{background:linear-gradient(145deg,#0c172c,#020812);padding:14px;border-radius:14px;border:1px solid rgba(255,255,255,0.04);box-shadow:0 20px 45px rgba(0,0,0,0.6)}
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:12px}
+.card-small{padding:12px;border-radius:12px;background:linear-gradient(160deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border:1px solid var(--glass-border)}
+.label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em}
+.value{font-size:20px;margin-top:6px;font-weight:700}
+
+/* table */
+.panel{background:var(--card);border-radius:12px;padding:12px;border:1px solid var(--glass-border);backdrop-filter: blur(6px)}
+.section-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;color:var(--muted);font-weight:600}
+.controls{display:flex;gap:8px;align-items:center}
+.input{padding:8px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text);min-width:0}
+.btn{padding:10px 14px;background:var(--accent);border:none;color:white;border-radius:999px;cursor:pointer;box-shadow:0 6px 18px rgba(128,0,0,0.24);font-weight:600}
+.btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);padding:8px 10px;border-radius:8px;cursor:pointer}
+.table-wrapper{max-height:460px;overflow:auto;border-radius:8px;border:1px solid rgba(255,255,255,0.04);margin-top:6px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{position:sticky;top:0;background:rgba(255,255,255,0.03);backdrop-filter:blur(4px);padding:8px;text-align:left}
+tbody td{padding:8px;border-bottom:1px solid rgba(255,255,255,0.02);vertical-align:middle}
+tr:nth-child(even) td{background:rgba(255,255,255,0.01)}
+.account-link{color:var(--accent2);font-weight:700;cursor:pointer;text-decoration:underline}
+.pill{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.04);padding:6px 10px;border-radius:999px;font-size:12px;color:var(--muted)}
+
+/* right panel */
+.right-panel{display:flex;flex-direction:column;gap:12px}
+.agent-box{padding:12px;border-radius:12px;background:linear-gradient(160deg,rgba(255,255,255,0.02),rgba(0,0,0,0.08));border:1px solid var(--glass-border)}
+.agent-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px}
+.small-action{display:inline-block;margin-right:8px;font-size:13px;color:var(--accent2);text-decoration:underline;cursor:pointer}
+.due-item{padding:10px;border-radius:10px;margin-bottom:8px;background:linear-gradient(90deg, rgba(255,255,255,0.01), rgba(0,0,0,0.02));border:1px solid rgba(255,255,255,0.02)}
+.emi-due{border-left:4px solid #ffd27a;padding-left:10px}
+.emi-overdue{border-left:4px solid var(--danger);padding-left:10px;background:linear-gradient(90deg, rgba(255,0,0,0.02), rgba(0,0,0,0.02))}
+
+/* modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);display:none;align-items:center;justify-content:center;z-index:2000}
+.modal-box{background:var(--card);padding:16px;width:900px;max-height:90vh;overflow:auto;border-radius:14px;border:1px solid rgba(255,255,255,0.06)}
+.modal-close{float:right;background:#111;border:1px solid #333;color:#fff;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.kv{font-size:13px;color:var(--muted)}
+.footer-note{font-size:12px;color:var(--muted);margin-top:8px}
+.status-active{background:rgba(0,200,100,0.12);color:#bff6d0;padding:4px 8px;border-radius:999px}
+.status-complete{color:var(--success);font-weight:700}
+
+/* responsive tweaks */
+@media(max-width:600px){ .agent-row{grid-template-columns:1fr} }
 </style>
 </head>
 <body>
 
-<main class="wrap">
-
-<div id="alertArea"></div>
-
-<!-- Loan Summary -->
-<div id="loanSummary" class="card">
-  <h3>Loan Summary</h3>
-  <div style="display:flex;gap:20px;flex-wrap:wrap">
-    <div><strong>Total Loans:</strong> <span id="totalLoans">0</span></div>
-    <div><strong>Active Loans:</strong> <span id="activeLoans">0</span></div>
-    <div><strong>Total Principal:</strong> <span id="totalPrincipal">₹0</span></div>
-    <div><strong>Total Paid EMI:</strong> <span id="totalPaid">₹0</span></div>
-    <div><strong>Total Outstanding:</strong> <span id="totalOutstanding">₹0</span></div>
+<div class="header">
+  <div class="brand">
+    <div class="badge"><span class="badge-dot"></span> SRCCS • Ultra Pro Loans</div>
+    <div class="title"><h1>Shree Radha Credit Co-operative Society</h1></div>
+    <div class="subtitle">FIC Loans · EMI · Agent Entry · Reports</div>
+  </div>
+  <div style="text-align:right">
+    <div id="lastUpdatedText" class="kv">डेटा लोड हो रहा है...</div>
+    <div style="margin-top:8px"><button id="btnRefresh" class="btn-ghost">🔄 Refresh</button></div>
   </div>
 </div>
 
-<!-- Top Buttons -->
-<div class="top-buttons">
-  <button onclick="toggleForm('loanFormCard')">नया लोन</button>
-  <button onclick="toggleForm('emiFormCard')">EMI Payment</button>
-  <button onclick="toggleForm('penaltyFormCard')">Penalty Entry</button>
-</div>
+<div class="container">
+  <!-- LEFT -->
+  <div>
+    <div class="main-card panel">
+      <div class="summary">
+        <div class="card-small"><div class="label">Total Loans</div><div id="totalLoans" class="value">0</div></div>
+        <div class="card-small"><div class="label">Active Loans</div><div id="activeLoans" class="value">0</div></div>
+        <div class="card-small"><div class="label">Total Principal</div><div id="totalPrincipal" class="value">₹ 0</div></div>
+        <div class="card-small"><div class="label">Total Outstanding</div><div id="totalOutstanding" class="value">₹ 0</div></div>
+      </div>
 
-<!-- Forms -->
-<div id="loanFormCard" class="card toggle-card">
-  <h3>नया लोन दर्ज करें</h3>
-  <form id="loanForm" onsubmit="return false">
-    <label>Loan ID</label><input id="loanId" required />
-    <label>नाम</label><input id="name" required />
-    <label>खाता नंबर</label><input id="account" required />
-    <label>लोन राशि (₹)</label><input id="principal" type="number" min="0" required />
-    <label>सालाना ब्याज दर (%)</label><input id="rate" type="number" step="0.01" min="0" value="12" required />
-    <label>अवधि (महीनों में)</label><input id="tenure" type="number" min="1" value="12" required />
-    <div style="display:flex;gap:8px;margin-top:8px">
-      <button id="calcBtn" type="button">EMI Calculate</button>
-      <button id="addLoan" type="button">Add/Update Loan</button>
+      <div class="section-title">
+        <div style="display:flex;gap:8px;align-items:center"><div style="font-weight:700">Loan Register</div><div class="kv">(FIC model)</div></div>
+        <div class="controls">
+          <input id="searchAccount" class="input" placeholder="खोज: नाम / खाता / लोन ID" style="width:320px"/>
+          <button class="btn-ghost" id="btnAddLoan">+ नया लोन</button>
+        </div>
+      </div>
+
+      <div class="panel table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Loan ID</th><th>Name</th><th>Account</th><th>Principal</th><th>File Charge</th><th>Rate%</th><th>Tenure</th><th>Total Payable</th><th>EMI</th><th>Paid EMI</th><th>Penalty</th><th>Outstanding</th><th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="loansTbody">
+            <tr><td colspan="13" style="text-align:center;padding:18px;color:var(--muted)">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="margin-top:10px;display:flex;gap:8px">
+        <button id="btnExport" class="btn-ghost">⬇️ Export CSV</button>
+        <button id="btnPrint" class="btn-ghost">🖨️ Print Register</button>
+      </div>
+
+      <div class="footer-note">* डेटा Google Sheets / Apps Script में सुरक्षित है।</div>
     </div>
-    <div style="margin-top:10px">
-      <div class="muted">Calculated EMI</div>
-      <div id="emiResult" style="font-weight:700;font-size:16px">—</div>
-    </div>
-  </form>
-</div>
-
-<div id="emiFormCard" class="card toggle-card">
-  <h3>EMI Payment</h3>
-  <form id="emiForm" onsubmit="return false">
-    <label>Loan ID</label><input id="emiLoanId" required />
-    <label>Paid EMI (₹)</label><input id="emiAmount" type="number" min="0" required />
-    <label>Payment Date</label><input id="emiDate" type="date" value="" required />
-    <button id="payEmi" type="button">Submit EMI Payment</button>
-  </form>
-</div>
-
-<div id="penaltyFormCard" class="card toggle-card">
-  <h3>Penalty Entry</h3>
-  <form id="penaltyForm" onsubmit="return false">
-    <label>Loan ID</label><input id="penaltyLoanId" required />
-    <label>Penalty (₹)</label><input id="penaltyAmount" type="number" min="0" required />
-    <label>Payment Date</label><input id="penaltyDate" type="date" value="" required />
-    <button id="addPenalty" type="button">Add Penalty</button>
-  </form>
-</div>
-
-<!-- Loan List -->
-<div class="card">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-    <h2 style="margin:0;font-size:16px">Loan Register & List</h2>
-    <input id="search" placeholder="खोज: नाम / खाता नंबर / लोन आईडी" style="width:250px;padding:8px;border-radius:8px;border:1px solid #ddd" />
   </div>
-  <table>
-    <thead>
-      <tr><th>Loan ID</th><th>Name</th><th>Account</th><th>Principal</th><th>Rate%</th><th>Tenure</th><th>EMI</th><th>Paid EMI</th><th>Penalty</th><th>Outstanding</th><th>Action</th></tr>
-    </thead>
-    <tbody id="loansTbody"></tbody>
-  </table>
+
+  <!-- RIGHT -->
+  <div class="right-panel">
+    <div class="panel">
+      <div class="section-title"><div style="font-weight:700">🔔 Upcoming EMI Alerts</div><div id="alertCount" class="kv"></div></div>
+      <div id="alertArea" style="max-height:200px;overflow:auto"></div>
+    </div>
+
+    <div class="agent-box panel">
+      <div class="section-title"><div style="font-weight:700">💼 Agent Entry</div><div id="agentClock" class="kv"></div></div>
+      <div class="agent-row">
+        <div><div class="kv">Account (last 4 digits)</div><input id="aAccount" class="input" maxlength="4" placeholder="e.g. 3578" /></div>
+        <div><div class="kv">Amount (₹)</div><input id="aAmount" class="input" type="number" placeholder="Amount" /></div>
+        <div><div class="kv">Type</div><select id="aType" class="input"><option value="">Select</option><option value="credit">Credit</option><option value="debit">Debit</option></select></div>
+        <div><div class="kv">Agent ID</div><select id="aID" class="input"><option value="">Select</option><option>SH7333</option><option>KA4564</option><option>JE2659</option><option>SRCCS1432</option></select></div>
+      </div>
+      <button id="agentSubmit" class="btn" style="margin-top:10px">💾 Submit</button>
+      <div id="agentMsg" class="kv" style="margin-top:8px"></div>
+    </div>
+
+    <div class="panel">
+      <div class="section-title"><div style="font-weight:700">Quick Actions</div><div></div></div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button id="btnRefreshMini" class="btn-ghost">🔁 Refresh Data</button>
+        <button id="btnShowDue" class="btn-ghost">Show Due Loans</button>
+      </div>
+    </div>
+  </div>
 </div>
 
-<!-- EMI History Modal -->
-<div id="historyModal" class="modal">
-  <div class="modal-content print-area">
-    <span class="modal-close" onclick="closeModal()">×</span>
-    <h3>EMI History & Schedule</h3>
-    <div><strong>Loan ID:</strong> <span id="modalLoanId"></span> &nbsp; <strong>Name:</strong> <span id="modalName"></span></div>
-    <table id="historyTable" style="width:100%;border-collapse:collapse">
-      <thead>
-        <tr>
-          <th>Month</th>
-          <th>Due Date</th>
-          <th>EMI Amount (₹)</th>
-          <th>Paid (₹)</th>
-          <th>Penalty (₹)</th>
-          <th>Outstanding (₹)</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+<!-- MODAL: Loan Add/Edit & EMI & Penalty & History -->
+<div id="modal" class="modal-overlay">
+  <div class="modal-box">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <div class="badge"><span class="badge-dot"></span> Details</div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div id="modalContent">Loading...</div>
   </div>
 </div>
 
 <script>
-/* (JS SAME AS BEFORE — कोई बदलाव नहीं किया गया) */
-  const WEB_APP_URL="https://script.google.com/macros/s/AKfycbyh7hCU6r6B36nxusfYri9cENVmPqv_lnyIGv-5pwK33bJE_CPcAZXpH1YcLCHdugm7dg/exec"; // Replace with your Apps Script URL
-let loans=[];
+/* ---------------- CONFIG ---------------- */
+/* Replace this with your Apps Script / API endpoints */
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyh7hCU6r6B36nxusfYri9cENVmPqv_lnyIGv-5pwK33bJE_CPcAZXpH1YcLCHdugm7dg/exec";
 
-function toggleForm(id){ const el=document.getElementById(id); el.style.display=el.style.display==='block'?'none':'block'; }
-function rupee(x){return '₹'+Number(x).toLocaleString('en-IN')}
-function calcEMI(P,r,n){P=Number(P);r=Number(r)/100/12;n=Number(n);return r===0? P/n: (P*r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1)}
+/* ---------------- HELPERS ---------------- */
+function formatINR(n){ if(n==null||n==undefined||n==="") return "0"; return Number(n).toLocaleString('en-IN'); }
+function toRupee(n){ return "₹ "+formatINR(n); }
+function calcEMI_FIC(principal, rate, months){
+  principal = Number(principal); rate = Number(rate); months = Number(months);
+  if(!principal || !months) return 0;
+  const interest = principal * (rate/100); // flat interest
+  const fileCharge = Math.round(principal * 0.03); // 3%
+  const totalPayable = Math.round(principal + interest + fileCharge);
+  return { interest: Math.round(interest), fileCharge, totalPayable, emi: Math.round(totalPayable / months) };
+}
+function normalizeMobile(m){ if(!m) return ""; m=String(m).trim(); m=m.replace(/[\s+\-()]/g,''); m=m.replace(/^0+/,''); if(m.length===10) return "91"+m; return m; }
 
+/* ---------------- STATE ---------------- */
+let LOANS = [];
+
+/* CLOCK */
+setInterval(()=> { document.getElementById("agentClock").textContent = new Date().toLocaleTimeString('en-IN',{hour12:true}); },1000);
+
+/* ---------------- FETCH & RENDER ---------------- */
 async function fetchLoans(){
   try{
-    const res=await fetch(WEB_APP_URL+'?action=getLoans');
-    const data=await res.json();
-    loans=data.map(l=>({...l,"EMI History":l["EMI History"]||'[]'}));
-    refreshList();
-    showUpcomingAlerts();
-  }catch(err){console.error(err);}
-}
-
-function showUpcomingAlerts(){
-  const alertDiv=document.getElementById('alertArea');
-  alertDiv.innerHTML='';
-  const today=new Date();
-  loans.forEach(l=>{
-    const start=new Date(l.StartDate);
-    for(let i=0;i<l.Tenure;i++){
-      const due=new Date(start); due.setMonth(start.getMonth()+i);
-      const diff=(due-today)/(1000*60*60*24);
-      if(diff>0 && diff<=3){
-        const d=document.createElement('div');
-        d.className='alert-box';
-        d.innerText=`⚠️ ${l.Name} की EMI ${due.toISOString().split('T')[0]} को देय है।`;
-        d.onclick=()=>openEMIModal(l);
-        alertDiv.appendChild(d);
-      }
-    }
-  });
-}
-
-function refreshList(filter=''){
-  const tbody=document.getElementById('loansTbody'); 
-  tbody.innerHTML='';
-  const q=filter.trim().toLowerCase();
-
-  let totalLoans = 0, activeLoans = 0, totalPrincipal = 0, totalPaid = 0, totalOutstanding = 0;
-
-  loans.forEach((l,idx)=>{
-    const text=[l["Loan ID"],l["Name"],l["Account"]].join(' ').toLowerCase();
-    if(q && !text.includes(q)) return;
-
-    totalLoans++;
-    totalPrincipal += Number(l.Principal);
-    totalPaid += Number(l["Paid EMI"]);
-    totalOutstanding += Number(l.Outstanding);
-    if(Number(l.Outstanding) > 0) activeLoans++;
-
-    const tr=document.createElement('tr');
-    // Completed loans text clickable for details
-    let actionCell = `<button class="view" data-idx="${idx}">View</button>`;
-    if(Number(l.Outstanding) <= 0){
-        actionCell = `<span style="color:green;font-weight:600;cursor:pointer" class="view" data-idx="${idx}">Successfully Completed</span>`;
-    }
-
-    tr.innerHTML=`<td>${l["Loan ID"]}</td>
-      <td>${l["Name"]}</td>
-      <td>${l["Account"]}</td>
-      <td>${rupee(l["Principal"])}</td>
-      <td>${l["Rate"]}</td>
-      <td>${l["Tenure"]}</td>
-      <td>${rupee(l["EMI"])}</td>
-      <td>${rupee(l["Paid EMI"])}</td>
-      <td>${rupee(l["Penalty"])}</td>
-      <td>${rupee(l["Outstanding"])}</td>
-      <td>${actionCell}</td>`;
-    tbody.appendChild(tr);
-  });
-
-  // Update summary
-  document.getElementById('totalLoans').innerText = totalLoans;
-  document.getElementById('activeLoans').innerText = activeLoans;
-  document.getElementById('totalPrincipal').innerText = rupee(totalPrincipal);
-  document.getElementById('totalPaid').innerText = rupee(totalPaid);
-  document.getElementById('totalOutstanding').innerText = rupee(totalOutstanding);
-}
-
-document.getElementById('loansTbody').addEventListener('click',e=>{
-  if(!e.target.classList.contains('view')) return;
-  const l=loans[e.target.dataset.idx];
-  openEMIModal(l);
-});
-
-function openEMIModal(l){
-  document.getElementById('modalLoanId').innerText=l["Loan ID"];
-  document.getElementById('modalName').innerText=l["Name"];
-  const tbody=document.querySelector("#historyTable tbody");
-  tbody.innerHTML='';
-  const start=new Date(l.StartDate);
-  const history=JSON.parse(l["EMI History"]||'[]');
-  let outstanding=l.Principal;
-  for(let i=0;i<l.Tenure;i++){
-    const due=new Date(start); due.setMonth(start.getMonth()+i);
-    const paid=history.filter(h=>h.type==="emi"&&new Date(h.date).getMonth()===due.getMonth()).reduce((a,h)=>a+h.amount,0);
-    const penalty=history.filter(h=>h.type==="penalty"&&new Date(h.date).getMonth()===due.getMonth()).reduce((a,h)=>a+h.amount,0);
-    outstanding = outstanding - paid + penalty;
-    const tr=document.createElement('tr');
-    tr.innerHTML=`<td>${i+1}</td>
-      <td>${due.toISOString().split('T')[0]}</td>
-      <td>${rupee(l.EMI)}</td>
-      <td>${rupee(paid)}</td>
-      <td>${rupee(penalty)}</td>
-      <td>${rupee(outstanding>0?outstanding.toFixed(0):0)}</td>`;
-    tbody.appendChild(tr);
+    const res = await fetch(WEB_APP_URL + "?action=getLoans");
+    const data = await res.json();
+    LOANS = (data || []).map(l => {
+      const principal = Number(l.Principal || l.principal || 0);
+      const rate = Number(l.Rate || l.rate || 0);
+      // ensure fileCharge, interest, totalPayable exist
+      const fileCharge = Number(l.FileCharge || l.fileCharge || Math.round(principal * 0.03));
+      const interest = Number(l.Interest || l.interest || Math.round(principal * (rate/100)));
+      const totalPayable = Number(l.TotalPayable || l.totalPayable || Math.round(principal + interest + fileCharge));
+      const outstandingProvided = Number(l.Outstanding || l.outstanding || 0);
+      const outstanding = outstandingProvided > 0 ? outstandingProvided : totalPayable - Number(l["Paid EMI"] || 0) + Number(l.Penalty || 0 || 0);
+      return {
+        "Loan ID": l["Loan ID"] || l.loanId || l.id || '',
+        "Name": l["Name"] || l.name || '',
+        "Account": l["Account"] || l.account || '',
+        "Principal": principal,
+        "Rate": rate,
+        "Tenure": Number(l.Tenure || l.tenure || 0),
+        "Interest": interest,
+        "FileCharge": fileCharge,
+        "TotalPayable": totalPayable,
+        "EMI": Number(l.EMI || l.emi || Math.round(totalPayable / (Number(l.Tenure || l.tenure || 1)))),
+        "Paid EMI": Number(l["Paid EMI"] || l.paid || 0),
+        "Penalty": Number(l.Penalty || l.penalty || 0),
+        "Outstanding": outstanding,
+        "StartDate": l.StartDate || l.startDate || new Date().toISOString().slice(0,10),
+        "EMI History": l["EMI History"] || l.emiHistory || l.history || '[]',
+        "Mobile": l.Mobile || l.mobile || ''
+      };
+    });
+    renderSummary();
+    renderTable();
+    renderAlerts();
+    document.getElementById("lastUpdatedText").textContent = "Last Update: " + new Date().toLocaleString('en-IN');
+  }catch(e){
+    console.error(e);
+    document.getElementById("loansTbody").innerHTML = `<tr><td colspan="13" style="text-align:center;color:var(--muted);padding:18px">Error loading loans</td></tr>`;
   }
-  document.getElementById('historyModal').style.display='flex';
 }
 
-function closeModal(){document.getElementById('historyModal').style.display='none'}
+function renderSummary(){
+  let totalLoans=0, activeLoans=0, totalPrincipal=0, totalOutstanding=0;
+  LOANS.forEach(l=>{
+    totalLoans++;
+    totalPrincipal += Number(l.Principal||0);
+    totalOutstanding += Number(l.Outstanding||0);
+    if(Number(l.Outstanding) > 0) activeLoans++;
+  });
+  document.getElementById("totalLoans").textContent = totalLoans;
+  document.getElementById("activeLoans").textContent = activeLoans;
+  document.getElementById("totalPrincipal").textContent = toRupee(totalPrincipal);
+  document.getElementById("totalOutstanding").textContent = toRupee(totalOutstanding);
+}
 
-document.getElementById('search').addEventListener('input',e=>refreshList(e.target.value));
-document.getElementById('calcBtn').addEventListener('click',()=>{
-  const P=document.getElementById('principal').value||0;
-  const r=document.getElementById('rate').value||0;
-  const n=document.getElementById('tenure').value||0;
-  const emi=calcEMI(P,r,n);
-  document.getElementById('emiResult').innerText=emi? rupee(emi.toFixed(0)):'—';
-});
-document.getElementById('addLoan').addEventListener('click',async ()=>{
-  const loanId=document.getElementById('loanId').value.trim();
-  const name=document.getElementById('name').value.trim();
-  const account=document.getElementById('account').value.trim();
-  const principal=Number(document.getElementById('principal').value||0);
-  const rate=Number(document.getElementById('rate').value||0);
-  const tenure=Number(document.getElementById('tenure').value||0);
-  if(!loanId||!name||!account||principal<=0){alert('Loan ID, Name, Account, Principal required');return;}
-  const emi=calcEMI(principal,rate,tenure).toFixed(0);
-  const startDate=new Date().toISOString().split('T')[0];
-  await fetch(WEB_APP_URL,{method:"POST",body:JSON.stringify({action:"addLoan",loanId,name,account,principal,rate,tenure,emi,startDate})});
-  alert("Loan saved successfully!"); document.getElementById('loanForm').reset(); document.getElementById('emiResult').innerText='—'; fetchLoans();
-});
-document.getElementById('payEmi').addEventListener('click',async ()=>{
-  const loanId=document.getElementById('emiLoanId').value.trim();
-  const amount=Number(document.getElementById('emiAmount').value||0);
-  const date=document.getElementById('emiDate').value;
-  if(!loanId||amount<=0){alert("Valid Loan ID and Amount required"); return;}
-  await fetch(WEB_APP_URL,{method:"POST",body:JSON.stringify({action:"payEmi",loanId,amount,date})});
-  alert("EMI updated successfully"); document.getElementById('emiForm').reset(); fetchLoans();
-});
-document.getElementById('addPenalty').addEventListener('click',async ()=>{
-  const loanId=document.getElementById('penaltyLoanId').value.trim();
-  const amount=Number(document.getElementById('penaltyAmount').value||0);
-  const date=document.getElementById('penaltyDate').value;
-  if(!loanId||amount<=0){alert("Valid Loan ID and Penalty required"); return;}
-  await fetch(WEB_APP_URL,{method:"POST",body:JSON.stringify({action:"addPenalty",loanId,amount,date})});
-  alert("Penalty added successfully"); document.getElementById('penaltyForm').reset(); fetchLoans();
+function renderTable(filter=''){
+  const tbody = document.getElementById("loansTbody"); tbody.innerHTML = "";
+  const q = (filter||'').toLowerCase();
+  if(!LOANS.length){ tbody.innerHTML = `<tr><td colspan="13" style="text-align:center;padding:18px;color:var(--muted)">No loans found</td></tr>`; return; }
+  LOANS.forEach((l, idx)=>{
+    const hay = `${l["Loan ID"]} ${l.Name} ${l.Account}`.toLowerCase();
+    if(q && !hay.includes(q)) return;
+    const completed = Number(l.Outstanding) <= 0;
+    const action = `<button class="btn-ghost view-btn" data-idx="${idx}">View</button> <button class="btn-ghost edit-btn" data-idx="${idx}">Edit</button>`;
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${l["Loan ID"]}</td>
+      <td>${l.Name}</td>
+      <td>${l.Account}</td>
+      <td>${toRupee(l.Principal)}</td>
+      <td>${toRupee(l.FileCharge)}</td>
+      <td>${l.Rate||0}</td>
+      <td>${l.Tenure||0}</td>
+      <td>${toRupee(l.TotalPayable)}</td>
+      <td style="font-weight:700">${toRupee(l.EMI)}</td>
+      <td>${toRupee(l["Paid EMI"])}</td>
+      <td>${toRupee(l.Penalty)}</td>
+      <td style="font-weight:700">${ toRupee(l.Outstanding) } ${completed?'<div class="status-complete">Completed</div>':''}</td>
+      <td>${action}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+/* ---------------- DUE / PENALTY LOGIC ----------------
+- If overdueDays > 2: initial 1% + daily 0.01% for (overdueDays - 2).
+*/
+function computePenaltyForLoan(loan){
+  let next = loan.NextEMIDate || null;
+  if(!next){
+    try{
+      const start = new Date(loan.StartDate);
+      const emiAmt = Number(loan.EMI)||0;
+      const paidAmt = Number(loan["Paid EMI"]||0);
+      const paidMonths = emiAmt>0? Math.floor(paidAmt/emiAmt):0;
+      const nd = new Date(start); nd.setMonth(start.getMonth()+paidMonths);
+      next = nd.toISOString().slice(0,10);
+    }catch(e){ next = null; }
+  }
+  if(!next) return { overdueDays:0, suggested:0, initial:0, daily:0 };
+  const today = new Date().toISOString().slice(0,10);
+  if(next > today) return { overdueDays:0, suggested:0, initial:0, daily:0 };
+  const overdueDays = Math.floor((new Date(today) - new Date(next))/(1000*60*60*24));
+  if(overdueDays <= 2) return { overdueDays, suggested:0, initial:0, daily:0 };
+  const outstanding = Number(loan.Outstanding) || 0;
+  const initial = outstanding * 0.01; // 1%
+  const extraDays = overdueDays - 2;
+  const daily = outstanding * 0.0001 * extraDays; // 0.01% per day
+  const suggested = Math.round(initial + daily);
+  return { overdueDays, suggested, initial: Math.round(initial), daily: Math.round(daily) };
+}
+
+function getDueAndOverdue(){
+  const today = new Date().toISOString().slice(0,10);
+  const due=[], overdue=[];
+  LOANS.forEach(l=>{
+    let next = l.NextEMIDate || null;
+    if(!next){
+      try{
+        const start = new Date(l.StartDate);
+        const emiAmt = Number(l.EMI)||0;
+        const paidAmt = Number(l["Paid EMI"]||0);
+        const paidMonths = emiAmt>0? Math.floor(paidAmt/emiAmt):0;
+        const nd = new Date(start); nd.setMonth(start.getMonth()+paidMonths);
+        next = nd.toISOString().slice(0,10);
+      }catch(e){ next=null; }
+    }
+    if(!next || Number(l.Outstanding) <= 0) return;
+    if(next <= today){
+      const diff = Math.floor((new Date(today)-new Date(next))/(1000*60*60*24));
+      const e = { loanId: l["Loan ID"], account: l.Account, name: l.Name, mobile: l.Mobile, emi: l.EMI, outstanding: l.Outstanding, dueDate: next, overdueDays: diff };
+      if(diff>0) overdue.push(e); else due.push(e);
+    }
+  });
+  overdue.sort((a,b)=>b.overdueDays - a.overdueDays);
+  due.sort((a,b)=> (a.name||'').localeCompare(b.name||''));
+  return { due, overdue };
+}
+
+function renderAlerts(){
+  const { due, overdue } = getDueAndOverdue();
+  const area = document.getElementById("alertArea"); area.innerHTML = "";
+  const total = due.length + overdue.length;
+  document.getElementById("alertCount").textContent = total ? (total + " pending") : "No pending";
+  if(total===0){ area.innerHTML = `<div style="padding:8px;color:var(--muted)">No upcoming EMI within window</div>`; return; }
+  due.forEach(d=>{
+    const el = document.createElement('div'); el.className='due-item emi-due';
+    el.innerHTML = `<div style="font-weight:700">${d.name} — ${d.account} <span style="float:right">${d.dueDate}</span></div><div class="kv">EMI ${toRupee(d.emi)} • Outstanding ${toRupee(d.outstanding)}</div><div style="margin-top:6px"><a class="small-action" href="#" onclick="openLoanById('${d.loanId}')">Open</a></div>`;
+    area.appendChild(el);
+  });
+  overdue.forEach(d=>{
+    const el = document.createElement('div'); el.className='due-item emi-overdue';
+    el.innerHTML = `<div style="font-weight:700">${d.name} — ${d.account} <span style="float:right">${d.overdueDays}d overdue</span></div><div class="kv">EMI ${toRupee(d.emi)} • Outstanding ${toRupee(d.outstanding)}</div><div style="margin-top:6px"><a class="small-action" href="#" onclick="openLoanById('${d.loanId}')">Open</a></div>`;
+    area.appendChild(el);
+  });
+}
+
+/* ---------------- MODAL ---------------- */
+function openModalWith(html){ document.getElementById("modalContent").innerHTML = html; document.getElementById("modal").style.display='flex'; }
+function closeModal(){ document.getElementById("modal").style.display='none'; }
+
+/* ADD / EDIT LOAN */
+function openAddLoan(prefill=null){
+  const today = new Date().toISOString().slice(0,10);
+  let html = `
+    <div style="font-weight:700;margin-bottom:8px">${prefill? 'Update Loan' : 'नया Loan (FIC)'}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <input id="mLoanId" class="input" placeholder="Loan ID" ${prefill? 'readonly':''} />
+      <input id="mName" class="input" placeholder="Name" />
+      <input id="mAccount" class="input" placeholder="Account" />
+      <input id="mPrincipal" class="input" type="number" placeholder="Principal (₹)" />
+      <input id="mRate" class="input" type="number" placeholder="Flat Interest Rate (%)" value="16" />
+      <input id="mTenure" class="input" type="number" placeholder="Tenure (months)" value="12" />
+    </div>
+    <div style="margin-top:10px;display:flex;gap:8px">
+      <button class="btn" onclick="previewEMI()">EMI Calculate (FIC)</button>
+      <button class="btn" onclick="saveLoan()">Save Loan</button>
+      <button class="btn-ghost" onclick="closeModal()">Cancel</button>
+    </div>
+    <div id="mEmiResult" style="margin-top:10px;font-weight:700"></div>
+  `;
+  openModalWith(html);
+  if(prefill){
+    document.getElementById("mLoanId").value = prefill["Loan ID"]||'';
+    document.getElementById("mName").value = prefill.Name||'';
+    document.getElementById("mAccount").value = prefill.Account||'';
+    document.getElementById("mPrincipal").value = prefill.Principal||'';
+    document.getElementById("mRate").value = prefill.Rate||16;
+    document.getElementById("mTenure").value = prefill.Tenure||12;
+  }
+}
+
+/* VIEW / PAY / HISTORY / PENALTY UI */
+function openLoanModal(loan, idx=null){
+  let history = [];
+  try{ history = JSON.parse(loan["EMI History"]||'[]'); }catch(e){ history = []; }
+  const today = new Date().toISOString().slice(0,10);
+  const historyRows = history.length ? history.map(h=>`<div style="padding:6px 0;border-bottom:1px dashed rgba(255,255,255,0.03)"><b>${h.date}</b> — ₹${formatINR(h.amount)} (${h.type||'emi'})</div>`).join('') : '<div class="kv">No EMI History</div>';
+  const penaltyCalc = computePenaltyForLoan(loan);
+  let penaltyHtml = penaltyCalc.suggested ? `<div class="kv">Suggested Penalty: <b>${toRupee(penaltyCalc.suggested)}</b> (Initial ${toRupee(penaltyCalc.initial)} + Daily ${toRupee(penaltyCalc.daily)})</div>
+    <div style="margin-top:8px"><button class="btn" onclick="applyPenalty('${loan["Loan ID"]}', ${penaltyCalc.suggested})">Apply Penalty</button></div>` : `<div class="kv">No penalty to apply</div>`;
+  let html = `
+    <div style="display:flex;justify-content:space-between;align-items:center"><div style="font-weight:700">${loan.Name || '—'}</div><div class="kv">Loan ID: ${loan["Loan ID"]}</div></div>
+    <div style="margin-top:8px" class="kv"><b>Account:</b> ${loan.Account} &nbsp; <b>Start:</b> ${loan.StartDate}</div>
+    <div style="display:flex;gap:12px;margin-top:10px">
+      <div style="flex:1">
+        <div class="kv">Principal</div><div style="font-weight:700">${toRupee(loan.Principal)}</div>
+        <div class="kv" style="margin-top:6px">File Charge</div><div style="font-weight:700">${toRupee(loan.FileCharge)}</div>
+        <div class="kv" style="margin-top:6px">Interest (flat)</div><div style="font-weight:700">${toRupee(loan.Interest)}</div>
+      </div>
+      <div style="flex:1">
+        <div class="kv">Total Payable</div><div style="font-weight:700">${toRupee(loan.TotalPayable)}</div>
+        <div class="kv" style="margin-top:6px">EMI (fixed)</div><div style="font-weight:700">${toRupee(loan.EMI)}</div>
+      </div>
+      <div style="flex:1">
+        <div class="kv">Paid EMI</div><div style="font-weight:700">${toRupee(loan["Paid EMI"])}</div>
+        <div class="kv" style="margin-top:6px">Penalty (recorded)</div><div style="font-weight:700">${toRupee(loan.Penalty)}</div>
+        <div class="kv" style="margin-top:6px">Outstanding</div><div style="font-weight:700">${toRupee(loan.Outstanding)}</div>
+      </div>
+    </div>
+
+    <div style="margin-top:12px">
+      <div style="font-weight:600;margin-bottom:6px">Pay EMI</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input id="emiAmt" class="input" type="number" placeholder="Amount" value="${loan.EMI||0}" style="width:140px"/>
+        <input id="emiDt" class="input" type="date" value="${today}" style="width:160px"/>
+        <button class="btn" onclick="submitEmiPayment('${loan["Loan ID"]}')">Pay EMI</button>
+        <button class="btn-ghost" onclick="printLoanStatement('${loan["Loan ID"]}')">Print Loan Statement</button>
+        <button class="btn-ghost" onclick="openEditFromModal('${loan["Loan ID"]}')">Edit Loan</button>
+      </div>
+    </div>
+
+    <hr style="margin:12px 0;border-color:rgba(255,255,255,0.04)">
+
+    <div style="font-weight:600;margin-bottom:6px">EMI History</div>
+    <div style="max-height:160px;overflow:auto">${historyRows}</div>
+
+    <hr style="margin:12px 0;border-color:rgba(255,255,255,0.04)">
+    <div style="font-weight:600;margin-bottom:6px">Penalty (auto-calc)</div>
+    <div>${penaltyHtml}</div>
+  `;
+  openModalWith(html);
+}
+
+/* Edit helper */
+function openEditFromModal(loanId){ const loan = LOANS.find(l=> String(l["Loan ID"])===String(loanId)); closeModal(); openAddLoan(loan); }
+
+/* ---------------- SAVE / API ---------------- */
+async function saveLoan(){
+  const loanId = document.getElementById("mLoanId").value.trim();
+  const name = document.getElementById("mName").value.trim();
+  const account = document.getElementById("mAccount").value.trim();
+  const principal = Number(document.getElementById("mPrincipal").value||0);
+  const rate = Number(document.getElementById("mRate").value||0);
+  const tenure = Number(document.getElementById("mTenure").value||0);
+  if(!loanId || !name || !account || principal<=0){ alert("Loan ID, Name, Account, Principal चाहिए"); return; }
+  const calc = calcEMI_FIC(principal, rate, tenure);
+  const interest = calc.interest;
+  const fileCharge = calc.fileCharge;
+  const totalPayable = calc.totalPayable;
+  const emi = calc.emi;
+  const startDate = new Date().toISOString().slice(0,10);
+  const outstanding = totalPayable; // initial outstanding includes fileCharge & interest
+  try{
+    const res = await fetch(WEB_APP_URL, { method:'POST', body: JSON.stringify({ action:'addLoan', loanId, name, account, principal, rate, tenure, interest, fileCharge, totalPayable, emi, startDate, outstanding }) });
+    const j = await res.json();
+    if(j.status === 'success' || j.success || j.result === 'ok'){
+      alert("Loan saved");
+      closeModal(); await fetchLoans();
+    } else {
+      alert("Saved (server response)");
+      closeModal(); await fetchLoans();
+    }
+  }catch(e){ console.error("saveLoan:",e); alert("Error saving loan"); }
+}
+
+/* preview EMI */
+function previewEMI(){
+  const P = Number(document.getElementById("mPrincipal").value||0);
+  const r = Number(document.getElementById("mRate").value||0);
+  const n = Number(document.getElementById("mTenure").value||0);
+  if(!P||!n){ alert("Principal और Tenure भरें"); return; }
+  const calc = calcEMI_FIC(P,r,n);
+  document.getElementById("mEmiResult").textContent = `Interest: ${toRupee(calc.interest)} • File Charge: ${toRupee(calc.fileCharge)} • Total Payable: ${toRupee(calc.totalPayable)} • EMI: ${toRupee(calc.emi)}`;
+}
+
+/* PAY EMI */
+async function submitEmiPayment(loanId){
+  const amount = Number(document.getElementById("emiAmt")?.value || 0);
+  const date = document.getElementById("emiDt")?.value;
+  if(!amount || !date){ alert("Amount और Date जरूरी हैं"); return; }
+  try{
+    const res = await fetch(WEB_APP_URL, { method:'POST', body: JSON.stringify({ action:'payEmi', loanId, amount, date }) });
+    const j = await res.json();
+    if(j.status === 'success' || j.success){ alert("EMI Paid"); closeModal(); await fetchLoans(); }
+    else { alert("Payment processed (server response)"); closeModal(); await fetchLoans(); }
+  }catch(e){ console.error("submitEmiPayment:",e); alert("Error while paying EMI"); }
+}
+
+/* APPLY PENALTY */
+async function applyPenalty(loanId, amount){
+  if(!confirm(`Apply penalty ${toRupee(amount)} to ${loanId}?`)) return;
+  try{
+    const date = new Date().toISOString().slice(0,10);
+    const res = await fetch(WEB_APP_URL, { method:'POST', body: JSON.stringify({ action:'addPenalty', loanId, amount, date }) });
+    const j = await res.json();
+    alert("Penalty applied");
+    closeModal();
+    await fetchLoans();
+  }catch(e){ console.error("applyPenalty:",e); alert("Error applying penalty"); }
+}
+
+/* PRINT Loan Statement (full) with QR */
+function printLoanStatement(loanId){
+  const loan = LOANS.find(l=> String(l["Loan ID"])===String(loanId));
+  if(!loan){ alert("Loan not found"); return; }
+  let history = [];
+  try{ history = JSON.parse(loan["EMI History"]||'[]'); }catch(e){ history=[]; }
+  const historyRows = history.length ? history.map(h=> `<tr><td>${h.date}</td><td>${h.type}</td><td style="text-align:right">₹ ${formatINR(h.amount)}</td></tr>`).join('') : `<tr><td colspan="3" style="text-align:center">No history</td></tr>`;
+  const now = new Date().toLocaleString('en-IN');
+  const summaryObj = { loanId: loan["Loan ID"], account: loan.Account, name: loan.Name, outstanding: loan.Outstanding, emi: loan.EMI };
+  const qrData = encodeURIComponent(JSON.stringify(summaryObj));
+  const qrUrl = `https://chart.googleapis.com/chart?cht=qr&chs=200x200&chl=${qrData}`;
+  const html = `
+    <html><head><meta charset="utf-8"><title>Loan_Statement_${loanId}</title>
+    <style>body{font-family:Arial;color:#111;padding:18px}table{width:100%;border-collapse:collapse}th,td{padding:6px;border-bottom:1px solid #ddd}</style>
+    </head><body>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-size:18px;font-weight:700">Shree Radha Credit Co-operative Society</div>
+          <div style="margin-top:6px">Loan Statement</div>
+        </div>
+        <div><img src="${qrUrl}" alt="qr" /></div>
+      </div>
+      <div style="margin-top:10px"><b>Printed:</b> ${now}</div>
+      <hr>
+      <div><b>Loan ID:</b> ${loan["Loan ID"]} &nbsp; <b>Account:</b> ${loan.Account}</div>
+      <div style="margin-top:6px"><b>Name:</b> ${loan.Name}</div>
+      <div style="margin-top:6px"><b>Principal:</b> ${toRupee(loan.Principal)} &nbsp; <b>File Charge:</b> ${toRupee(loan.FileCharge)} &nbsp; <b>Interest (flat):</b> ${toRupee(loan.Interest)}</div>
+      <div style="margin-top:6px"><b>Total Payable:</b> ${toRupee(loan.TotalPayable)} &nbsp; <b>EMI:</b> ${toRupee(loan.EMI)}</div>
+      <div style="margin-top:6px"><b>Paid EMI:</b> ${toRupee(loan["Paid EMI"])} &nbsp; <b>Penalty (recorded):</b> ${toRupee(loan.Penalty)}</div>
+      <div style="margin-top:6px"><b>Outstanding:</b> ${toRupee(loan.Outstanding)}</div>
+      <hr>
+      <h4>EMI & Transaction History</h4>
+      <table>
+        <thead><tr><th>Date</th><th>Type</th><th style="text-align:right">Amount</th></tr></thead>
+        <tbody>${historyRows}</tbody>
+      </table>
+      <div style="margin-top:40px;display:flex;justify-content:space-between"><div>Prepared By</div><div>Checked By</div></div>
+    </body></html>
+  `;
+  const w = window.open('','_blank'); w.document.write(html); w.document.close(); setTimeout(()=> w.print(),500);
+}
+
+/* ---------------- AGENT TRANSACTION ---------------- */
+async function saveAgentTransaction(){
+  let acc = document.getElementById("aAccount").value.trim();
+  const amt = Number(document.getElementById("aAmount").value||0);
+  const type = document.getElementById("aType").value;
+  const id = document.getElementById("aID").value;
+  const msg = document.getElementById("agentMsg");
+  if(!acc || acc.length !== 4){ alert("Enter last 4 digits of account"); return; }
+  if(acc.toUpperCase().startsWith("SRC")) acc = acc.substring(3);
+  const account = "SRC" + acc;
+  if(!amt || !type || !id){ alert("सभी fields भरें"); return; }
+  try{
+    const r = await fetch(WEB_APP_URL, { method:'POST', body: JSON.stringify({ action:'agentTransaction', account, amount:amt, type, agent:id }) });
+    const data = await r.json();
+    msg.textContent = data.message || "Saved";
+    msg.style.color = "var(--success)";
+    document.getElementById("aAccount").value=""; document.getElementById("aAmount").value=""; document.getElementById("aType").value=""; document.getElementById("aID").value="";
+    await fetchLoans();
+  }catch(e){ console.error("saveAgentTransaction:",e); msg.textContent = "Error"; msg.style.color = "var(--danger)"; }
+  setTimeout(()=>{ document.getElementById("agentMsg").textContent=""; },3000);
+}
+
+/* ---------------- EXPORT & PRINT ---------------- */
+function exportCSV(){
+  if(!LOANS.length){ alert("No data"); return; }
+  const rows = [["Loan ID","Name","Account","Principal","FileCharge","Interest","Rate%","Tenure","TotalPayable","EMI","Paid EMI","Penalty","Outstanding"]];
+  LOANS.forEach(l=> rows.push([l["Loan ID"], l.Name, l.Account, l.Principal, l.FileCharge, l.Interest, l.Rate, l.Tenure, l.TotalPayable, l.EMI, l["Paid EMI"], l.Penalty, l.Outstanding]));
+  const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = `loans_${new Date().toISOString().slice(0,10)}.csv`; a.click(); URL.revokeObjectURL(url);
+}
+
+function printRegister(){
+  const rows = LOANS.map(l=> `<tr><td>${l["Loan ID"]}</td><td>${l.Name}</td><td>${l.Account}</td><td>${toRupee(l.Principal)}</td><td>${toRupee(l.Outstanding)}</td></tr>`).join('') || '<tr><td colspan="5">No loans</td></tr>';
+  const html = `<html><head><meta charset="utf-8"><title>Loan Register</title></head><body style="font-family:Arial;padding:18px;color:#111"><h2>Loan Register</h2><table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><thead><tr><th>Loan ID</th><th>Name</th><th>Account</th><th>Principal</th><th>Outstanding</th></tr></thead><tbody>${rows}</tbody></table></body></html>`;
+  const w = window.open('','_blank'); w.document.write(html); w.document.close(); setTimeout(()=> w.print(),500);
+}
+
+/* ---------------- EVENTS ---------------- */
+document.getElementById("btnRefresh").addEventListener("click", fetchLoans);
+document.getElementById("btnRefreshMini").addEventListener("click", fetchLoans);
+document.getElementById("btnExport").addEventListener("click", exportCSV);
+document.getElementById("btnPrint").addEventListener("click", printRegister);
+document.getElementById("btnAddLoan").addEventListener("click", ()=> openAddLoan());
+document.getElementById("agentSubmit").addEventListener("click", saveAgentTransaction);
+document.getElementById("searchAccount").addEventListener("input", (e)=> renderTable(e.target.value));
+document.getElementById("btnShowDue").addEventListener("click", ()=> { const d = getDueAndOverdue(); alert(`Due: ${d.due.length}, Overdue: ${d.overdue.length}`); });
+
+/* delegate table buttons */
+document.getElementById("loansTbody").addEventListener("click", (e)=>{
+  if(e.target.classList.contains('view-btn')){
+    const idx = e.target.dataset.idx; openLoanModal(LOANS[idx], idx);
+  } else if(e.target.classList.contains('edit-btn')){
+    const idx = e.target.dataset.idx; openAddLoan(LOANS[idx]);
+  }
 });
 
+/* quick helpers */
+document.addEventListener("keydown",(e)=>{ if(e.key==='Escape') closeModal(); });
+
+/* init */
 fetchLoans();
 </script>
 
-</main>
 </body>
 </html>
