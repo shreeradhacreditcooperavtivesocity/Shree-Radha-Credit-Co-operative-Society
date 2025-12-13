@@ -1,468 +1,376 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SRCCS — Auto Balance Sheet + Agent Transaction Entry</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SRCCS — Ultra Pro Auto Balance Sheet</title>
 
-  <style>
-    :root {
-      --bg: #0f172a;
-      --bg-soft: #111827;
-      --card: #020617;
-      --accent: #22c55e;
-      --accent-soft: rgba(34, 197, 94, 0.15);
-      --danger: #ef4444;
-      --danger-soft: rgba(239, 68, 68, 0.15);
-      --text: #e5e7eb;
-      --muted: #9ca3af;
-      --border: #1f2937;
-      --yellow: #eab308;
-      --accent2: #06b6d4;
-      --accent3: #4f46e5;
-    }
+<style>
+/* -----------------------------------------------------------
+   ULTRA PRO PREMIUM THEME (Same as Option-A Dashboard look)
+----------------------------------------------------------- */
+:root{
+  --bg:#0b1220;
+  --bg2:#071022;
+  --card:#0f172a;
+  --card2:#111827;
+  --accent:#800000;
+  --accent2:#0ea5a4;
+  --muted:#9aa4b2;
+  --text:#e6eef6;
+  --border:rgba(255,255,255,0.05);
+  --glass:rgba(255,255,255,0.06);
+}
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
-    }
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,system-ui,'Noto Sans Devanagari',sans-serif;}
 
-    body {
-      background: radial-gradient(circle at top, #111827 0, #020617 50%, #000 100%);
-      color: var(--text);
-      min-height: 100vh;
-      padding: 16px;
-    }
+body{
+  background:radial-gradient(circle at top, #0d162c 0%, #020b18 40%, #000 90%);
+  color:var(--text);
+  padding:20px;
+}
 
-    .container {
-      max-width: 1200px;
-      margin: 0 auto 32px auto;
-    }
+/* Center container */
+.container{
+  max-width:1200px;
+  margin:auto;
+}
 
-    .header {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      gap: 12px;
-      align-items: center;
-      margin-bottom: 18px;
-    }
+/* Header Title */
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:16px;
+  flex-wrap:wrap;
+  gap:12px;
+}
 
-    .title-block {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
+.title h1{
+  font-size:22px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:1px;
+}
 
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 11px;
-      padding: 2px 8px;
-      border-radius: 999px;
-      background: rgba(34, 197, 94, 0.15);
-      color: #bbf7d0;
-      border: 1px solid rgba(34, 197, 94, 0.4);
-      width: fit-content;
-    }
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:3px 10px;
+  font-size:11px;
+  background:rgba(128,0,0,0.25);
+  border:1px solid rgba(128,0,0,0.4);
+  color:#ffcece;
+  border-radius:999px;
+}
 
-    .badge-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 999px;
-      background: #22c55e;
-      box-shadow: 0 0 10px rgba(34, 197, 94, 0.9);
-    }
+.badge-dot{
+  width:6px;height:6px;
+  border-radius:50%;
+  background:var(--accent);
+  box-shadow:0 0 10px #ff3333;
+}
 
-    h1 {
-      font-size: 20px;
-      font-weight: 600;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-    }
+.last-update{
+  font-size:12px;
+  color:var(--muted);
+}
 
-    .subtitle {
-      font-size: 12px;
-      color: var(--muted);
-    }
+/* Main Card */
+.main-card{
+  background:linear-gradient(145deg,#0c172c,#020812);
+  padding:16px;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,0.08);
+  box-shadow:0 20px 45px rgba(0,0,0,0.7);
+}
 
-    .last-update {
-      font-size: 12px;
-      color: var(--muted);
-      text-align: right;
-    }
+/* Summary Grid */
+.summary{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:12px;
+}
 
-    .main-card {
-      background: linear-gradient(145deg, rgba(15,23,42,0.98), rgba(2,6,23,1));
-      border-radius: 16px;
-      padding: 14px;
-      border: 1px solid rgba(148,163,184,0.2);
-      box-shadow: 0 18px 40px rgba(15,23,42,0.9);
-    }
+.card-small{
+  padding:14px;
+  border-radius:14px;
+  background:linear-gradient(160deg,rgba(255,255,255,0.05),rgba(0,0,0,0.35));
+  border:1px solid rgba(255,255,255,0.08);
+  position:relative;
+  overflow:hidden;
+}
 
-    .summary-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 10px;
-      margin-bottom: 12px;
-    }
+.card-small::after{
+  content:"";
+  position:absolute;
+  top:0;left:0;right:0;height:40%;
+  background:radial-gradient(circle at top,rgba(255,255,255,0.2),transparent);
+  opacity:.2;
+}
 
-    .card-small {
-      background: radial-gradient(circle at top left, rgba(148,163,184,0.2), rgba(15,23,42,0.9));
-      border-radius: 12px;
-      padding: 10px;
-      border: 1px solid rgba(31,41,55,0.9);
-      position: relative;
-      overflow: hidden;
-    }
+.label{
+  font-size:12px;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:0.06em;
+}
 
-    .card-small::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at 0 0, rgba(248,250,252,0.12), transparent 55%);
-      opacity: 0.7;
-      pointer-events: none;
-    }
+.value{
+  font-size:22px;
+  margin-top:4px;
+  font-weight:700;
+}
 
-    .card-label {
-      font-size: 11px;
-      color: var(--muted);
-      margin-bottom: 2px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
+/* Section Title */
+.section-title{
+  margin-top:14px;
+  margin-bottom:6px;
+  font-size:13px;
+  font-weight:600;
+  color:var(--muted);
+  letter-spacing:0.08em;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
 
-    .card-value {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 2px;
-    }
+/* Panel Box */
+.panel{
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:14px;
+  padding:10px;
+  backdrop-filter:blur(4px);
+}
 
-    .card-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 11px;
-      padding: 2px 8px;
-      border-radius: 999px;
-      background: rgba(15,23,42,0.8);
-      border: 1px solid rgba(55,65,81,0.9);
-      color: var(--muted);
-    }
+/* Table */
+.table-wrapper{
+  max-height:330px;
+  overflow:auto;
+  border-radius:8px;
+  border:1px solid rgba(255,255,255,0.08);
+}
 
-    .chip-dot-green { width: 6px; height: 6px; border-radius: 999px; background: var(--accent); }
-    .chip-dot-yellow { width: 6px; height: 6px; border-radius: 999px; background: var(--yellow); }
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:12px;
+}
 
-    .split-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-    }
+thead{
+  background:rgba(255,255,255,0.08);
+  position:sticky;
+  top:0;
+}
 
-    .section-title {
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--muted);
-      margin: 12px 0 6px 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 6px;
-    }
+th,td{
+  padding:6px 10px;
+  white-space:nowrap;
+}
 
-    .panel {
-      background: rgba(15,23,42,0.95);
-      border-radius: 12px;
-      border: 1px solid rgba(31,41,55,0.9);
-      padding: 8px;
-      overflow: hidden;
-    }
+tbody tr:nth-child(even){background:rgba(255,255,255,0.03);}
+tbody tr:nth-child(odd){background:rgba(255,255,255,0.05);}
 
-    table {
-      width: 100%;
-      font-size: 12px;
-      border-collapse: collapse;
-    }
+/* Badges */
+.badge-active{
+  background:rgba(0,200,100,0.2);
+  color:#baffda;
+  padding:2px 8px;
+  border-radius:999px;
+  cursor:pointer;
+}
 
-    th, td {
-      padding: 6px 8px;
-      white-space: nowrap;
-    }
+.badge-inactive{
+  background:rgba(255,60,60,0.2);
+  color:#ffd2d2;
+  padding:2px 8px;
+  border-radius:999px;
+  cursor:pointer;
+}
 
-    thead {
-      background: rgba(30, 41, 59, 0.8);
-      position: sticky;
-      top: 0;
-    }
+.badge-loan{
+  background:rgba(255,200,0,0.25);
+  color:#fff7bf;
+  padding:2px 8px;
+  border-radius:999px;
+  cursor:pointer;
+}
 
-    tbody tr:nth-child(even) { background: rgba(255,255,255,0.03); }
-    tbody tr:nth-child(odd) { background: rgba(255,255,255,0.07); }
+.badge-no{
+  background:rgba(255,255,255,0.15);
+  color:#ddd;
+  padding:2px 8px;
+  border-radius:999px;
+}
 
-    .badge-active {
-      background: rgba(34, 197, 94, 0.15);
-      padding: 2px 8px;
-      border-radius: 999px;
-      color: #bbf7d0;
-      cursor: pointer;
-    }
+/* Account clickable cell */
+.account-link{
+  font-weight:700;
+  cursor:pointer;
+  color:var(--accent2);
+  text-decoration:underline;
+}
 
-    .badge-inactive {
-      background: rgba(239, 68, 68, 0.15);
-      padding: 2px 8px;
-      border-radius: 999px;
-      color: #fecaca;
-      cursor: pointer;
-    }
+/* Pills */
+.pill{
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.1);
+  padding:3px 10px;
+  border-radius:999px;
+  font-size:11px;
+  margin-right:4px;
+  color:var(--muted);
+}
 
-    .badge-loan {
-      background: rgba(234, 179, 8, 0.2);
-      padding: 2px 8px;
-      border-radius: 999px;
-      color: #fef9c3;
-      cursor: pointer;
-    }
+/* Agent Entry */
+.agent-box{
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:14px;
+  padding:12px;
+  margin-top:10px;
+}
 
-    .badge-noloan {
-      background: rgba(100,100,100,0.3);
-      padding: 2px 8px;
-      border-radius: 999px;
-      color: #ccc;
-    }
+.agent-row{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:10px;
+}
 
-    .pill {
-      padding: 2px 8px;
-      border-radius: 999px;
-      background: rgba(15,23,42,0.7);
-      font-size: 11px;
-      color: var(--muted);
-      border: 1px solid rgba(55,65,81,0.6);
-      margin-right: 4px;
-    }
+.agent-label{
+  font-size:12px;
+  color:var(--muted);
+  margin-bottom:3px;
+}
 
-    .status-bar {
-      margin-bottom: 6px;
-    }
+.input,select{
+  width:100%;
+  padding:8px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.08);
+  background:rgba(0,0,0,0.3);
+  color:white;
+  font-size:13px;
+}
 
-    .table-wrapper {
-      max-height: 320px;
-      overflow: auto;
-      border-radius: 8px;
-      border: 1px solid rgba(31, 41, 55, 0.9);
-    }
+.btn{
+  margin-top:12px;
+  padding:10px 18px;
+  background:var(--accent);
+  border:none;
+  font-size:13px;
+  border-radius:999px;
+  color:white;
+  cursor:pointer;
+  letter-spacing:.5px;
+  box-shadow:0 4px 12px rgba(128,0,0,0.5);
+}
 
-    .refresh-btn {
-      padding: 4px 10px;
-      font-size: 11px;
-      border-radius: 999px;
-      border: 1px solid rgba(148,163,184,0.6);
-      background: rgba(15,23,42,0.9);
-      color: var(--muted);
-      cursor: pointer;
-    }
+.agent-msg{margin-top:6px;font-size:12px}
+.success{color:#22c55e}
+.error{color:#ef4444}
 
-    /* Agent Entry */
-    .agent-card {
-      background: rgba(15,23,42,0.95);
-      border-radius: 12px;
-      border: 1px solid rgba(148,163,184,0.4);
-      padding: 12px;
-    }
+/* Modal */
+.modal-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.75);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:1000;
+}
 
-    .agent-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
+.modal-box{
+  background:#0f172a;
+  padding:16px;
+  width:640px;
+  max-height:90vh;
+  overflow:auto;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,0.1);
+}
 
-    .agent-label {
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 3px;
-    }
+.modal-close{
+  float:right;
+  background:#222;
+  color:white;
+  border:1px solid #555;
+  width:28px;height:28px;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:50%;
+  cursor:pointer;
+}
 
-    .agent-input,
-    .agent-select {
-      width: 100%;
-      padding: 8px;
-      background: #0f172a;
-      border-radius: 8px;
-      border: 1px solid rgba(148,163,184,0.4);
-      color: white;
-      font-size: 12px;
-    }
-
-    .agent-btn {
-      padding: 9px 14px;
-      margin-top: 10px;
-      font-size: 12px;
-      background: var(--accent3);
-      border: none;
-      color: white;
-      border-radius: 999px;
-      cursor: pointer;
-    }
-
-    .agent-msg { font-size: 12px; margin-top: 6px; }
-    .success { color: #22c55e; }
-    .error { color: #ef4444; }
-
-    /* Modal */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.7);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 999;
-    }
-
-    .modal-box {
-      background: #1e293b;
-      padding: 16px;
-      border-radius: 12px;
-      width: 360px;
-      max-height: 90vh;
-      overflow: auto;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.8);
-      font-size: 13px;
-    }
-
-    .modal-close-btn {
-      background: transparent;
-      border: 1px solid #888;
-      color: white;
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      cursor: pointer;
-    }
-
-    .modal-section-title {
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #9ca3af;
-      margin: 8px 0 4px;
-    }
-
-    .modal-input {
-      width: 100%;
-      padding: 6px 8px;
-      border-radius: 8px;
-      border: 1px solid #4b5563;
-      background: #0f172a;
-      color: #e5e7eb;
-      font-size: 12px;
-      margin-bottom: 6px;
-    }
-
-    .modal-button {
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: none;
-      cursor: pointer;
-      font-size: 12px;
-      margin-right: 4px;
-      margin-top: 4px;
-    }
-
-    .btn-emi { background: #22c55e; color: #022c22; }
-    .btn-penalty { background: #eab308; color: #451a03; }
-    .btn-print { background: #0ea5e9; color: #022c3a; }
-    .btn-status { background: #6366f1; color: #e0e7ff; }
-
-    .emi-history-item {
-      padding: 3px 0;
-      border-bottom: 1px dashed rgba(148,163,184,0.35);
-    }
-
-    .footer-note {
-      margin-top:10px;
-      text-align:right;
-      font-size:12px;
-      color:#888;
-    }
-
-    @media (max-width: 720px) {
-      .modal-box { width: 90%; }
-    }
-  </style>
+/* Transactions list inside modal */
+.tx-list{margin-top:10px;max-height:320px;overflow:auto;padding-right:6px;}
+.tx-row{display:flex;justify-content:space-between;padding:8px 6px;border-bottom:1px dashed rgba(255,255,255,0.03);font-size:13px;}
+.tx-row .left{display:flex;gap:12px;align-items:center}
+.tx-row .amt{font-weight:700}
+.modal-controls{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+.btn-secondary{background:transparent;border:1px solid rgba(255,255,255,0.08);padding:8px 10px;border-radius:8px;color:var(--muted);cursor:pointer}
+.input-date{padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:var(--text)}
+</style>
 </head>
-
 <body>
   <div class="container">
 
+    <!-- HEADER -->
     <div class="header">
-      <div class="title-block">
-        <div class="badge"><div class="badge-dot"></div> SRCCS • Live Auto Balance Sheet</div>
+      <div class="title">
+        <div class="badge"><span class="badge-dot"></span> SRCCS • Live Auto Balance Sheet</div>
         <h1>Shree Radha Credit Co-operative Society</h1>
-        <div class="subtitle">Accounts + Daily Transactions — एक ही Dashboard पर</div>
+        <div class="subtitle" style="font-size:13px;color:var(--muted);margin-top:6px">Accounts · Agent Entry · Loans · Reports</div>
       </div>
-
-      <div id="lastUpdatedText" class="last-update">डेटा लोड हो रहा है...</div>
+      <div style="text-align:right">
+        <div id="lastUpdatedText" class="last-update">डेटा लोड हो रहा है...</div>
+        <div style="margin-top:6px"><button class="pill" id="btnRefresh">Refresh</button></div>
+      </div>
     </div>
 
-    <!-- TOP SUMMARY -->
+    <!-- MAIN CARD -->
     <div class="main-card">
 
-      <div class="summary-grid">
+      <!-- SUMMARY -->
+      <div class="summary" style="margin-bottom:12px">
         <div class="card-small">
-          <div class="card-label">समिति का कुल बैलेंस</div>
-          <div id="totalBalance" class="card-value">₹ 0</div>
+          <div class="label">समिति का कुल बैलेंस</div>
+          <div id="totalBalance" class="value">₹ 0</div>
         </div>
-
         <div class="card-small">
-          <div class="card-label">कुल Loan Outstanding</div>
-          <div id="totalLoanOutstanding" class="card-value">₹ 0</div>
+          <div class="label">कुल Loan Outstanding</div>
+          <div id="totalLoanOutstanding" class="value">₹ 0</div>
         </div>
-
         <div class="card-small">
-          <div class="card-label">Net Position</div>
-          <div id="netPosition" class="card-value">₹ 0</div>
+          <div class="label">Net Position</div>
+          <div id="netPosition" class="value">₹ 0</div>
         </div>
-
         <div class="card-small">
-          <div class="card-label">आज की जमा / निकासी</div>
-          <div class="card-value">
-            <span id="todayCredit">₹ 0</span> /
-            <span id="todayDebit">₹ 0</span>
-          </div>
+          <div class="label">आज की जमा / निकासी</div>
+          <div class="value"><span id="todayCredit">₹ 0</span> / <span id="todayDebit">₹ 0</span></div>
         </div>
       </div>
 
       <!-- MAIN GRID -->
-      <div class="split-grid">
+      <div style="display:grid;grid-template-columns:1fr 420px;gap:12px;align-items:start">
 
-        <!-- LEFT SIDE -->
+        <!-- LEFT: Accounts + Table -->
         <div>
           <div class="section-title">
-            <input id="searchAccount" class="agent-input" style="margin-bottom:8px;" placeholder="Search Account...">
-
-            <span>Accounts Status</span>
-            <button class="refresh-btn" onclick="loadDashboard()">Refresh</button>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input id="searchAccount" class="input" placeholder="Search account or name..." style="width:320px"/>
+              <button class="refresh-btn" id="miniRefresh">🔄</button>
+            </div>
+            <div id="accountsSummary"></div>
           </div>
 
           <div class="panel">
-            <div id="accountsSummary" class="status-bar"></div>
-
             <div class="table-wrapper">
               <table>
                 <thead>
-                  <tr>
-                    <th>Account</th>
-                    <th>Created</th>
-                    <th>Balance</th>
-                    <th>Last Payment</th>
-                    <th>Type</th>
-                    <th>Status</th>
-                    <th>Loan</th>
-                  </tr>
+                  <tr><th>Account</th><th>Created</th><th>Balance</th><th>Last Payment</th><th>Type</th><th>Status</th><th>Loan</th></tr>
                 </thead>
                 <tbody id="accountsTableBody">
                   <tr><td colspan="7">Loading...</td></tr>
@@ -470,130 +378,129 @@
               </table>
             </div>
           </div>
+        </div>
 
-          <!-- AGENT ENTRY -->
-          <div class="section-title"><span>💼 Agent Entry</span> <span id="agentClock">--:--:--</span></div>
+        <!-- RIGHT: Agent Entry + Quick Stats -->
+        <div>
+          <div class="section-title"><span>💼 Agent Entry</span> <span id="agentClock" style="font-size:12px;color:var(--muted)"></span></div>
 
-          <div class="agent-card">
+          <div class="agent-box">
             <div class="agent-row">
-
-              <div style="flex:1">
-                <label class="agent-label">Account Number</label>
-                <input id="aAccount" class="agent-input" maxlength="4" placeholder="4 digit">
+              <div>
+                <div class="agent-label">Account (last 4 digits)</div>
+                <input id="aAccount" class="input" placeholder="e.g. 3578" maxlength="4" />
               </div>
-
-              <div style="flex:1">
-                <label class="agent-label">Amount</label>
-                <input id="aAmount" type="number" class="agent-input" placeholder="Amount">
+              <div>
+                <div class="agent-label">Amount (₹)</div>
+                <input id="aAmount" class="input" type="number" placeholder="Amount" />
               </div>
-
-              <div style="flex:1">
-                <label class="agent-label">Type</label>
-                <select id="aType" class="agent-select">
+              <div>
+                <div class="agent-label">Type</div>
+                <select id="aType" class="input">
                   <option value="">Select</option>
                   <option value="credit">Credit</option>
                   <option value="debit">Debit</option>
                 </select>
               </div>
-
-              <div style="flex:1">
-                <label class="agent-label">Agent ID</label>
-                <select id="aID" class="agent-select">
+              <div>
+                <div class="agent-label">Agent ID</div>
+                <select id="aID" class="input">
                   <option value="">Select</option>
                   <option value="SH7333">SH7333</option>
                   <option value="KA4564">KA4564</option>
                   <option value="JE2659">JE2659</option>
                   <option value="SRCCS1432">SRCCS1432</option>
+                  <option value="CHARGE">CHARGE</option>
+                  <option value="LOAN EMI">LOAN EMI</option>
                 </select>
               </div>
-
             </div>
 
-            <button class="agent-btn" onclick="saveAgentTransaction()">💾 Submit</button>
+            <button class="btn" id="agentSubmit">💾 Submit</button>
             <div id="agentMsg" class="agent-msg"></div>
           </div>
+
+          <div style="height:12px"></div>
+
+          <div class="panel" style="padding:10px">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <div class="label">Today Totals</div>
+                <div style="font-weight:700;font-size:16px;margin-top:6px"><span id="miniTodayCredit">₹ 0</span> / <span id="miniTodayDebit">₹ 0</span></div>
+              </div>
+              <div style="text-align:right">
+                <div class="label">Loans</div>
+                <div id="miniLoanCount" style="font-weight:700;font-size:16px;margin-top:6px">0</div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
 
-      <div class="footer-note">
-        * Read-Only Dashboard — Data Google Sheets में सुरक्षित है।
-      </div>
+      <div class="footer-note">* Read-Only Dashboard — Data Google Sheets में सुरक्षित है।</div>
     </div>
   </div>
 
-  <!-- MODAL (Customer + Loan दोनों के लिए) -->
+  <!-- MODAL -->
   <div id="customerModal" class="modal-overlay">
     <div class="modal-box">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-        <div class="badge"><div class="badge-dot"></div> Details</div>
-        <button class="modal-close-btn" onclick="closeCustomerModal()">×</button>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div class="badge"><span class="badge-dot"></span> Details</div>
+        <button class="modal-close" onclick="closeCustomerModal()">×</button>
       </div>
-
-      <div id="modalContent" style="color:#ddd; font-size:13px;">Loading...</div>
+      <div id="modalContent" style="color:#ddd;font-size:13px">Loading...</div>
     </div>
   </div>
 
 <script>
-/* -------------------------
-   API URLs
-------------------------- */
+/* --------------------------
+   CONFIG (replace if needed)
+---------------------------*/
 const ACCOUNT_API_URL  = "https://script.google.com/macros/s/AKfycbw2TxBUYHne2uZ7JiI71ly8hctmpj-dXkMu3rCeEXalm7fCU_GQOxGpFO6ik-HRdNwB/exec";
 const LOAN_API_URL     = "https://script.google.com/macros/s/AKfycbxo7Q9PoAPWtdrLtQIR_uweA5A3j9AUSlyp3Hbzk7IKorOHDpW-UIfLXWbb0jWwNVBx1g/exec";
 const CUSTOMER_API_URL = "https://script.google.com/macros/s/AKfycbxm_Fmpn-Oaa9tNOiPBXVEqmUK_cZQyMkYNBEd0kUTNvvEQtp25BOBDkeppg0ZqrMtF/exec";
 const AGENT_API_URL    = "https://script.google.com/macros/s/AKfycbyNgpjiGxsdawUqPPVwsclM0x3AOlFPSK-VsgpH937HLf4A7XrhuncW8M0F0UcNKWmT/exec";
 
+/* UTILS */
+function formatINR(n){ if(n==null||n==undefined) return "0"; return Number(n).toLocaleString('en-IN'); }
+function toRupee(n){ return "₹ "+formatINR(n); }
 
-
-document.getElementById("searchAccount").addEventListener("input", function () {
-  const q = this.value.toLowerCase();
-  const rows = document.querySelectorAll("#accountsTableBody tr");
-
-  rows.forEach(r => {
-    const text = r.textContent.toLowerCase();
-    r.style.display = text.includes(q) ? "" : "none";
-  });
-});
-
-/* INR FORMAT */
-function formatINR(n){ return Number(n||0).toLocaleString("en-IN"); }
-
-/* Modal */
+/* MODAL */
 function openCustomerModal(){ document.getElementById("customerModal").style.display="flex"; }
 function closeCustomerModal(){ document.getElementById("customerModal").style.display="none"; }
 
-/* Agent Clock */
-setInterval(()=>{
-  document.getElementById("agentClock").textContent =
-    new Date().toLocaleTimeString("en-IN",{hour12:true});
+/* AGENT CLOCK */
+setInterval(()=> {
+  document.getElementById("agentClock").textContent = new Date().toLocaleTimeString('en-IN',{hour12:true});
 },1000);
 
-/* Global Loan Cache + Current Loan */
+/* GLOBAL CACHE */
 let LOANS_CACHE = [];
-let CURRENT_LOAN = null;
+let LAST_TX_CACHE = {}; // cache transactions per account
 
-/* LOAD LOANS (Summary + Cache) */
+/* LOAD LOANS */
 async function loadLoanSummary(){
   try{
-    const r = await fetch(LOAN_API_URL+"?action=getLoans");
-    const data = await r.json();
-
+    const res = await fetch(LOAN_API_URL + "?action=getLoans");
+    const data = await res.json();
     LOANS_CACHE = data || [];
 
     let totalOut = 0;
     const set = new Set();
 
-    (LOANS_CACHE).forEach(l=>{
+    LOANS_CACHE.forEach(l=>{
       totalOut += Number(l.Outstanding)||0;
       const acc = l.Account || l["Account No"] || "";
       if(acc) set.add(String(acc).trim());
     });
 
-    document.getElementById("totalLoanOutstanding").textContent =
-      "₹ "+formatINR(totalOut);
+    document.getElementById("totalLoanOutstanding").textContent = toRupee(totalOut);
+    document.getElementById("miniLoanCount").textContent = LOANS_CACHE.length||0;
 
-    return { totalOutstanding: totalOut, loanAccountsSet:set };
+    return { totalOutstanding: totalOut, loanAccountsSet: set };
   }catch(e){
-    console.error(e);
+    console.error("loadLoanSummary:",e);
     return { totalOutstanding:0, loanAccountsSet:new Set() };
   }
 }
@@ -601,510 +508,446 @@ async function loadLoanSummary(){
 /* LOAD ACCOUNTS */
 async function loadAccountSummary(loanSet){
   try{
-    const todayRes = await fetch(ACCOUNT_API_URL+"?fn=getTodayTotals");
+    const todayRes = await fetch(ACCOUNT_API_URL + "?fn=getTodayTotals");
     const today = await todayRes.json();
 
-    document.getElementById("todayCredit").textContent = "₹ "+formatINR(today.creditToday);
-    document.getElementById("todayDebit").textContent  = "₹ "+formatINR(today.debitToday);
-    document.getElementById("totalBalance").textContent= "₹ "+formatINR(today.totalBalance);
+    document.getElementById("todayCredit").textContent = toRupee(today.creditToday);
+    document.getElementById("todayDebit").textContent  = toRupee(today.debitToday);
+    document.getElementById("totalBalance").textContent = toRupee(today.totalBalance || 0);
+    document.getElementById("miniTodayCredit").textContent = toRupee(today.creditToday);
+    document.getElementById("miniTodayDebit").textContent = toRupee(today.debitToday);
 
-    const accRes = await fetch(ACCOUNT_API_URL+"?fn=getAccountsStatus&days=90");
+    // accounts list
+    const accRes = await fetch(ACCOUNT_API_URL + "?fn=getAccountsStatus&days=90");
     const acc = await accRes.json();
 
     const tbody = document.getElementById("accountsTableBody");
-    const top   = document.getElementById("accountsSummary");
-
+    const top = document.getElementById("accountsSummary");
     tbody.innerHTML = "";
     top.innerHTML = "";
 
     let loanCount=0;
-
     (acc.accounts||[]).forEach(a=>{
-      const id=a.account||a.accountNo||"";
+      const id = a.account || a.accountNo || "";
       const hasLoan = loanSet.has(String(id).trim());
       if(hasLoan) loanCount++;
 
-      const tr=document.createElement("tr");
-      tr.innerHTML=`
-        <td>${id}</td>
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td><span class="account-link" onclick="showAccountTransactions('${id}')">${id}</span></td>
         <td>${a.createdDate||"-"}</td>
-        <td>${formatINR(a.balance)}</td>
+        <td>₹ ${formatINR(a.balance)}</td>
         <td>${a.lastPaymentDate||"-"}</td>
         <td>${a.lastPaymentType||"-"}</td>
-        <td><span class="${a.active?'badge-active':'badge-inactive'} customer-badge" data-acc="${id}">
-           ${a.active?'Active':'Inactive'}
-        </span></td>
-        <td>${hasLoan
-          ? '<span class="badge-loan loan-badge" data-acc="'+id+'">Loan</span>'
-          : '<span class="badge-noloan">No</span>'}
-        </td>`;
+        <td><span class="${a.active ? 'badge-active customer-badge' : 'badge-inactive customer-badge'}" data-acc="${id}">${a.active ? 'Active' : 'Inactive'}</span></td>
+        <td>${hasLoan ? `<span class="badge-loan loan-badge" data-acc="${id}">Loan</span>` : `<span class="badge-no">No</span>` }</td>
+      `;
       tbody.appendChild(tr);
     });
 
-    top.innerHTML=`
+    top.innerHTML = `
       <span class="pill">Total: ${acc.total||0}</span>
       <span class="pill">Active: ${acc.activeCount||0}</span>
       <span class="pill">Inactive: ${acc.inactiveCount||0}</span>
       <span class="pill">Loan Accounts: ${loanCount}</span>
     `;
 
-    document.querySelectorAll(".customer-badge").forEach(x=>{
-      x.onclick=()=>showCustomerDetails(x.dataset.acc);
-    });
+    // attach handlers
+    document.querySelectorAll(".customer-badge").forEach(x => x.onclick = ()=> showCustomerDetails(x.dataset.acc));
+    document.querySelectorAll(".loan-badge").forEach(x => x.onclick = ()=> showLoanDetails(x.dataset.acc));
 
-    document.querySelectorAll(".loan-badge").forEach(x=>{
-      x.onclick=()=>showLoanDetails(x.dataset.acc);
-    });
-
-    return today.totalBalance||0;
+    return today.totalBalance || 0;
 
   }catch(e){
-    console.error(e);
+    console.error("loadAccountSummary:", e);
     return 0;
   }
 }
 
-/* CUSTOMER DETAILS */
+/* SHOW CUSTOMER DETAILS (Modal) */
 async function showCustomerDetails(acc){
   openCustomerModal();
-  document.getElementById("modalContent").innerHTML="Loading...";
-
+  document.getElementById("modalContent").innerHTML = "Loading...";
   try{
-    const r=await fetch(CUSTOMER_API_URL+"?action=fetchOne&accountNumber="+encodeURIComponent(acc));
-    const data=await r.json();
-
+    const r = await fetch(CUSTOMER_API_URL + "?action=fetchOne&accountNumber=" + encodeURIComponent(acc));
+    const data = await r.json();
     if(!data.record){
-      document.getElementById("modalContent").innerHTML="Not Found!";
+      document.getElementById("modalContent").innerHTML = "Not Found!";
       return;
     }
-
-    const rcd=data.record;
-
-    document.getElementById("modalContent").innerHTML=`
-      <div class="modal-section-title">Customer Details</div>
-      <div><b>Account:</b> ${rcd.accountNumber}</div>
-      <div><b>Name:</b> ${rcd.name}</div>
-      <div><b>Aadhaar:</b> ${rcd.aadhaar}</div>
-      <div><b>Mobile:</b> ${rcd.mobile}</div>
-      <div><b>Address:</b> ${rcd.address||""}</div>
-      <div><b>Pin Code:</b> ${rcd.pin||""}</div>
+    const rcd = data.record;
+    document.getElementById("modalContent").innerHTML = `
+      <div style="font-weight:700;margin-bottom:6px">${rcd.name || '-'}</div>
+      <div><b>Account:</b> ${rcd.accountNumber || '-'}</div>
+      <div><b>Aadhaar:</b> ${rcd.aadhaar || '-'}</div>
+      <div><b>Mobile:</b> ${rcd.mobile || '-'}</div>
+      <div><b>Address:</b> ${rcd.address || '-'}</div>
+      <div style="margin-top:8px"><button class="modal-button btn-print" onclick="printCustomer('${rcd.accountNumber||''}')">Print</button></div>
     `;
   }catch(e){
     console.error(e);
-    document.getElementById("modalContent").innerHTML="Error!";
+    document.getElementById("modalContent").innerHTML = "Error loading customer";
   }
 }
 
 /* FIND LOAN BY ACCOUNT */
 function findLoanByAccount(acc){
   if(!LOANS_CACHE) return null;
-  return LOANS_CACHE.find(l =>
-    String(l.Account).trim() === String(acc).trim() ||
-    String(l["Account No"]||"").trim() === String(acc).trim()
-  );
+  return LOANS_CACHE.find(l => String(l.Account).trim() === String(acc).trim() || String(l["Account No"]||"").trim() === String(acc).trim());
 }
 
-/* LOAN DETAILS MODAL */
+/* SHOW LOAN DETAILS (Modal) */
 function showLoanDetails(acc){
   const loan = findLoanByAccount(acc);
   openCustomerModal();
-
   if(!loan){
-    document.getElementById("modalContent").innerHTML="Loan Not Found!";
+    document.getElementById("modalContent").innerHTML = "Loan Not Found!";
     return;
   }
-
-  CURRENT_LOAN = loan;
-
   let history=[];
-  try{
-    history = JSON.parse(loan["EMI History"]||"[]");
-  }catch(e){ history=[]; }
+  try{ history = JSON.parse(loan["EMI History"]||"[]"); }catch(e){ history=[]; }
 
-  let histHTML = "";
-  if(history.length){
-    histHTML = history.map(h=>`
-      <div class="emi-history-item">
-        <b>${h.date}</b> — ₹${formatINR(h.amount)} (${h.type==="emi"?"EMI":"Penalty"})
-      </div>
-    `).join("");
-  }else{
-    histHTML = "No EMI History";
-  }
+  let histHTML = history.length ? history.map(h=>`<div style="padding:6px 0;border-bottom:1px dashed rgba(255,255,255,0.04)"><b>${h.date}</b> — ₹${formatINR(h.amount)} (${h.type||'emi'})</div>`).join("") : "No EMI History";
 
   const todayStr = new Date().toISOString().slice(0,10);
 
   document.getElementById("modalContent").innerHTML = `
-    <div class="modal-section-title">Loan Details</div>
+    <div style="font-weight:700;margin-bottom:6px">${loan.Name || '—'}</div>
     <div><b>Loan ID:</b> ${loan["Loan ID"]}</div>
-    <div><b>Name:</b> ${loan.Name}</div>
     <div><b>Account:</b> ${loan.Account}</div>
     <div><b>Principal:</b> ₹${formatINR(loan.Principal)}</div>
-    <div><b>Rate:</b> ${loan.Rate}%</div>
-    <div><b>Tenure:</b> ${loan.Tenure} Months</div>
-    <div><b>EMI:</b> ₹${formatINR(loan.EMI)}</div>
-    <div><b>Paid EMI:</b> ₹${formatINR(loan["Paid EMI"])}</div>
-    <div><b>Penalty:</b> ₹${formatINR(loan.Penalty)}</div>
     <div><b>Outstanding:</b> ₹${formatINR(loan.Outstanding)}</div>
-    <div><b>Start Date:</b> ${loan.StartDate}</div>
-    <div><b>Status:</b> ${loan.Status||"Active"}</div>
-
-    <div class="modal-section-title">Actions</div>
-    <div>
-      <div style="margin-bottom:4px;"><b>Pay EMI</b></div>
-      <input id="emiAmount" class="modal-input" type="number"
-             value="${loan.EMI}" placeholder="EMI Amount">
+    <div><b>EMI:</b> ₹${formatINR(loan.EMI)}</div>
+    <div style="margin-top:8px">
+      <div style="margin-bottom:6px"><b>Pay EMI</b></div>
+      <input id="emiAmount" class="modal-input" type="number" value="${loan.EMI || ''}" placeholder="EMI Amount">
       <input id="emiDate" class="modal-input" type="date" value="${todayStr}">
-      <button class="modal-button btn-emi" onclick="submitEmiPayment()">Pay EMI</button>
+      <div style="margin-top:6px">
+        <button class="modal-button btn-emi" onclick="submitEmiPayment('${loan["Loan ID"]}')">Pay EMI</button>
+        <button class="modal-button btn-print" onclick="printLoanSummary('${loan["Loan ID"]}')">Print Slip</button>
+      </div>
     </div>
 
-    <div style="margin-top:8px;">
-      <div style="margin-bottom:4px;"><b>Add Penalty</b></div>
-      <input id="penaltyAmount" class="modal-input" type="number" placeholder="Penalty Amount">
-      <input id="penaltyDate" class="modal-input" type="date" value="${todayStr}">
-      <button class="modal-button btn-penalty" onclick="submitPenalty()">Add Penalty</button>
-    </div>
+    <hr style="margin:10px 0;border-color:#3b4756;">
 
-    <div style="margin-top:8px;">
-      <button class="modal-button btn-print" onclick="printLoanSummary()">Print Loan Slip</button>
-      <button class="modal-button btn-print" onclick="printLoanAgreement()">Loan Agreement</button>
-      <button class="modal-button btn-status"
-        onclick="toggleLoanStatus('${loan["Loan ID"]}','${loan.Status||"Active"}')">
-        ${loan.Status==="Closed"?"Activate Loan":"Close Loan"}
-      </button>
-    </div>
-
-    <hr style="margin:10px 0; border-color:#4b5563;">
-
-    <div class="modal-section-title">EMI History</div>
-    <div style="max-height:180px; overflow:auto;">
-      ${histHTML}
-    </div>
+    <div style="font-weight:600;margin-bottom:6px">EMI History</div>
+    <div style="max-height:180px;overflow:auto">${histHTML}</div>
   `;
 }
 
-/* EMI PAYMENT */
-async function submitEmiPayment(){
-  if(!CURRENT_LOAN){ alert("Loan not loaded"); return; }
+/* SHOW ACCOUNT TRANSACTIONS (last 10 days) & PDF DOWNLOAD */
+async function showAccountTransactions(acc){
+  openCustomerModal();
+  const content = document.getElementById("modalContent");
+  content.innerHTML = `Loading transactions for <b>${acc}</b> ...`;
 
+  try{
+    // fetch last 10 days transactions
+    const res = await fetch(ACCOUNT_API_URL + "?fn=getTransactions&account=" + encodeURIComponent(acc) + "&days=10");
+    const data = await res.json();
+    // Expect data.transactions = [{date,type,amount,remarks,txnId}, ...]
+    const tx = data.transactions || data.txns || [];
+
+    // cache for quick filtering/printing
+    LAST_TX_CACHE[acc] = tx;
+
+    // build modal html
+    let rowsHTML = '';
+    if(tx.length === 0){
+      rowsHTML = '<div style="padding:8px;color:var(--muted)">कोई लेन-देन नहीं मिला (Last 10 days)</div>';
+    }else{
+      rowsHTML = tx.map(t => {
+        return `<div class="tx-row">
+                  <div class="left">
+                    <div style="min-width:120px"><b>${t.date || t.txnDate || '-'}</b></div>
+                    <div style="min-width:120px">${t.remarks || t.description || ''}</div>
+                  </div>
+                  <div class="right">
+                    <div class="amt">${t.type && t.type.toLowerCase()==='credit' ? '+' : '-'} ₹ ${formatINR(t.amount)}</div>
+                    <div style="font-size:11px;color:var(--muted);margin-top:6px">${t.txnId || ''}</div>
+                  </div>
+                </div>`;
+      }).join('');
+    }
+
+    const today = new Date().toISOString().slice(0,10);
+
+    content.innerHTML = `
+      <div style="font-weight:700;margin-bottom:6px">Account: ${acc}</div>
+
+      <div class="modal-controls">
+        <button class="btn-secondary" onclick="renderTxList('${acc}')">Show Last 10 Days</button>
+        <label style="font-size:13px;color:var(--muted)">Select date:</label>
+        <input class="input-date" id="filterDate" type="date" max="${today}" />
+        <button class="btn" onclick="downloadPdfForDate('${acc}')">📄 Download PDF for Date</button>
+        <button class="btn-secondary" onclick="printTxWindow('${acc}')">🖨️ Print All (10 days)</button>
+      </div>
+
+      <div id="txListContainer" class="tx-list">${rowsHTML}</div>
+    `;
+
+  }catch(e){
+    console.error("showAccountTransactions:", e);
+    content.innerHTML = "Error loading transactions.";
+  }
+}
+
+/* render tx list from cache */
+function renderTxList(acc){
+  const tx = LAST_TX_CACHE[acc] || [];
+  const container = document.getElementById("txListContainer");
+  if(!container) return;
+  if(tx.length===0){
+    container.innerHTML = '<div style="padding:8px;color:var(--muted)">No transactions in last 10 days</div>';
+    return;
+  }
+  container.innerHTML = tx.map(t => {
+    return `<div class="tx-row">
+              <div class="left">
+                <div style="min-width:120px"><b>${t.date || t.txnDate || '-'}</b></div>
+                <div style="min-width:120px">${t.remarks || t.description || ''}</div>
+              </div>
+              <div class="right">
+                <div class="amt">${t.type && t.type.toLowerCase()==='credit' ? '+' : '-'} ₹ ${formatINR(t.amount)}</div>
+                <div style="font-size:11px;color:var(--muted);margin-top:6px">${t.txnId || ''}</div>
+              </div>
+            </div>`;
+  }).join('');
+}
+
+/* Print/Download helpers */
+
+/* Print entire 10-day transactions in a new window (user can Save as PDF) */
+function printTxWindow(acc){
+  const tx = LAST_TX_CACHE[acc] || [];
+  const w = window.open('','_blank');
+  const title = `Transactions_${acc}`;
+  const now = new Date().toLocaleString('en-IN');
+  let rows = '';
+  if(tx.length===0){
+    rows = `<tr><td colspan="4">No transactions in last 10 days</td></tr>`;
+  }else{
+    rows = tx.map(t => {
+      const date = t.date || t.txnDate || '';
+      const type = t.type || '';
+      const amt = formatINR(t.amount || 0);
+      const desc = (t.remarks || t.description || '').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      const id = t.txnId || '';
+      return `<tr style="border-bottom:1px solid #ddd"><td>${date}</td><td>${desc}</td><td style="text-align:right">${type}</td><td style="text-align:right">₹ ${amt}</td></tr>`;
+    }).join('');
+  }
+
+  const html = `
+    <html><head><meta charset="utf-8"><title>${title}</title>
+      <style>
+        body{font-family:Arial;padding:18px;color:#111}
+        table{width:100%;border-collapse:collapse;font-size:13px}
+        th,td{padding:8px}
+        th{background:#f5f5f5}
+      </style>
+    </head>
+    <body>
+      <h2>Shree Radha Credit Co-operative Society</h2>
+      <div>Account: <b>${acc}</b></div>
+      <div>Printed: ${now}</div>
+      <hr>
+      <table>
+        <thead><tr><th>Date</th><th>Description</th><th>Type</th><th style="text-align:right">Amount</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <div style="margin-top:40px;display:flex;justify-content:space-between">
+        <div>Prepared By</div><div>Checked By</div>
+      </div>
+    </body></html>
+  `;
+  w.document.write(html);
+  w.document.close();
+  w.focus();
+  // let user choose Save as PDF via print dialog
+  setTimeout(()=> w.print(), 500);
+}
+
+/* Download PDF for specific date: filter cached tx and print that subset */
+function downloadPdfForDate(acc){
+  const date = document.getElementById("filterDate").value;
+  if(!date){
+    alert("कृपया एक तारीख चुनें (Select a date)");
+    return;
+  }
+  const tx = (LAST_TX_CACHE[acc] || []).filter(t => {
+    const tdate = (t.date || t.txnDate || '').slice(0,10);
+    return tdate === date;
+  });
+
+  const w = window.open('','_blank');
+  const title = `Transactions_${acc}_${date}`;
+  const now = new Date().toLocaleString('en-IN');
+
+  let rows = '';
+  if(tx.length===0){
+    rows = `<tr><td colspan="4">No transactions on ${date}</td></tr>`;
+  }else{
+    rows = tx.map(t => {
+      const d = t.date || t.txnDate || '';
+      const type = t.type || '';
+      const amt = formatINR(t.amount || 0);
+      const desc = (t.remarks || t.description || '').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      const id = t.txnId || '';
+      return `<tr style="border-bottom:1px solid #ddd"><td>${d}</td><td>${desc}</td><td style="text-align:right">${type}</td><td style="text-align:right">₹ ${amt}</td></tr>`;
+    }).join('');
+  }
+
+  const html = `
+    <html><head><meta charset="utf-8"><title>${title}</title>
+      <style>
+        body{font-family:Arial;padding:18px;color:#111}
+        table{width:100%;border-collapse:collapse;font-size:13px}
+        th,td{padding:8px}
+        th{background:#f5f5f5}
+      </style>
+    </head>
+    <body>
+      <h2>Shree Radha Credit Co-operative Society</h2>
+      <div>Account: <b>${acc}</b></div>
+      <div>Date: <b>${date}</b></div>
+      <div>Printed: ${now}</div>
+      <hr>
+      <table>
+        <thead><tr><th>Date & Time</th><th>Description</th><th style="text-align:right">Type</th><th style="text-align:right">Amount</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <div style="margin-top:40px;display:flex;justify-content:space-between">
+        <div>Prepared By</div><div>Checked By</div>
+      </div>
+    </body></html>
+  `;
+  w.document.write(html);
+  w.document.close();
+  w.focus();
+  setTimeout(()=> w.print(), 500);
+}
+
+/* SUBMIT EMI PAYMENT */
+async function submitEmiPayment(loanId){
   const amt = document.getElementById("emiAmount").value;
   const dt  = document.getElementById("emiDate").value;
-
   if(!amt || !dt){ alert("Amount and Date required"); return; }
 
   try{
-    const r = await fetch(LOAN_API_URL,{
-      method:"POST",
-      body:JSON.stringify({
-        action:"payEmi",
-        loanId: CURRENT_LOAN["Loan ID"],
-        amount: amt,
-        date: dt
-      })
-    });
+    const r = await fetch(LOAN_API_URL, { method:'POST', body: JSON.stringify({ action:'payEmi', loanId, amount:amt, date:dt }) });
     const res = await r.json();
-    if(res.status==="success"){
-      alert("EMI Paid");
-      await loadDashboard();
-      const acc = CURRENT_LOAN.Account;
-      const cacheRes = await fetch(LOAN_API_URL+"?action=getLoans");
-      LOANS_CACHE = await cacheRes.json();
-      CURRENT_LOAN = findLoanByAccount(acc);
-      showLoanDetails(acc);
-    }else{
-      alert("Error: "+(res.message||""));
-    }
+    if(res.status === "success"){ alert("EMI Paid"); await refreshAll(); closeCustomerModal(); }
+    else alert("Error: "+(res.message||''));
   }catch(e){
     console.error(e);
     alert("Error while paying EMI");
   }
 }
 
-/* PENALTY ADD */
-async function submitPenalty(){
-  if(!CURRENT_LOAN){ alert("Loan not loaded"); return; }
-
-  const amt = document.getElementById("penaltyAmount").value;
-  const dt  = document.getElementById("penaltyDate").value;
-
-  if(!amt || !dt){ alert("Amount and Date required"); return; }
-
-  try{
-    const r = await fetch(LOAN_API_URL,{
-      method:"POST",
-      body:JSON.stringify({
-        action:"addPenalty",
-        loanId: CURRENT_LOAN["Loan ID"],
-        amount: amt,
-        date: dt
-      })
-    });
-    const res = await r.json();
-    if(res.status==="success"){
-      alert("Penalty Added");
-      await loadDashboard();
-      const acc = CURRENT_LOAN.Account;
-      const cacheRes = await fetch(LOAN_API_URL+"?action=getLoans");
-      LOANS_CACHE = await cacheRes.json();
-      CURRENT_LOAN = findLoanByAccount(acc);
-      showLoanDetails(acc);
-    }else{
-      alert("Error: "+(res.message||""));
-    }
-  }catch(e){
-    console.error(e);
-    alert("Error while adding penalty");
-  }
+/* PRINT FUNCTIONS (customer/loan kept as before) */
+function printCustomer(acc){
+  const w = window.open('','_blank');
+  w.document.write(`<html><head><meta charset="utf-8"><title>Customer ${acc}</title></head><body><h2>Customer: ${acc}</h2><p>Details printed from SRCCS</p></body></html>`);
+  w.document.close(); w.print();
 }
 
-/* TOGGLE LOAN STATUS */
-async function toggleLoanStatus(loanId,current){
-  const newStatus = current==="Active" ? "Closed" : "Active";
-  if(!confirm("Change status to "+newStatus+" ?")) return;
-
-  try{
-    const r = await fetch(LOAN_API_URL,{
-      method:"POST",
-      body:JSON.stringify({
-        action:"updateStatus",
-        loanId,
-        status:newStatus
-      })
-    });
-    const res = await r.json();
-    if(res.status==="success"){
-      alert("Status Updated");
-      await loadDashboard();
-      const cacheRes = await fetch(LOAN_API_URL+"?action=getLoans");
-      LOANS_CACHE = await cacheRes.json();
-      if(CURRENT_LOAN){
-        CURRENT_LOAN = LOANS_CACHE.find(l=>String(l["Loan ID"])===String(loanId));
-        if(CURRENT_LOAN) showLoanDetails(CURRENT_LOAN.Account);
-      }
-    }else{
-      alert("Error: "+(res.message||""));
-    }
-  }catch(e){
-    console.error(e);
-    alert("Error updating status");
-  }
-}
-
-/* PRINT LOAN SUMMARY SLIP */
-function printLoanSummary(){
-  if(!CURRENT_LOAN){ alert("No loan data"); return; }
-
-  const l = CURRENT_LOAN;
-  const w = window.open("", "_blank");
-  const today = new Date().toLocaleString("en-IN");
-
+function printLoanSummary(loanId){
+  const loan = LOANS_CACHE.find(l=>String(l["Loan ID"])===String(loanId));
+  if(!loan){ alert("Loan not found"); return; }
+  const w = window.open('','_blank');
+  const today = new Date().toLocaleString('en-IN');
   const html = `
-  <!DOCTYPE html>
-  <html>
-  <head>
-    <meta charset="utf-8">
-    <title>Loan Slip - ${l["Loan ID"]}</title>
-    <style>
-      body{font-family:system-ui,Arial; padding:16px; font-size:13px;}
-      h2{text-align:center; margin-bottom:6px;}
-      .line{border-bottom:1px dashed #555; margin:6px 0;}
-      table{width:100%; font-size:13px;}
-      td{padding:3px 2px; vertical-align:top;}
-      .right{text-align:right;}
-      .small{font-size:11px; color:#555;}
-    </style>
-  </head>
-  <body>
-    <h2>Shree Radha Credit Co-operative Society</h2>
-    <div class="small" style="text-align:center;">Loan Payment Slip</div>
-    <div class="line"></div>
-    <table>
-      <tr><td><b>Date & Time:</b></td><td class="right">${today}</td></tr>
-      <tr><td><b>Loan ID:</b></td><td class="right">${l["Loan ID"]}</td></tr>
-      <tr><td><b>Name:</b></td><td class="right">${l.Name}</td></tr>
-      <tr><td><b>Account:</b></td><td class="right">${l.Account}</td></tr>
-      <tr><td><b>Principal:</b></td><td class="right">₹${formatINR(l.Principal)}</td></tr>
-      <tr><td><b>Outstanding:</b></td><td class="right">₹${formatINR(l.Outstanding)}</td></tr>
-      <tr><td><b>Status:</b></td><td class="right">${l.Status||"Active"}</td></tr>
-    </table>
-    <div class="line"></div>
-    <div style="margin-top:30px; display:flex; justify-content:space-between;">
-      <div class="small">Borrower Signature</div>
-      <div class="small">Manager / Agent Signature</div>
-    </div>
-  </body>
-  </html>
+    <html><head><meta charset="utf-8"><title>Loan Slip</title></head>
+    <body style="font-family:Arial;padding:18px">
+      <h2>Shree Radha Credit Co-operative Society</h2>
+      <div style="margin-top:6px">Loan Slip</div>
+      <hr>
+      <table style="width:100%;font-size:13px">
+        <tr><td><b>Date</b></td><td style="text-align:right">${today}</td></tr>
+        <tr><td><b>Loan ID</b></td><td style="text-align:right">${loan["Loan ID"]}</td></tr>
+        <tr><td><b>Name</b></td><td style="text-align:right">${loan.Name}</td></tr>
+        <tr><td><b>Account</b></td><td style="text-align:right">${loan.Account}</td></tr>
+        <tr><td><b>Outstanding</b></td><td style="text-align:right">₹${formatINR(loan.Outstanding)}</td></tr>
+      </table>
+      <div style="margin-top:40px;display:flex;justify-content:space-between">
+        <div>Borrower Signature</div><div>Manager Signature</div>
+      </div>
+    </body></html>
   `;
-
-  w.document.write(html);
-  w.document.close();
-  w.focus();
-  w.print();
+  w.document.write(html); w.document.close(); w.print();
 }
 
-/* PRINT LOAN AGREEMENT (PDF via Print) */
-function printLoanAgreement(){
-  if(!CURRENT_LOAN){ alert("No loan data"); return; }
-
-  const l = CURRENT_LOAN;
-  const w = window.open("", "_blank");
-  const today = new Date().toLocaleDateString("en-IN");
-
-  const html = `
-  <!DOCTYPE html>
-  <html>
-  <head>
-    <meta charset="utf-8">
-    <title>Loan Agreement - ${l["Loan ID"]}</title>
-    <style>
-      body{font-family:system-ui,Arial; padding:20px; font-size:13px; line-height:1.5;}
-      h2{text-align:center; margin-bottom:4px;}
-      h4{text-align:center; margin-top:0; margin-bottom:16px;}
-      .section-title{font-weight:bold; margin-top:10px; margin-bottom:4px;}
-      .line{border-bottom:1px solid #555; margin:6px 0;}
-      table{width:100%; font-size:13px;}
-      td{padding:3px 2px; vertical-align:top;}
-      .sign-row{margin-top:40px; display:flex; justify-content:space-between;}
-      .sign-box{width:40%; text-align:center; font-size:11px;}
-    </style>
-  </head>
-  <body>
-    <h2>Shree Radha Credit Co-operative Society</h2>
-    <h4>Loan Agreement</h4>
-
-    <div class="section-title">1. Loan Details</div>
-    <table>
-      <tr><td><b>Loan ID</b></td><td>${l["Loan ID"]}</td></tr>
-      <tr><td><b>Borrower Name</b></td><td>${l.Name}</td></tr>
-      <tr><td><b>Account Number</b></td><td>${l.Account}</td></tr>
-      <tr><td><b>Principal Amount</b></td><td>₹${formatINR(l.Principal)}</td></tr>
-      <tr><td><b>Rate of Interest</b></td><td>${l.Rate}% per annum</td></tr>
-      <tr><td><b>Tenure</b></td><td>${l.Tenure} Months</td></tr>
-      <tr><td><b>EMI</b></td><td>₹${formatINR(l.EMI)}</td></tr>
-      <tr><td><b>Start Date</b></td><td>${l.StartDate}</td></tr>
-      <tr><td><b>Status</b></td><td>${l.Status||"Active"}</td></tr>
-    </table>
-
-    <div class="section-title">2. Terms & Conditions (सारांश)</div>
-    <ol style="padding-left:16px;">
-      <li>उधारकर्ता सहमत है कि वह समय पर EMI का भुगतान करेगा।</li>
-      <li>EMI लेट होने पर निर्धारित नियमों के अनुसार पेनल्टी जोड़ी जाएगी।</li>
-      <li>यदि लगातार किस्तें बकाया रहती हैं तो समिति को वसूली की वैधानिक कार्यवाही करने का अधिकार रहेगा।</li>
-      <li>समिति के नियम एवं उपविधियाँ इस समझौते का अभिन्न हिस्सा हैं।</li>
-    </ol>
-
-    <div class="section-title">3. Declaration</div>
-    <p>
-      मैं, ऊपर वर्णित उधारकर्ता, घोषित करता/करती हूँ कि मैंने उपरोक्त सभी विवरणों को पढ़ लिया है
-      और समझ लिया है तथा मैं स्वयं की इच्छा से यह ऋण ग्रहण कर रहा/रही हूँ।
-    </p>
-
-    <div class="line"></div>
-    <div class="sign-row">
-      <div class="sign-box">
-        उधारकर्ता के हस्ताक्षर<br><br><br>
-        (${l.Name})
-      </div>
-      <div class="sign-box">
-        अधिकृत अधिकारी के हस्ताक्षर<br><br><br>
-        (Manager / Officer)
-      </div>
-    </div>
-
-    <div style="margin-top:20px; font-size:11px;">
-      Date: ${today}
-    </div>
-  </body>
-  </html>
-  `;
-
-  w.document.write(html);
-  w.document.close();
-  w.focus();
-  w.print();
-}
-
-/* AGENT TRANSACTION */
+/* AGENT TRANSACTION SAVE */
 async function saveAgentTransaction(){
-
   let acc = document.getElementById("aAccount").value.trim();
   const amt = document.getElementById("aAmount").value;
   const type = document.getElementById("aType").value;
   const id = document.getElementById("aID").value;
   const msg = document.getElementById("agentMsg");
 
-  // Remove "SRC" if typed
-  if(acc.toUpperCase().startsWith("SRC")){
-      acc = acc.substring(3).trim();
-  }
-
-  if(acc.length !== 4){
-      alert("4 digit account number required!");
-      return;
-  }
-
+  if(!acc || acc.length !== 4){ alert("Enter last 4 digits of account"); return; }
+  if(acc.toUpperCase().startsWith("SRC")) acc = acc.substring(3);
   const account = "SRC" + acc;
 
-  if(!amt || !type || !id){
-      alert("Fill all fields!");
-      return;
-  }
+  if(!amt || !type || !id){ alert("Fill all fields"); return; }
 
   try{
-      const r = await fetch(AGENT_API_URL,{
-        method:"POST",
-        body:JSON.stringify({
-          fn:"transaction",
-          account,
-          amount:amt,
-          type,
-          agent:id
-        })
-      });
+    const r = await fetch(AGENT_API_URL, { method:'POST', body: JSON.stringify({ fn:'transaction', account, amount:amt, type, agent:id }) });
+    const data = await r.json();
+    msg.textContent = data.message || "Saved";
+    msg.className = "agent-msg success";
 
-      const data = await r.json();
-      msg.textContent = data.message || "Saved";
-      msg.className = "agent-msg success";
+    // reset
+    document.getElementById("aAccount").value = "";
+    document.getElementById("aAmount").value = "";
+    document.getElementById("aType").value = "";
+    document.getElementById("aID").value = "";
+    document.getElementById("aAccount").focus();
 
-      // 🔥 FORM RESET AFTER SAVE
-      document.getElementById("aAccount").value = "";
-      document.getElementById("aAmount").value = "";
-      document.getElementById("aType").value = "";
-      document.getElementById("aID").value = "";
-
-      // 🔥 FOCUS BACK TO ACCOUNT FIELD
-      document.getElementById("aAccount").focus();
-
-      // 🔄 REFRESH DASHBOARD
-      await loadDashboard();
+    await refreshAll();
 
   }catch(e){
-      console.error(e);
-      msg.textContent = "Error";
-      msg.className = "agent-msg error";
+    console.error("saveAgentTransaction:",e);
+    msg.textContent = "Error";
+    msg.className = "agent-msg error";
   }
 
-  setTimeout(()=> msg.textContent="", 3000);
+  setTimeout(()=>{ msg.textContent = ""; msg.className = "agent-msg"; }, 3000);
 }
 
-
-
-/* LOAD DASHBOARD */
+/* REFRESH ALL DATA */
 async function loadDashboard(){
-  document.getElementById("lastUpdatedText").textContent="Loading...";
-
-  const loan=await loadLoanSummary();
-  const accBal=await loadAccountSummary(loan.loanAccountsSet);
-
-  const net = Number(accBal)-Number(loan.totalOutstanding||0);
-  document.getElementById("netPosition").textContent="₹ "+formatINR(net);
-
-  document.getElementById("lastUpdatedText").textContent=
-    "Last Update: "+new Date().toLocaleString("en-IN");
+  document.getElementById("lastUpdatedText").textContent = "Loading...";
+  const loan = await loadLoanSummary();
+  const accBal = await loadAccountSummary(loan.loanAccountsSet);
+  const net = Number(accBal) - Number(loan.totalOutstanding || 0);
+  document.getElementById("netPosition").textContent = toRupee(net);
+  document.getElementById("lastUpdatedText").textContent = "Last Update: " + new Date().toLocaleString('en-IN');
 }
 
-loadDashboard();
-</script>
+async function refreshAll(){
+  await loadDashboard();
+}
 
+/* SEARCH FILTER */
+document.getElementById("searchAccount").addEventListener("input", function(){
+  const q = this.value.toLowerCase();
+  const rows = document.querySelectorAll("#accountsTableBody tr");
+  rows.forEach(r=>{ const text = r.textContent.toLowerCase(); r.style.display = text.includes(q) ? "" : "none"; });
+});
+
+/* BUTTON HOOKS */
+document.getElementById("btnRefresh").addEventListener("click", loadDashboard);
+document.getElementById("miniRefresh").addEventListener("click", loadDashboard);
+document.getElementById("agentSubmit").addEventListener("click", saveAgentTransaction);
+
+/* INIT */
+loadDashboard();
+
+/* Close modal on overlay click */
+document.getElementById("customerModal").addEventListener("click", function(e){
+  if(e.target === this) closeCustomerModal();
+});
+</script>
 </body>
 </html>
