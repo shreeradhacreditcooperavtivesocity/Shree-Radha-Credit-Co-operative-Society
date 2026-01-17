@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<title>SRCCS – Agent Transaction Entry</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<style>
+body{
+  margin:0;
+  font-family:"Courier New", monospace;
+  background:#f4f6fb;
+  color:#000;
+  font-size:13px;
+}
+.app{max-width:420px;margin:auto;padding:12px}
+.card{background:#fff;border:1px solid #000;padding:14px}
+
+h2{text-align:center;margin:0 0 4px;font-size:15px;font-weight:bold}
+p{text-align:center;margin:0 0 12px;font-size:11px}
+
+label{font-size:11px;font-weight:bold;margin-top:8px;display:block}
+input,select{
+  width:100%;
+  padding:6px 4px;
+  margin-top:3px;
+  font-size:12px;
+  border:none;
+  border-bottom:1px dotted #000;
+  background:transparent;
+}
+input[readonly]{background:#f3f3f3}
+
+button{
+  width:100%;
+  margin-top:14px;
+  padding:8px;
+  font-size:13px;
+  font-weight:bold;
+  border:1px solid #000;
+  background:#e5e5e5;
+}
+
+.msg{text-align:center;font-size:12px;font-weight:bold;margin-top:8px}
+.ok{color:#0a7a00}
+.err{color:#b91c1c}
+
+.verify-wrap{position:relative}
+.verify-tick{
+  position:absolute;right:0;top:55%;
+  transform:translateY(-50%);
+  font-size:11px;color:#0a7a00;
+  font-weight:bold;display:none
+}
+
+.history-box{
+  margin-top:14px;
+  border-top:1px solid #000;
+  padding-top:8px;
+}
+.history-box h4{text-align:center;font-size:12px;margin-bottom:6px}
+.total-box{text-align:center;font-size:12px;font-weight:bold;margin-bottom:6px}
+
+.history-item{
+  border-bottom:1px dotted #000;
+  padding:6px 0;
+  font-size:11px;
+}
+.history-item:last-child{border-bottom:none}
+.h-credit{color:#0a7a00;font-weight:bold}
+.h-debit{color:#b91c1c;font-weight:bold}
+.small{font-size:10px}
+</style>
+</head>
+
+<body>
+<div class="app">
+<div class="card">
+
+<h2>Agent Daily Entry</h2>
+<p>Shree Radha Credit Co-operative Society</p>
+
+<label>Account Number</label>
+<input id="account" placeholder="SRC1234">
+
+<label>Customer Name</label>
+<div class="verify-wrap">
+  <input id="name" readonly>
+  <div id="tick" class="verify-tick">✔ Verified</div>
+</div>
+
+<label>Transaction Type</label>
+<select id="type">
+  <option value="credit">Credit</option>
+  <option value="debit">Debit</option>
+</select>
+
+<label>Amount</label>
+<input id="amount" type="number">
+
+<label>Agent ID</label>
+<select id="agent">
+  <option value="">Select</option>
+  <option>SH7333</option>
+  <option>KA4564</option>
+  <option>JE2659</option>
+  <option>SRCCS1432</option>
+</select>
+
+<label>Mode</label>
+<select id="mode">
+  <option>Cash</option>
+  <option>UPI</option>
+  <option>Cheque</option>
+</select>
+
+<label>Remarks</label>
+<input id="remarks">
+
+<button onclick="saveEntry()">SAVE ENTRY</button>
+<div id="msg" class="msg"></div>
+
+<!-- HISTORY ALWAYS VISIBLE -->
+<div class="history-box" id="historyBox">
+  <h4>Transaction History (All Accounts – Last 24 Hours)</h4>
+  <div class="total-box" id="totalBox">Total Collection: ₹0</div>
+  <div id="historyList"></div>
+</div>
+
+</div>
+</div>
+
+<script>
+const API="https://script.google.com/macros/s/AKfycbwH8WgzhzGMFtvACzgoxkMNRLGJGh8yCXHDL7d1OHeuYoE7zUIEQATxYj0oUGAKXE7EXA/exec";
+const EXPIRY=24*60*60*1000;
+
+const account=document.getElementById("account");
+const name=document.getElementById("name");
+const tick=document.getElementById("tick");
+const msg=document.getElementById("msg");
+const amount=document.getElementById("amount");
+const type=document.getElementById("type");
+const agent=document.getElementById("agent");
+const mode=document.getElementById("mode");
+const remarks=document.getElementById("remarks");
+const historyList=document.getElementById("historyList");
+const totalBox=document.getElementById("totalBox");
+
+let t=null;
+
+/* PAGE LOAD PAR HISTORY */
+window.onload=showHistory;
+
+account.addEventListener("input",()=>{
+  clearTimeout(t);
+  t=setTimeout(fetchName,400);
+});
+
+function cleanOld(){
+  let h=JSON.parse(localStorage.getItem("SRCCS_HISTORY")||"{}");
+  let now=Date.now();
+  Object.keys(h).forEach(a=>{
+    h[a]=h[a].filter(x=>now-x.time<EXPIRY);
+    if(!h[a].length) delete h[a];
+  });
+  localStorage.setItem("SRCCS_HISTORY",JSON.stringify(h));
+}
+
+function fetchName(){
+  let acc=account.value.trim();
+  if(!acc)return;
+  if(!acc.startsWith("SRC")) acc="SRC"+acc;
+  account.value=acc;
+
+  fetch(`${API}?fn=getName&account=${acc}`)
+  .then(r=>r.json())
+  .then(d=>{
+    if(d.success){
+      name.value=d.name;
+      tick.style.display="block";
+      msg.innerText="✔ Account Verified";
+      msg.className="msg ok";
+    }else{
+      name.value="";
+      tick.style.display="none";
+      msg.innerText="❌ Account Number Not Found";
+      msg.className="msg err";
+    }
+  });
+}
+
+function showHistory(){
+  cleanOld();
+  let h=JSON.parse(localStorage.getItem("SRCCS_HISTORY")||"{}");
+  let all=[],total=0;
+
+  Object.values(h).forEach(arr=>{
+    arr.forEach(x=>{
+      all.push(x);
+      if(x.type==="credit") total+=Number(x.amount);
+    });
+  });
+
+  all.sort((a,b)=>b.time-a.time);
+  historyList.innerHTML="";
+
+  all.forEach(x=>{
+    historyList.innerHTML+=`
+    <div class="history-item">
+      <b>${x.name}</b> (${x.account})<br>
+      <span class="${x.type==="credit"?"h-credit":"h-debit"}">
+        ${x.type.toUpperCase()} ₹${x.amount}
+      </span><br>
+      <span class="small">
+        ${new Date(x.time).toLocaleString()} |
+        Agent:${x.agent} | ${x.mode}
+      </span><br>
+      <span class="small">Remark: ${x.remarks||"-"}</span>
+    </div>`;
+  });
+
+  totalBox.innerText="Total Collection: ₹"+total;
+}
+
+function saveEntry(){
+  if(!account.value||!amount.value||!agent.value){
+    msg.innerText="❌ Required fields missing";
+    msg.className="msg err";
+    return;
+  }
+
+  fetch(API,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"addLedger",
+      account:account.value,
+      amount:amount.value,
+      type:type.value,
+      agent:agent.value,
+      mode:mode.value,
+      remarks:remarks.value
+    })
+  })
+  .then(r=>r.json())
+  .then(d=>{
+    if(d.success){
+      let h=JSON.parse(localStorage.getItem("SRCCS_HISTORY")||"{}");
+      if(!h[account.value]) h[account.value]=[];
+      h[account.value].push({
+        account:account.value,
+        name:name.value,
+        amount:amount.value,
+        type:type.value,
+        agent:agent.value,
+        mode:mode.value,
+        remarks:remarks.value,
+        time:Date.now()
+      });
+      localStorage.setItem("SRCCS_HISTORY",JSON.stringify(h));
+      location.reload();   // ✅ refresh but history stays
+    }
+  });
+}
+</script>
+</body>
+</html>
