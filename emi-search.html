@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<title>SRCCS – Loan & EMI Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root{
+  --primary:#1a237e;
+  --primary-dark:#0d154f;
+  --bg:#eef2f7;
+  --card:#ffffff;
+  --border:#c5cae9;
+  --text:#111827;
+  --success:#2e7d32;
+  --danger:#c62828;
+}
+
+*{
+  box-sizing:border-box;
+  font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+}
+
+/* ===== HEADER ===== */
+.header{
+  background:var(--primary);
+  color:#fff;
+  padding:16px 22px;
+  font-size:20px;
+  font-weight:600;
+  letter-spacing:0.5px;
+  border-bottom:3px solid var(--primary-dark);
+}
+
+/* ===== CONTAINER ===== */
+.container{
+  max-width:1200px;
+  margin:22px auto;
+  padding:0 16px;
+}
+
+/* ===== CARD ===== */
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  padding:16px;
+  margin-bottom:18px;
+}
+
+/* ===== GRID ===== */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+}
+@media(max-width:900px){
+  .grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:500px){
+  .grid{grid-template-columns:1fr}
+}
+
+/* ===== FORM ===== */
+label{
+  font-size:12px;
+  font-weight:bold;
+}
+
+input,select{
+  width:100%;
+  padding:8px;
+  border:1px solid var(--primary);
+  margin-top:4px;
+  font-size:13px;
+}
+
+button{
+  width:100%;
+  padding:9px;
+  background:var(--primary);
+  color:#fff;
+  border:none;
+  cursor:pointer;
+  font-weight:bold;
+  letter-spacing:0.3px;
+}
+
+button:hover{
+  background:var(--primary-dark);
+}
+
+/* ===== BADGE ===== */
+.badge{
+  padding:4px 14px;
+  border-radius:20px;
+  font-size:12px;
+  font-weight:bold;
+}
+.badge.active{
+  background:#e8f5e9;
+  color:var(--success);
+  border:1px solid var(--success);
+}
+.badge.close{
+  background:#fdeaea;
+  color:var(--danger);
+  border:1px solid var(--danger);
+}
+
+/* ===== TABLE ===== */
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:10px;
+}
+
+th{
+  background:#e8eaf6;
+  color:var(--primary);
+  border:1px solid var(--border);
+  padding:8px;
+  font-size:13px;
+}
+
+td{
+  border:1px solid var(--border);
+  padding:8px;
+  font-size:13px;
+  text-align:center;
+}
+
+tr:nth-child(even){
+  background:#fafafa;
+}
+
+.hidden{
+  display:none;
+}
+
+/* ===== PRINT MODE ===== */
+@media print{
+  body{background:#fff}
+  .header,
+  #searchBox,
+  #emiPay,
+  button,
+  input,
+  select{
+    display:none !important;
+  }
+  .print-header{
+    display:block !important;
+  }
+  .card{
+    border:none;
+    padding:6px;
+  }
+}
+
+.print-header{
+  display:none;
+  text-align:center;
+  font-size:13px;
+}
+
+.print-header h3{
+  color:#1a237e;
+  margin-bottom:4px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- PRINT HEADER -->
+<div class="print-header">
+  <h3>Shri Radha Credit Co-operative Society Limited, Gujri (Dhamnod)</h3>
+  <div>Mob: +91 83700 22176, 8889137464</div>
+  <div>
+    In front of Chatrawas, Gram Panchayat Gujri,<br>
+    Sub District Dharmapuri, District Dhar – 454552
+  </div>
+  <hr>
+</div>
+
+<div class="header">🏦 SRCCS – Loan & EMI Dashboard</div>
+
+<div class="container">
+
+<!-- SEARCH -->
+<div id="searchBox" class="card">
+  <label>🔍 Loan Search</label>
+  <div style="display:flex;gap:10px;margin-top:6px">
+    <input id="searchQ" placeholder="Loan ID / Name / Mobile / Account">
+    <button onclick="searchLoan()">Search</button>
+  </div>
+</div>
+
+<!-- LOAN DETAILS -->
+<div id="loanBox" class="card hidden">
+  <h3>📄 Loan Details</h3>
+  <div class="grid">
+    <div><b>Loan ID</b><div id="l_id"></div></div>
+    <div><b>Account</b><div id="l_acc"></div></div>
+    <div><b>Name</b><div id="l_name"></div></div>
+    <div><b>Mobile</b><div id="l_mob"></div></div>
+
+    <div><b>Loan Amount</b><div id="l_amt"></div></div>
+    <div><b>File Charge (3%)</b><div id="l_fc"></div></div>
+    <div><b>Interest</b><div id="l_int"></div></div>
+    <div><b>Tenure</b><div id="l_ten"></div></div>
+
+    <div><b>EMI</b><div id="l_emi"></div></div>
+
+    <div>
+      <b>Status</b>
+      <select id="statusSel" onchange="updateStatus()">
+        <option>Active</option>
+        <option>Close</option>
+      </select>
+      <div id="l_status"></div>
+    </div>
+  </div>
+</div>
+
+<!-- EMI PAY -->
+<div id="emiPay" class="card hidden">
+  <h3>💰 Pay EMI</h3>
+  <div class="grid">
+    <div>
+      <label>Amount</label>
+      <input id="emiAmount" type="number">
+    </div>
+    <div>
+      <label>Mode</label>
+      <select id="emiMode">
+        <option>Cash</option>
+        <option>UPI</option>
+        <option>Bank</option>
+        <option>Bank(490 Panalty)</option>
+      </select>
+    </div>
+    <div style="align-self:end">
+      <button onclick="payEmi()">Pay EMI</button>
+    </div>
+  </div>
+  <div id="emiMsg" style="margin-top:6px"></div>
+</div>
+
+<!-- EMI HISTORY -->
+<div id="emiHistory" class="card hidden">
+  <h3>📑 EMI History</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Amount</th>
+        <th>Mode</th>
+        <th>Voucher</th>
+      </tr>
+    </thead>
+    <tbody id="emiTable"></tbody>
+  </table>
+</div>
+
+</div>
+
+<script>
+const SCRIPT_URL="https://script.google.com/macros/s/AKfycbxUTlShJm_7rPOenFXIIcDInLtUH1unuBgCJUN0TJ-i0R8cohI1UyRCXnBluX5xGGK8/exec";
+let CURRENT_LOAN_ID="";
+
+function searchLoan(){
+  const q=searchQ.value.trim();
+  if(!q) return alert("Search required");
+
+  fetch(SCRIPT_URL,{
+    method:"POST",
+    body:JSON.stringify({action:"searchLoan",q})
+  })
+  .then(r=>r.json())
+  .then(res=>{
+    if(!res.found) return alert("Loan not found");
+
+    const r=res.row;
+    CURRENT_LOAN_ID=r.loan_id;
+
+    loanBox.classList.remove("hidden");
+    emiPay.classList.remove("hidden");
+    emiHistory.classList.remove("hidden");
+
+    l_id.innerText=r.loan_id;
+    l_acc.innerText=r.account;
+    l_name.innerText=r.name;
+    l_mob.innerText=r.mobile;
+    l_amt.innerText="₹ "+r.amount;
+    l_fc.innerText="₹ "+r.file_charge;
+    l_int.innerText=r.interest+" %";
+    l_ten.innerText=r.tenure+" Month";
+    l_emi.innerText="₹ "+r.emi;
+
+    statusSel.value=r.status;
+    renderStatus(r.status);
+    renderEmi(res.emiHistory||[]);
+  });
+}
+
+function renderStatus(s){
+  l_status.innerHTML=`<span class="badge ${s==="Active"?"active":"close"}">${s}</span>`;
+}
+
+function updateStatus(){
+  fetch(SCRIPT_URL,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"updateStatus",
+      loan_id:CURRENT_LOAN_ID,
+      status:statusSel.value
+    })
+  }).then(()=>renderStatus(statusSel.value));
+}
+
+function payEmi(){
+  if(!emiAmount.value) return alert("Amount required");
+  fetch(SCRIPT_URL,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"payEMI",
+      loan_id:CURRENT_LOAN_ID,
+      amount:emiAmount.value,
+      mode:emiMode.value
+    })
+  })
+  .then(r=>r.json())
+  .then(res=>{
+    if(res.success){
+      emiMsg.innerHTML="✅ EMI Paid | Voucher: "+res.voucher;
+      searchLoan();
+    }
+  });
+}
+
+function renderEmi(list){
+  emiTable.innerHTML="";
+  list.forEach(e=>{
+    emiTable.innerHTML+=`
+      <tr>
+        <td>${new Date(e.date).toLocaleDateString()}</td>
+        <td>₹ ${e.amount}</td>
+        <td>${e.mode}</td>
+        <td>${e.voucher}</td>
+      </tr>`;
+  });
+}
+</script>
+
+</body>
+</html>

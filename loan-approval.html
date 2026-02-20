@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<title>SRCCS – Loan & EMI System (FINAL)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root{
+  --primary:#1a237e;
+  --primary-dark:#0d154f;
+  --border:#c5cae9;
+  --bg:#eef2f7;
+  --card:#ffffff;
+  --text:#111827;
+}
+
+body{
+  font-family:Segoe UI, Arial, sans-serif;
+  background:var(--bg);
+  margin:0;
+  color:var(--text);
+}
+
+.container{
+  max-width:1300px;
+  margin:25px auto;
+  background:var(--card);
+  padding:25px;
+  border:1px solid var(--border);
+  box-shadow:0 8px 18px rgba(0,0,0,.06);
+}
+
+h2{
+  color:var(--primary);
+  margin-bottom:15px;
+}
+
+/* ✅ DARK HEADING STYLE */
+h3{
+  margin:30px 0 18px;
+  background:linear-gradient(90deg,var(--primary),var(--primary-dark));
+  color:#fff;
+  padding:10px 16px;
+  font-size:14px;
+  font-weight:600;
+  letter-spacing:.5px;
+}
+
+label{
+  font-size:12px;
+  font-weight:600;
+  color:var(--primary);
+}
+
+input,select{
+  width:100%;
+  padding:8px;
+  border:1px solid var(--border);
+  background:#fff;
+  transition:.2s;
+}
+
+input:focus,select:focus{
+  border-color:var(--primary);
+  outline:none;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+}
+
+.grid2{
+  display:grid;
+  grid-template-columns:1fr 2fr;
+  gap:14px;
+}
+
+button{
+  background:var(--primary);
+  color:#fff;
+  border:none;
+  padding:10px 26px;
+  cursor:pointer;
+  font-weight:600;
+  transition:.2s;
+}
+
+button:hover{
+  background:var(--primary-dark);
+}
+
+.preview img{
+  width:100%;
+  height:95px;
+  object-fit:cover;
+  border:1px solid var(--border);
+  margin-bottom:6px;
+}
+
+.small{
+  font-size:11px;
+  color:#666;
+}
+
+/* POPUP */
+#popup{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.45);
+  display:none;
+  align-items:center;
+  justify-content:center;
+}
+
+#popup .box{
+  background:#fff;
+  width:380px;
+  padding:20px;
+  border:1px solid var(--border);
+  box-shadow:0 8px 20px rgba(0,0,0,.2);
+}
+
+#popup h3{
+  margin-top:0;
+}
+
+@media print{
+  body{background:#fff}
+  .container{border:none;box-shadow:none;margin:0}
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h2>🏦 SRCCS – Loan Registration (FINAL)</h2>
+
+<h3>Applicant Details</h3>
+<div class="grid">
+  <div><label>Account Number</label><input id="account"></div>
+  <div><label>Applicant Name</label><input id="customer_name"></div>
+  <div><label>Mobile Number</label><input id="mobile"></div>
+</div>
+
+<h3>Loan Details</h3>
+<div class="grid">
+  <div><label>Loan ID (Manual)</label><input id="loan_id"></div>
+  <div><label>Loan Amount</label><input id="amount" oninput="calcAll()"></div>
+  <div><label>File Charge (3%)</label><input id="file_charge" readonly></div>
+  <div><label>Interest % (FLAT)</label><input id="interest" oninput="calcAll()"></div>
+  <div><label>Tenure (Months)</label><input id="tenure" oninput="calcAll()"></div>
+  <div><label>EMI (Auto)</label><input id="emi" readonly></div>
+</div>
+
+<h3>Guarantor Details</h3>
+<div class="grid">
+  <div><label>Guarantor Name</label><input id="g_name"></div>
+  <div><label>Guarantor Mobile</label><input id="g_mobile"></div>
+  <div><label>Relation</label><input id="g_relation"></div>
+</div>
+
+<h3>Applicant Documents</h3>
+<div class="grid2">
+  <div class="preview">
+    <img id="ap1"><img id="ap2"><img id="ap3"><img id="ap4"><img id="ap5"><img id="ap6"><img id="ap7">
+    <div class="small">Photo • Aadhaar • PAN • Voter • DL • Cheque 1 • Cheque 2</div>
+  </div>
+  <div class="grid">
+    <div><label>Photo</label><input type="file" onchange="pv(this,'ap1')"></div>
+    <div><label>Aadhaar</label><input type="file" onchange="pv(this,'ap2')"></div>
+    <div><label>PAN</label><input type="file" onchange="pv(this,'ap3')"></div>
+    <div><label>Voter ID</label><input type="file" onchange="pv(this,'ap4')"></div>
+    <div><label>Driving Licence</label><input type="file" onchange="pv(this,'ap5')"></div>
+    <div><label>Cheque 1</label><input type="file" onchange="pv(this,'ap6')"></div>
+    <div><label>Cheque 2</label><input type="file" onchange="pv(this,'ap7')"></div>
+  </div>
+</div>
+
+<h3>Guarantor Documents</h3>
+<div class="grid2">
+  <div class="preview">
+    <img id="gr1"><img id="gr2"><img id="gr3"><img id="gr4"><img id="gr5"><img id="gr6"><img id="gr7">
+    <div class="small">Photo • Aadhaar • PAN • Voter • DL • Cheque 1 • Cheque 2</div>
+  </div>
+  <div class="grid">
+    <div><label>Photo</label><input type="file" onchange="pv(this,'gr1')"></div>
+    <div><label>Aadhaar</label><input type="file" onchange="pv(this,'gr2')"></div>
+    <div><label>PAN</label><input type="file" onchange="pv(this,'gr3')"></div>
+    <div><label>Voter ID</label><input type="file" onchange="pv(this,'gr4')"></div>
+    <div><label>Driving Licence</label><input type="file" onchange="pv(this,'gr5')"></div>
+    <div><label>Cheque 1</label><input type="file" onchange="pv(this,'gr6')"></div>
+    <div><label>Cheque 2</label><input type="file" onchange="pv(this,'gr7')"></div>
+  </div>
+</div>
+
+<div style="text-align:center;margin-top:20px">
+<button onclick="saveLoan()">💾 SAVE LOAN</button>
+</div>
+
+<hr>
+
+<h2>🔍 Loan Search & EMI Pay</h2>
+<input id="q" placeholder="Loan ID / Account Number">
+<button onclick="searchLoan()">Search</button>
+<div id="res"></div>
+
+</div>
+
+
+<script>
+const API_URL="https://script.google.com/macros/s/AKfycbxJPiEaIuT9F_NVTobIVeFca3lRU5tz4hPuiw4aFL86eAJiAqKcnDC1a6VZCnYHR3-8/exec";
+const DOCS={};
+
+/* ===== PREVIEW ===== */
+function pv(i,id){
+ const r=new FileReader();
+ r.onload=e=>{
+  document.getElementById(id).src=e.target.result;
+  DOCS[id]=e.target.result;
+ };
+ r.readAsDataURL(i.files[0]);
+}
+
+/* ===== EMI CALC ===== */
+function calcAll(){
+ let P=+amount.value||0;
+ let R=+interest.value||0;
+ let N=+tenure.value||0;
+
+ file_charge.value=Math.round(P*0.03);
+ if(P&&R&&N){
+  let T=N/12;
+  emi.value=Math.round((P+(P*R*T/100))/N);
+ }else emi.value="";
+}
+
+/* ===== SAVE LOAN ===== */
+function saveLoan(){
+ fetch(API_URL,{
+  method:"POST",
+  body:JSON.stringify({
+   action:"addLoan",
+   loan_id:loan_id.value,
+   account:account.value,
+   customer_name:customer_name.value, // ✅ FIXED
+   mobile:mobile.value,
+   amount:amount.value,
+   file_charge:file_charge.value,
+   interest:interest.value,
+   tenure:tenure.value,
+   emi:emi.value,
+   guarantor_name:g_name.value,
+   guarantor_mobile:g_mobile.value,
+   guarantor_relation:g_relation.value,
+   docs:DOCS
+  })
+ }).then(r=>r.json()).then(()=>{
+  alert("Loan Saved Successfully");
+ });
+}
+
+/* ===== SEARCH ===== */
+function searchLoan(){
+ fetch(API_URL,{
+  method:"POST",
+  body:JSON.stringify({action:"searchLoan",q:q.value})
+ }).then(r=>r.json()).then(d=>{
+  if(!d.found){alert("Loan not found");return;}
+  res.innerHTML=`
+   Name: ${d.row.name}<br>
+   EMI: ₹${d.row.emi}<br>
+   <button onclick="openPay('${d.row.loan_id}',${d.row.emi})">PAY EMI</button>
+  `;
+ });
+}
+
+function openPay(id,amt){
+ p_loan.value=id;
+ p_amt.value=amt;
+ popup.style.display="flex";
+}
+
+/* ===== PAY EMI ===== */
+function payEMI(){
+ fetch(API_URL,{
+  method:"POST",
+  body:JSON.stringify({
+   action:"payEMI",
+   loan_id:p_loan.value,
+   amount:p_amt.value,
+   mode:p_mode.value
+  })
+ }).then(r=>r.json()).then(d=>{
+  popup.style.display="none";
+  alert("EMI Paid\nVoucher: "+d.voucher);
+ });
+}
+</script>
+
+</body>
+</html>

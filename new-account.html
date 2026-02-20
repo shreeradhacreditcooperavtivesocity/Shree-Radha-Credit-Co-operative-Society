@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<title>SRCCS – Official Banking Account Opening Form</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<style>
+@page{size:A4;margin:14mm}
+
+:root{
+  --primary:#1a237e;
+  --primary-dark:#0d154f;
+  --border:#c5cae9;
+  --bg:#eef2f7;
+  --card:#ffffff;
+  --label:#e8eaf6;
+  --text:#111827;
+}
+
+/* BASE */
+body{
+  font-family:Arial, Helvetica, sans-serif;
+  background:var(--bg);
+  margin:0;
+  color:var(--text);
+}
+
+.page{
+  width:190mm;
+  margin:20px auto;
+  background:var(--card);
+  border:1px solid var(--border);
+  padding:12mm;
+}
+
+/* HEADER */
+.header{
+  text-align:center;
+  padding:14px 10px;
+  border-bottom:3px solid var(--primary);
+}
+
+.header h1{
+  margin:0;
+  font-size:18px;
+  font-weight:700;
+  color:var(--primary);
+}
+
+.header .reg{
+  font-size:12px;
+  margin-top:3px;
+}
+
+.header .title{
+  margin-top:8px;
+  font-size:13px;
+  font-weight:700;
+  background:var(--primary);
+  color:#fff;
+  display:inline-block;
+  padding:6px 18px;
+}
+
+/* SEARCH */
+.search{
+  display:flex;
+  gap:10px;
+  margin:16px 0;
+}
+
+.search input{
+  flex:1;
+  padding:9px;
+  border:1px solid var(--primary);
+}
+
+.search button{
+  padding:9px 20px;
+  border:none;
+  background:var(--primary);
+  color:#fff;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.search button:hover{
+  background:var(--primary-dark);
+}
+
+/* SECTION */
+.section{
+  margin-top:20px;
+  font-size:13px;
+  font-weight:bold;
+  color:var(--primary);
+}
+
+/* TABLE */
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:8px;
+  font-size:13px;
+}
+
+td{
+  border:1px solid var(--border);
+  padding:8px;
+}
+
+.label{
+  width:30%;
+  font-weight:bold;
+  background:var(--label);
+}
+
+/* INPUTS */
+input,select,textarea{
+  width:100%;
+  border:none;
+  outline:none;
+  font-size:13px;
+  background:transparent;
+}
+
+textarea{
+  resize:none;
+}
+
+/* FLEX */
+.flex{
+  display:flex;
+  gap:16px;
+}
+
+/* PHOTO / SIGN */
+.photo{
+  width:35mm;
+  height:45mm;
+  border:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#f4f6fb;
+}
+
+.sign{
+  width:55mm;
+  height:18mm;
+  border:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#f4f6fb;
+  margin-top:6px;
+}
+
+.photo img,.sign img{
+  max-width:100%;
+  max-height:100%;
+}
+
+/* BUTTON */
+button{
+  margin-top:20px;
+  padding:10px 28px;
+  border:none;
+  background:var(--primary);
+  color:#fff;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+button:hover{
+  background:var(--primary-dark);
+}
+
+#msg{
+  margin-top:10px;
+  font-size:13px;
+  font-weight:bold;
+  color:#2e7d32;
+}
+
+/* PRINT */
+@media print{
+  body{background:#fff}
+  .page{margin:0;border:none}
+  .search,button{display:none}
+}
+</style>
+</head>
+
+<body>
+<div class="page">
+
+<div class="header">
+  <h1>SHREE RADHA CREDIT CO-OPERATIVE SOCIETY</h1>
+  <div class="reg">Reg. No.: DR/DHR/151716</div>
+  <div class="title">ACCOUNT OPENING FORM</div>
+</div>
+
+<div class="search">
+  <input id="search" placeholder="Search by Account / Aadhaar / Mobile / Name">
+  <button onclick="searchAcc()">SEARCH</button>
+</div>
+
+<div class="section">1. Account Details</div>
+<table>
+<tr><td class="label">Account Number</td><td><input id="accno" readonly></td></tr>
+</table>
+
+<div class="section">2. Personal Details</div>
+<div class="flex">
+<table style="width:70%">
+<tr><td class="label">Full Name</td><td><input id="fullname"></td></tr>
+<tr><td class="label">Father / Husband</td><td><input id="father"></td></tr>
+<tr><td class="label">Mobile</td><td><input id="mobile"></td></tr>
+<tr><td class="label">Aadhaar No</td><td><input id="aadhaar"></td></tr>
+<tr><td class="label">Caste</td><td><input id="caste"></td></tr>
+<tr>
+<td class="label">Gender</td>
+<td>
+<select id="gender">
+<option value="">Select</option>
+<option>Male</option>
+<option>Female</option>
+<option>Other</option>
+</select>
+</td>
+</tr>
+<tr><td class="label">Address</td><td><textarea id="address" rows="2"></textarea></td></tr>
+<tr><td class="label">PIN Code</td><td><input id="pin" maxlength="6"></td></tr>
+</table>
+
+<div>
+<div class="photo"><img id="photoPrev"></div>
+Photo<br>
+<input type="file" accept="image/*" onchange="preview(this,'photoPrev')"><br>
+
+<div class="sign"><img id="signPrev"></div>
+Signature<br>
+<input type="file" accept="image/*" onchange="preview(this,'signPrev')"><br>
+
+<hr>
+
+<b>Aadhaar Card</b><br>
+<div class="photo"><img id="aadhaarFrontPrev"></div>
+Front<br>
+<input type="file" accept="image/*" onchange="preview(this,'aadhaarFrontPrev')"><br>
+
+<div class="photo"><img id="aadhaarBackPrev"></div>
+Back<br>
+<input type="file" accept="image/*" onchange="preview(this,'aadhaarBackPrev')">
+</div>
+</div>
+
+<div class="section">3. Nominee Details</div>
+<table>
+<tr><td class="label">Nominee Name</td><td><input id="nominee"></td></tr>
+<tr><td class="label">Relation</td><td><input id="relation"></td></tr>
+</table>
+
+<button onclick="save()">SAVE ACCOUNT</button>
+<p id="msg"></p>
+
+</div>
+
+<script>
+const API="https://script.google.com/macros/s/AKfycbzg3oSfu5LkzVSBmh8_avloXYL7Vu_x4cFROkPD7-EKv5wTvempH9aYC2n2ZRuO_jQ4Dw/exec";
+
+function preview(inp,id){
+ if(!inp.files[0]) return;
+ const r=new FileReader();
+ r.onload=()=>document.getElementById(id).src=r.result;
+ r.readAsDataURL(inp.files[0]);
+}
+
+function save(){
+ fetch(API,{
+  method:"POST",
+  body:JSON.stringify({
+    action:"save",
+    fullname:fullname.value,
+    father:father.value,
+    mobile:mobile.value,
+    aadhaar:aadhaar.value,
+    caste:caste.value,
+    gender:gender.value,
+    address:address.value,
+    pin:pin.value,
+    nominee:nominee.value,
+    relation:relation.value,
+    photo:photoPrev.src||"",
+    signature:signPrev.src||"",
+    aadhaarFront:aadhaarFrontPrev.src||"",
+    aadhaarBack:aadhaarBackPrev.src||""
+  })
+ }).then(r=>r.json()).then(d=>{
+   accno.value=d.accNo;
+   msg.innerHTML="✅ Account Created Successfully : <b>"+d.accNo+"</b>";
+ });
+}
+
+function searchAcc(){
+ fetch(API,{
+  method:"POST",
+  body:JSON.stringify({action:"search",query:search.value.trim()})
+ }).then(r=>r.json()).then(d=>{
+   if(!d.found){alert("Record not found");return;}
+   const r=d.row;
+   accno.value=r[2];
+   fullname.value=r[3];
+   father.value=r[4];
+   mobile.value=r[5];
+   aadhaar.value=r[6];
+   caste.value=r[7];
+   gender.value=r[8];
+   address.value=r[9];
+   pin.value=r[10];
+   nominee.value=r[11];
+   relation.value=r[12];
+   photoPrev.src=r[13]||"";
+   signPrev.src=r[14]||"";
+   aadhaarFrontPrev.src=r[15]||"";
+   aadhaarBackPrev.src=r[16]||"";
+ });
+}
+</script>
+
+</body>
+</html>

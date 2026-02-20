@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Loan Sanction Letter – SRCCS</title>
+
+<style>
+@page{size:A4;margin:25mm}
+
+body{
+  margin:0;
+  background:#eef2f7;
+  font-family:"Times New Roman", serif;
+  color:#000;
+}
+
+/* ===== SBI STYLE CONTAINER ===== */
+.container{
+  max-width:900px;
+  margin:25px auto;
+  background:#fff;
+  padding:30px;
+  border:2px solid #1a237e;
+}
+
+/* ===== SBI HEADER ===== */
+h1{
+  font-size:18px;
+  text-align:center;
+  margin:0;
+  letter-spacing:0.5px;
+  color:#1a237e;
+}
+
+.sub{
+  text-align:center;
+  font-size:12px;
+  margin-top:4px;
+  color:#333;
+}
+
+.hr{
+  border-top:2px solid #1a237e;
+  margin:14px 0;
+}
+
+/* ===== FORM FIELDS ===== */
+label{
+  font-size:12px;
+  font-weight:bold;
+}
+
+input{
+  width:100%;
+  padding:6px;
+  font-size:12px;
+  border:1px solid #1a237e;
+  margin-top:3px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+}
+
+/* ===== BUTTON ===== */
+button{
+  background:#1a237e;
+  color:#fff;
+  padding:9px 22px;
+  border:none;
+  font-size:13px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+/* ===== TABLE STYLE (SBI OFFICIAL LOOK) ===== */
+table{
+  border:1px solid #1a237e;
+}
+
+th{
+  background:#e8eaf6;
+  color:#1a237e;
+}
+
+td{
+  border:1px solid #1a237e;
+}
+
+/* PRINT SETTINGS */
+.no-print{}
+.print-only{display:none}
+
+@media print{
+  body{background:#fff}
+  .container{border:none}
+  .no-print{display:none !important}
+  .print-only{display:block}
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<!-- ================= FORM ================= -->
+<div class="no-print">
+
+<h1>SHREE RADHA CREDIT CO-OPERATIVE SOCIETY</h1>
+<div class="sub">(Loan Registration)</div>
+
+<div class="hr"></div>
+
+<div class="grid">
+  <div>
+    <label>Account Number</label>
+    <input id="account">
+  </div>
+  <div>
+    <label>Borrower Name</label>
+    <input id="customer_name">
+  </div>
+  <div>
+    <label>Loan ID</label>
+    <input id="loan_id">
+  </div>
+
+  <div>
+    <label>Loan Amount</label>
+    <input id="amount" oninput="calcAll()">
+  </div>
+  <div>
+    <label>Interest % (Flat)</label>
+    <input id="interest" oninput="calcAll()">
+  </div>
+  <div>
+    <label>Tenure (Months)</label>
+    <input id="tenure" oninput="calcAll()">
+  </div>
+
+  <div>
+    <label>Loan Disbursement Date</label>
+    <input type="date" id="loan_date">
+  </div>
+  <div>
+    <label>EMI Amount</label>
+    <input id="emi" readonly>
+  </div>
+  <div>
+    <label>Documentation & Processing Charges<br><small>(Collected Separately)</small></label>
+    <input id="file_charge">
+  </div>
+
+  <div>
+    <label>Registration Fees</label>
+    <input id="reg_fee" oninput="calcAll()">
+  </div>
+  <div>
+    <label>Net Disbursal Amount</label>
+    <input id="net_amt" readonly>
+  </div>
+</div>
+
+<div style="text-align:center;margin-top:18px">
+  <button onclick="saveLoan()">SAVE & GENERATE SANCTION LETTER</button>
+</div>
+
+</div>
+
+<!-- ================= SANCTION LETTER ================= -->
+<div id="sanctionBox" class="print-only">
+
+<h1>SHREE RADHA CREDIT CO-OPERATIVE SOCIETY</h1>
+<div class="sub">Loan Sanction Letter (As per RBI Applicable Norms)</div>
+
+<div class="hr"></div>
+
+<p style="font-size:13px">
+To,<br>
+<b id="sl_name"></b><br>
+Account No: <span id="sl_acc"></span>
+</p>
+
+<p style="font-size:13px"><b>Subject:</b> Sanction of Loan</p>
+
+<table width="100%" border="1" cellpadding="7" style="border-collapse:collapse;font-size:13px">
+<tr><td>Loan ID</td><td id="sl_loan"></td></tr>
+<tr><td>Sanctioned Amount</td><td>₹ <span id="sl_amt"></span></td></tr>
+<tr><td>Interest Rate</td><td><span id="sl_int"></span>% Flat</td></tr>
+<tr><td>Tenure</td><td><span id="sl_ten"></span> Months</td></tr>
+<tr><td>EMI Amount</td><td>₹ <span id="sl_emi"></span></td></tr>
+<tr><td>Documentation & Processing Charges</td><td>₹ <span id="sl_file"></span></td></tr>
+<tr><td>Registration Fees</td><td>₹ <span id="sl_reg"></span></td></tr>
+<tr><td><b>Net Disbursed</b></td><td><b>₹ <span id="sl_net"></span></b></td></tr>
+</table>
+
+<p style="margin-top:30px;font-size:13px">
+Borrower Signature: _______________________<br><br>
+Authorized Signatory<br>
+<b>SRCCS</b>
+</p>
+
+</div>
+
+<!-- ================= EMI SCHEDULE ================= -->
+<div id="emiBox" class="print-only" style="margin-top:30px">
+
+<h3 style="text-align:center;color:#1a237e">EMI REPAYMENT SCHEDULE</h3>
+
+<table width="100%" border="1" cellpadding="7" style="border-collapse:collapse;font-size:13px">
+<tr>
+<th>Inst. No</th>
+<th>EMI Month</th>
+<th>EMI Date</th>
+<th>Amount</th>
+<th>Status</th>
+</tr>
+<tbody id="emiTable"></tbody>
+</table>
+
+</div>
+
+<div class="no-print" style="text-align:center;margin-top:25px">
+  <button onclick="window.print()">PRINT SANCTION LETTER</button>
+</div>
+
+</div>
+
+<script>
+/* JS SAME – NOT CHANGED */
+function calcAll(){
+ let P = +amount.value || 0;
+ let R = +interest.value || 0;
+ let N = +tenure.value || 0;
+ let REG = +reg_fee.value || 0;
+
+ if(P && R && N){
+   let T = N / 12;
+   emi.value = Math.round((P + (P * R * T / 100)) / N);
+ }else{
+   emi.value = "";
+ }
+
+ net_amt.value = P - REG;
+}
+
+function saveLoan(){
+
+ sl_name.innerText = customer_name.value;
+ sl_acc.innerText  = account.value;
+ sl_loan.innerText = loan_id.value;
+ sl_amt.innerText  = amount.value;
+ sl_int.innerText  = interest.value;
+ sl_ten.innerText  = tenure.value;
+ sl_emi.innerText  = emi.value;
+ sl_file.innerText = file_charge.value;
+ sl_reg.innerText  = reg_fee.value;
+ sl_net.innerText  = net_amt.value;
+
+ sanctionBox.style.display = "block";
+ emiBox.style.display = "block";
+
+ let start = new Date(loan_date.value);
+ let rows = "";
+ let months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+ for(let i=1;i<=+tenure.value;i++){
+   let d = new Date(start);
+   d.setMonth(d.getMonth()+i);
+   d.setDate(1);
+
+   rows += `
+   <tr>
+     <td>${i}</td>
+     <td>${months[d.getMonth()]} ${d.getFullYear()}</td>
+     <td>${String(d.getDate()).padStart(2,"0")}/${String(d.getMonth()+1).padStart(2,"0")}/${d.getFullYear()}</td>
+     <td>₹${emi.value}</td>
+     <td>PENDING</td>
+   </tr>`;
+ }
+
+ emiTable.innerHTML = rows;
+
+ alert("Loan Saved & Sanction Letter Generated");
+}
+</script>
+
+</body>
+</html>

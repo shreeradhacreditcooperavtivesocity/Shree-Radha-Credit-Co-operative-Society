@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Loan Clearance / NOC — Shree Radha Credit Co-operative Society</title>
+
+<style>
+@page { size:A4; margin:15mm; }
+
+body{
+  margin:0;
+  padding:0;
+  background:#e9f1fb;
+  font-family:"Noto Sans Devanagari","Mangal",Arial,sans-serif;
+}
+
+/* ===== SBI COLORS ===== */
+:root{
+  --sbi-blue:#1c4fa3;
+  --sbi-dark:#0b2e6b;
+  --sbi-light:#f4f8ff;
+  --border:#cfd9ee;
+}
+
+/* ===== MAIN CONTAINER ===== */
+.container{
+  max-width:800px;
+  margin:20px auto;
+  background:#fff;
+  border:3px solid var(--sbi-blue);
+  box-shadow:0 5px 20px rgba(0,0,0,0.08);
+  padding:20px;
+}
+
+/* ===== HEADER ===== */
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:3px solid var(--sbi-blue);
+  padding-bottom:10px;
+  margin-bottom:15px;
+}
+
+.org h1{
+  margin:0;
+  font-size:18px;
+  color:var(--sbi-dark);
+}
+
+.reg{
+  font-size:12px;
+  color:#333;
+}
+
+.official-badge{
+  background:var(--sbi-blue);
+  color:#fff;
+  padding:6px 12px;
+  font-weight:600;
+  border-radius:4px;
+  font-size:12px;
+}
+
+/* ===== TITLE ===== */
+.title{
+  text-align:center;
+  font-size:17px;
+  font-weight:700;
+  color:var(--sbi-blue);
+  margin:15px 0;
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+}
+
+/* ===== CONTENT BOX ===== */
+.content{
+  background:var(--sbi-light);
+  border:1px solid var(--border);
+  padding:15px;
+  border-radius:6px;
+  font-size:13px;
+}
+
+.field{
+  margin-bottom:8px;
+}
+
+.field label{
+  font-weight:600;
+  display:block;
+  margin-bottom:3px;
+  color:var(--sbi-dark);
+}
+
+.field input,
+.field textarea{
+  width:100%;
+  padding:6px;
+  border:1px solid var(--border);
+  border-radius:4px;
+  font-size:13px;
+}
+
+ul.points-list{
+  margin:10px 0 10px 18px;
+}
+
+ul.points-list li{
+  margin-bottom:5px;
+}
+
+/* ===== FOOTER ===== */
+.footer{
+  display:flex;
+  justify-content:space-between;
+  margin-top:20px;
+  align-items:flex-end;
+}
+
+.stamp{
+  width:180px;
+  height:80px;
+  border:2px dashed var(--sbi-blue);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:11px;
+  color:var(--sbi-dark);
+  text-align:center;
+}
+
+.signature{
+  text-align:right;
+}
+
+.signature .name{
+  font-weight:700;
+  margin-top:5px;
+  color:var(--sbi-dark);
+}
+
+.signature .title{
+  font-size:12px;
+}
+
+/* ===== PRINT BUTTON ===== */
+.btn-print{
+  display:block;
+  margin:15px auto;
+  padding:8px 18px;
+  background:var(--sbi-blue);
+  color:#fff;
+  border:none;
+  border-radius:4px;
+  cursor:pointer;
+  font-size:14px;
+}
+
+.btn-print:hover{
+  background:var(--sbi-dark);
+}
+
+/* ===== PRINT MODE ===== */
+@media print{
+  body{ background:#fff; }
+  .btn-print{ display:none; }
+  .container{
+    border:2px solid var(--sbi-blue);
+    box-shadow:none;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container" id="nocContainer">
+
+  <div class="header">
+    <div class="org">
+      <h1>Shri Radha Credit Co-operative Society Ltd., Gujri (Dhamnod)</h1>
+      <div class="reg">Reg. No.: DR/DHR/151716</div>
+    </div>
+    <div class="official-badge">
+      OFFICIAL NOC
+    </div>
+  </div>
+
+  <div class="title">
+    Loan Clearance / No Objection Certificate
+  </div>
+
+  <div class="content">
+
+    <p><strong>This is to certify that:</strong></p>
+
+    <div class="field"><label>Member Name:</label><input type="text" id="memberName"></div>
+    <div class="field"><label>Father / Husband Name:</label><input type="text" id="fatherName"></div>
+    <div class="field"><label>Address:</label><textarea id="address" rows="2"></textarea></div>
+    <div class="field"><label>Account No:</label><input type="text" id="accountNo"></div>
+    <div class="field"><label>Loan Amount:</label><input type="text" id="loanAmount"></div>
+    <div class="field"><label>Loan Purpose:</label><input type="text" id="loanPurpose"></div>
+
+    <p style="margin-top:10px;">
+      The above member has fully repaid the loan taken from the Society.
+    </p>
+
+    <ul class="points-list">
+      <li>No outstanding dues remaining.</li>
+      <li>Certificate valid for financial & legal purposes.</li>
+      <li>No pending loan obligation.</li>
+      <li>All dues cleared as per Society records.</li>
+      <li>Issued upon member request.</li>
+    </ul>
+
+    <div class="field"><label>Date:</label><input type="date" id="date"></div>
+    <div class="field"><label>Place:</label><input type="text" id="place"></div>
+
+  </div>
+
+  <div class="footer">
+
+    <div class="stamp">
+      Official Stamp<br>
+      Digitally Verified
+    </div>
+
+    <div class="signature">
+      <div class="name">Dharmendra Prajapat</div>
+      <div class="title">Manager</div>
+    </div>
+
+  </div>
+
+</div>
+
+<button class="btn-print" onclick="printNOC()">Print NOC</button>
+
+<script>
+function printNOC() {
+
+  const ids = ["memberName","fatherName","address","accountNo","loanAmount","loanPurpose","date","place"];
+
+  ids.forEach(id=>{
+    const el=document.getElementById(id);
+    el.outerHTML = `<span>${el.value}</span>`;
+  });
+
+  window.print();
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SRCCS – Complete Transaction Dashboard</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body{margin:0;font-family:Arial;background:#f2f4f7;}
+.header{background:#0d47a1;color:#fff;padding:15px;text-align:center;font-size:20px;font-weight:bold;}
+.container{padding:20px;max-width:1400px;margin:auto;}
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:15px;}
+input,button{padding:8px;font-size:14px;}
+button{background:#0d47a1;color:#fff;border:none;cursor:pointer;}
+button:hover{opacity:0.9;}
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:20px;}
+.card{background:#fff;padding:15px;border-radius:6px;text-align:center;font-weight:bold;box-shadow:0 2px 6px rgba(0,0,0,0.1);}
+.credit{color:green;}
+.debit{color:red;}
+.net{color:#0d47a1;}
+table{width:100%;border-collapse:collapse;background:#fff;}
+th,td{padding:8px;border:1px solid #ddd;text-align:center;font-size:13px;}
+th{background:#e3f2fd;}
+.accountLink{color:#0d47a1;cursor:pointer;font-weight:bold;}
+.locationLink{color:#e65100;cursor:pointer;font-weight:bold;}
+canvas{background:#fff;padding:10px;margin-top:20px;}
+@media print{.filters,button{display:none;}}
+</style>
+</head>
+
+<body>
+
+<div class="header">🏦 SRCCS – Complete Transaction Report</div>
+
+<div class="container">
+
+<div class="filters">
+<input type="date" id="fromDate">
+<input type="date" id="toDate">
+<input type="text" id="account" placeholder="Account No">
+<input type="text" id="agent" placeholder="Agent ID">
+<button onclick="loadData()">Search</button>
+<button onclick="downloadExcel()">Excel</button>
+<button onclick="window.print()">Print</button>
+</div>
+
+<div class="summary">
+<div class="card">Total Transactions<br><span id="totalTxn">0</span></div>
+<div class="card">Total Accounts<br><span id="totalAccounts">0</span></div>
+<div class="card credit">Total Credit<br>₹<span id="totalCredit">0</span></div>
+<div class="card debit">Total Debit<br>₹<span id="totalDebit">0</span></div>
+<div class="card net">Net Amount<br>₹<span id="netAmount">0</span></div>
+</div>
+
+<div style="overflow:auto;">
+<table id="txnTable">
+<thead>
+<tr>
+<th>Date</th>
+<th>Account</th>
+<th>Name</th>
+<th>Agent</th>
+<th>Location</th>
+<th>Credit</th>
+<th>Debit</th>
+<th>Balance</th>
+<th>Voucher</th>
+<th>Mode</th>
+<th>Remark</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+</div>
+
+<!-- ✅ GRAPH MOVED BELOW TABLE -->
+<canvas id="chart" height="80"></canvas>
+
+</div>
+
+<!-- MAP POPUP -->
+<div id="mapModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;
+background:rgba(0,0,0,0.6);justify-content:center;align-items:center;z-index:9999;">
+
+<div style="background:#fff;width:90%;max-width:800px;height:500px;position:relative;border-radius:8px;overflow:hidden;">
+
+<button onclick="closeMap()"
+style="position:absolute;top:10px;right:10px;background:red;color:#fff;border:none;padding:5px 10px;cursor:pointer;">
+Close
+</button>
+
+<iframe id="mapFrame" width="100%" height="100%" style="border:0;"></iframe>
+
+</div>
+</div>
+
+<script>
+
+const API_URL = "https://script.google.com/macros/s/AKfycbzNjQqpcp3C0AtciEIacnNr6RujXmm2UyQ2vdHB9dtUokLP4lXcKAlDVWH9Dff_f4zyzA/exec";
+let globalData = [];
+let chartInstance = null;
+
+function formatDate(d){
+ const date = new Date(d);
+ return ("0"+date.getDate()).slice(-2)+"-"+("0"+(date.getMonth()+1)).slice(-2)+"-"+date.getFullYear();
+}
+
+function loadData(){
+
+ const from = document.getElementById("fromDate").value;
+ const to   = document.getElementById("toDate").value;
+ const account = document.getElementById("account").value.trim();
+ const agent   = document.getElementById("agent").value.trim();
+
+ let url = API_URL + "?fn=txnList";
+
+ if(from) url += "&from="+formatDate(from);
+ if(to)   url += "&to="+formatDate(to);
+ if(account) url += "&account="+encodeURIComponent(account);
+ if(agent)   url += "&agent="+encodeURIComponent(agent);
+
+ fetch(url)
+ .then(res=>res.json())
+ .then(data=>{
+
+  globalData = data.transactions;
+  const tbody = document.querySelector("#txnTable tbody");
+  tbody.innerHTML = "";
+
+  let totalCredit=0,totalDebit=0;
+  let accountSet = new Set();
+
+  data.transactions.forEach(tx=>{
+
+    accountSet.add(tx.account);
+
+    let credit="",debit="";
+
+    if(tx.type==="credit"){
+      credit=tx.amount;
+      totalCredit+=tx.amount;
+    }else{
+      debit=tx.amount;
+      totalDebit+=tx.amount;
+    }
+
+    tbody.innerHTML+=`
+    <tr>
+      <td>${tx.postDate}</td>
+      <td><span class="accountLink" onclick="filterAccount('${tx.account}')">${tx.account}</span></td>
+      <td>${tx.name}</td>
+      <td>${tx.agent}</td>
+      <td><span class="locationLink" onclick="openMap('${tx.location}')">${tx.location}</span></td>
+      <td class="credit">${credit}</td>
+      <td class="debit">${debit}</td>
+      <td>${tx.balance}</td>
+      <td>${tx.voucher}</td>
+      <td>${tx.mode}</td>
+      <td>${tx.remark}</td>
+    </tr>`;
+  });
+
+  const net = totalCredit-totalDebit;
+
+  document.getElementById("totalTxn").innerText = data.transactions.length;
+  document.getElementById("totalAccounts").innerText = accountSet.size;
+  document.getElementById("totalCredit").innerText = totalCredit;
+  document.getElementById("totalDebit").innerText = totalDebit;
+  document.getElementById("netAmount").innerText = net;
+
+  drawChart(totalCredit,totalDebit);
+
+ });
+
+}
+
+function filterAccount(acc){
+ document.getElementById("account").value = acc;
+ loadData();
+}
+
+function drawChart(credit,debit){
+
+ if(chartInstance){
+   chartInstance.destroy();
+ }
+
+ const ctx = document.getElementById('chart');
+
+ chartInstance = new Chart(ctx,{
+   type:'bar',
+   data:{
+     labels:['Credit','Debit'],
+     datasets:[{
+       data:[credit,debit],
+       backgroundColor:['green','red']
+     }]
+   }
+ });
+
+}
+
+function downloadExcel(){
+
+ let csv="Date,Account,Name,Agent,Location,Credit,Debit,Balance,Voucher,Mode,Remark\n";
+
+ globalData.forEach(tx=>{
+   let credit = tx.type==="credit"?tx.amount:"";
+   let debit  = tx.type==="debit"?tx.amount:"";
+   csv+=`${tx.postDate},${tx.account},${tx.name},${tx.agent},${tx.location},${credit},${debit},${tx.balance},${tx.voucher},${tx.mode},${tx.remark}\n`;
+ });
+
+ const blob=new Blob([csv],{type:'text/csv'});
+ const link=document.createElement("a");
+ link.href=URL.createObjectURL(blob);
+ link.download="Transaction_Report.csv";
+ link.click();
+}
+
+function openMap(location){
+
+ if(!location){
+   alert("No location available");
+   return;
+ }
+
+ let mapURL="";
+
+ if(location.includes(",")){
+   mapURL="https://maps.google.com/maps?q="+location+"&output=embed";
+ }else{
+   mapURL="https://maps.google.com/maps?q="+encodeURIComponent(location)+"&output=embed";
+ }
+
+ document.getElementById("mapFrame").src=mapURL;
+ document.getElementById("mapModal").style.display="flex";
+}
+
+function closeMap(){
+ document.getElementById("mapModal").style.display="none";
+ document.getElementById("mapFrame").src="";
+}
+
+</script>
+
+</body>
+</html>

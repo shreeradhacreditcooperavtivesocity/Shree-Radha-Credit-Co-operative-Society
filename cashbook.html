@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<title>SRCCS – Cash Book ULTRA PRO</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+:root{
+ --primary:#1a237e;
+ --primary-dark:#0d154f;
+ --bg:#eef2f7;
+ --card:#ffffff;
+ --border:#c5cae9;
+}
+
+*{
+ box-sizing:border-box;
+ font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+ margin:0;
+ background:var(--bg);
+}
+
+/* HEADER */
+.header{
+ background:#ffffff;
+ border-bottom:3px solid var(--primary);
+ position:sticky;
+ top:0;
+ z-index:10;
+}
+
+.head-wrap{
+ max-width:1500px;
+ margin:auto;
+ display:flex;
+ align-items:center;
+ gap:14px;
+ padding:14px 16px;
+}
+
+.head-logo img{
+ width:70px;
+}
+
+.head-title{
+ flex:1;
+ text-align:center;
+}
+
+.head-title h2{
+ margin:0;
+ font-size:20px;
+ color:var(--primary);
+}
+
+.head-title .sub{
+ font-size:13px;
+ color:#374151;
+}
+
+.head-title .meta{
+ font-size:12px;
+ color:#6b7280;
+}
+
+.head-tag{
+ font-size:14px;
+ font-weight:700;
+ color:#fff;
+ background:var(--primary);
+ padding:6px 12px;
+ border-radius:6px;
+}
+
+/* LAYOUT */
+.container{
+ max-width:1500px;
+ margin:auto;
+ padding:18px;
+}
+
+.card{
+ background:var(--card);
+ border:1px solid var(--border);
+ border-radius:8px;
+ padding:16px;
+ margin-bottom:16px;
+}
+
+.grid{
+ display:grid;
+ grid-template-columns:repeat(4,1fr);
+ gap:12px;
+}
+
+input,select{
+ padding:8px;
+ border:1px solid var(--primary);
+ border-radius:4px;
+ width:100%;
+}
+
+button{
+ background:var(--primary);
+ color:#fff;
+ border:none;
+ border-radius:4px;
+ padding:9px 14px;
+ cursor:pointer;
+ font-weight:600;
+}
+
+button:hover{
+ background:var(--primary-dark);
+}
+
+.filters{
+ display:flex;
+ gap:8px;
+ flex-wrap:wrap;
+ margin:12px 0;
+}
+
+.filter-btn{
+ background:#fff;
+ border:1px solid var(--border);
+ border-radius:20px;
+ padding:6px 14px;
+ cursor:pointer;
+}
+
+.filter-btn.active{
+ background:var(--primary);
+ color:#fff;
+}
+
+.summary{
+ display:grid;
+ grid-template-columns:repeat(4,1fr);
+ gap:12px;
+}
+
+.summary div{
+ text-align:center;
+}
+
+.summary b{
+ font-size:18px;
+ color:var(--primary);
+}
+
+table{
+ width:100%;
+ border-collapse:collapse;
+ font-size:13px;
+}
+
+th{
+ background:#e8eaf6;
+ color:var(--primary);
+ border:1px solid var(--border);
+ padding:8px;
+}
+
+td{
+ border:1px solid var(--border);
+ padding:7px;
+ text-align:center;
+}
+
+tbody tr:hover{
+ background:#f1f5ff;
+}
+
+@media print{
+ .no-print,.header{display:none}
+ body{background:#fff}
+}
+</style>
+</head>
+
+<body>
+
+<div class="header no-print">
+ <div class="head-wrap">
+  <div class="head-logo"><img src="logo.png"></div>
+  <div class="head-title">
+   <h2>Shree Radha Credit Co-operative Society Limited</h2>
+   <div class="sub">Reg. No.: DR/DHR/151716 | Gujri (Dhamnod)</div>
+   <div class="meta">📘 CASH BOOK MANAGEMENT SYSTEM</div>
+  </div>
+  <div class="head-tag">ULTRA PRO</div>
+ </div>
+</div>
+
+<div class="container">
+
+<div class="card no-print">
+ <div class="grid">
+  <input id="date" type="date">
+  <input id="particulars" placeholder="Particulars">
+  <input id="lf" placeholder="L.F.">
+  <input id="cashIn" placeholder="Cash Received">
+  <input id="cashOut" placeholder="Cash Paid">
+  <input id="bankIn" placeholder="Bank Received">
+  <input id="bankOut" placeholder="Bank Paid">
+ </div><br>
+ <button onclick="save()">💾 Save Entry</button>
+</div>
+
+<div class="card no-print">
+ <div class="filters">
+  <button class="filter-btn active" onclick="quickFilter(0)">All</button>
+  <button class="filter-btn" onclick="quickFilter(7)">7 Days</button>
+  <button class="filter-btn" onclick="quickFilter(30)">1 Month</button>
+  <button class="filter-btn" onclick="ledger('cash')">💵 Cash</button>
+  <button class="filter-btn" onclick="ledger('bank')">🏦 Bank</button>
+ </div>
+
+ <div class="grid">
+  <input id="search" placeholder="🔍 Search" onkeyup="searchData()">
+  <input id="from" type="date">
+  <input id="to" type="date">
+  <button onclick="dateRange()">📅 Apply</button>
+ </div><br>
+
+ <button onclick="exportExcel()">📥 Export Excel</button>
+ <button onclick="window.print()">🖨️ Print</button>
+</div>
+
+<div class="card summary">
+ <div>Cash Balance<br><b id="cashBal">0</b></div>
+ <div>Bank Balance<br><b id="bankBal">0</b></div>
+ <div>Total Closing<br><b id="totalBal">0</b></div>
+ <div>Monthly Closing<br><b id="monthBal">0</b></div>
+</div>
+
+<div class="card">
+<table>
+<thead>
+<tr>
+ <th>Date</th>
+ <th>Particulars</th>
+ <th>Voucher</th>
+ <th>Cash Dr</th>
+ <th>Cash Cr</th>
+ <th>Bank Dr</th>
+ <th>Bank Cr</th>
+ <th>Closing</th>
+</tr>
+</thead>
+<tbody id="rows"></tbody>
+</table>
+</div>
+
+<div class="card">
+<h3 style="margin-top:0;color:#1a237e">📊 Cash vs Bank Overview</h3>
+<canvas id="cashChart" height="90"></canvas>
+</div>
+
+</div>
+
+<script>
+/* 🔹 YOUR ORIGINAL JS – NOT CHANGED */
+const API="https://script.google.com/macros/s/AKfycbwh1e6rmxukXVzW7ynJj-y8z6oyqZnDOUJ3QE-amjb_6Tff9PJaXSBQ7QKwMHrm9ojW/exec";
+let ALL=[], VIEW=[];
+let chart=null;
+
+function formatDate(d){
+ if(!d) return "";
+ if(typeof d==="string"){
+  if(d.includes("T")) d=d.split("T")[0];
+  let a=d.split("-");
+  return `${a[2]}-${a[1]}-${a[0]}`;
+ }
+ let x=new Date(d);
+ return `${String(x.getDate()).padStart(2,"0")}-${String(x.getMonth()+1).padStart(2,"0")}-${x.getFullYear()}`;
+}
+function toDate(d){ if(!d) return null; return new Date(d+"T00:00:00"); }
+
+function save(){
+ fetch(API,{method:"POST",body:JSON.stringify({
+  action:"addEntry",
+  date:date.value,
+  particulars:particulars.value,
+  lf:lf.value,
+  cashIn:cashIn.value,
+  cashOut:cashOut.value,
+  bankIn:bankIn.value,
+  bankOut:bankOut.value
+ })}).then(()=>{alert("Saved ✔");load()});
+}
+
+function load(){
+ fetch(API,{method:"POST",body:JSON.stringify({action:"getAll"})})
+ .then(r=>r.json()).then(d=>{ALL=d;VIEW=d;render(d)});
+}
+
+function render(d){
+ rows.innerHTML="";
+ let cash=0,bank=0,monthClose=0;
+
+ d.forEach(r=>{
+  cash+=+r[4]-+r[5];
+  bank+=+r[6]-+r[7];
+  monthClose=r[12];
+
+  rows.innerHTML+=`
+  <tr>
+   <td>${formatDate(r[0])}</td>
+   <td>${r[1]}</td>
+   <td>${r[2]}</td>
+   <td>${r[4]}</td>
+   <td>${r[5]}</td>
+   <td>${r[6]}</td>
+   <td>${r[7]}</td>
+   <td>${r[12]}</td>
+  </tr>`;
+ });
+
+ cashBal.innerText=cash.toFixed(2);
+ bankBal.innerText=bank.toFixed(2);
+ totalBal.innerText=(cash+bank).toFixed(2);
+ monthBal.innerText=monthClose||0;
+
+ drawChart(cash,bank);
+}
+
+function drawChart(cash,bank){
+ if(chart) chart.destroy();
+ chart=new Chart(document.getElementById("cashChart"),{
+  type:"bar",
+  data:{
+   labels:["Cash Balance","Bank Balance"],
+   datasets:[{
+    data:[cash,bank],
+    backgroundColor:["#1a237e","#2e7d32"]
+   }]
+  }
+ });
+}
+
+function quickFilter(days){
+ if(!days){VIEW=ALL;render(VIEW);return}
+ let d=new Date();d.setDate(d.getDate()-days);
+ VIEW=ALL.filter(r=>toDate(r[0])>=d);
+ render(VIEW);
+}
+
+function ledger(type){
+ VIEW=ALL.filter(r=>{
+  if(type==="cash") return (+r[4]||+r[5]);
+  if(type==="bank") return (+r[6]||+r[7]);
+ });
+ render(VIEW);
+}
+
+function searchData(){
+ let q=search.value.toLowerCase();
+ render(VIEW.filter(r=>r.join(" ").toLowerCase().includes(q)));
+}
+
+function dateRange(){
+ let f=toDate(from.value),t=toDate(to.value);
+ VIEW=ALL.filter(r=>{
+  let d=toDate(r[0]);
+  return d>=f && d<=t;
+ });
+ render(VIEW);
+}
+
+function exportExcel(){
+ let html=document.querySelector("table").outerHTML;
+ let a=document.createElement("a");
+ a.href='data:application/vnd.ms-excel,'+encodeURIComponent(html);
+ a.download="SRCCS_CashBook.xls";
+ a.click();
+}
+
+load();
+</script>
+
+</body>
+</html>

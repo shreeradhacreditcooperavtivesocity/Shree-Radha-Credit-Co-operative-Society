@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<title>SRCCS – Complete Loan EMI Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+/* ===== SBI BASE ===== */
+body{
+  margin:0;
+  background:#f2f5f9;
+  font-family:Arial, Helvetica, sans-serif;
+}
+.header{
+  background:#1a237e;
+  color:#fff;
+  padding:15px 22px;
+  font-size:20px;
+  font-weight:600;
+}
+.container{
+  max-width:1700px;
+  margin:18px auto;
+  padding:0 14px;
+}
+
+/* ===== SEARCH BOX ===== */
+.searchBox{
+  margin-bottom:15px;
+}
+.searchBox input{
+  width:100%;
+  padding:10px;
+  font-size:14px;
+  border:1px solid #c5cae9;
+  outline:none;
+}
+
+/* ===== SUMMARY ===== */
+.summary{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:12px;
+  margin-bottom:16px;
+}
+.card{
+  background:#ffffff;
+  border:1px solid #c5cae9;
+  padding:14px;
+}
+.card h4{
+  margin:0;
+  font-size:12px;
+  color:#555;
+}
+.card .value{
+  margin-top:6px;
+  font-size:18px;
+  font-weight:bold;
+  color:#1a237e;
+}
+.pendingText{color:#c62828}
+.greenText{color:#2e7d32}
+
+@media(max-width:1200px){.summary{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:600px){.summary{grid-template-columns:1fr}}
+
+/* ===== TABLE ===== */
+table{
+  width:100%;
+  border-collapse:collapse;
+  background:#fff;
+}
+th{
+  background:#e8eaf6;
+  color:#1a237e;
+  border:1px solid #c5cae9;
+  padding:8px;
+  font-size:12px;
+}
+td{
+  border:1px solid #e0e0e0;
+  padding:8px;
+  font-size:12px;
+  text-align:center;
+}
+tr:nth-child(even){
+  background:#fafafa;
+}
+
+/* ===== STATUS ===== */
+.pending{color:#c62828;font-weight:bold}
+.clear{color:#2e7d32;font-weight:bold}
+.partial{
+  color:#ef6c00;
+  font-weight:bold;
+  font-size:11px;
+}
+
+/* ===== OVERDUE BLINK ===== */
+@keyframes blinkRed{
+  0%{background:#fee2e2}
+  50%{background:#fecaca}
+  100%{background:#fee2e2}
+}
+.overdue{
+  animation:blinkRed 1s infinite;
+  color:#7f1d1d;
+  font-weight:700;
+}
+</style>
+</head>
+
+<body onload="loadDashboard()">
+
+<div class="header">📊 SRCCS – Complete Loan & EMI Dashboard</div>
+
+<div class="container">
+
+<!-- SEARCH BOX -->
+<div class="searchBox">
+  <input type="text" id="searchInput" placeholder="Search by Loan ID / Name / Mobile / Account..." onkeyup="filterTable()">
+</div>
+
+<div class="summary">
+  <div class="card"><h4>Total Loan Amount</h4><div class="value">₹ <span id="sLoan">0</span></div></div>
+  <div class="card"><h4>Total Interest</h4><div class="value">₹ <span id="sInterest">0</span></div></div>
+  <div class="card"><h4>Total EMI Payable</h4><div class="value">₹ <span id="sPayable">0</span></div></div>
+  <div class="card"><h4>Total EMI Paid</h4><div class="value greenText">₹ <span id="sPaid">0</span></div></div>
+  <div class="card"><h4>Total Outstanding</h4><div class="value pendingText">₹ <span id="sOutstanding">0</span></div></div>
+  <div class="card"><h4>Total Pending EMI (Months)</h4><div class="value pendingText"><span id="sPendingMonths">0</span></div></div>
+  <div class="card"><h4>Total Active Loans</h4><div class="value"><span id="sLoans">0</span></div></div>
+</div>
+
+<table id="loanTable">
+<thead>
+<tr>
+  <th>Loan ID</th>
+  <th>Account</th>
+  <th>Customer</th>
+  <th>Mobile</th>
+  <th>Loan Amount</th>
+  <th>EMI Amount</th>
+  <th>Outstanding</th>
+  <th>Total EMI</th>
+  <th>EMI Start</th>
+  <th>Paid EMI</th>
+  <th>Pending EMI</th>
+  <th>Pending Month Names</th>
+  <th>Status</th>
+</tr>
+</thead>
+<tbody id="dashTable"></tbody>
+</table>
+
+</div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxJPiEaIuT9F_NVTobIVeFca3lRU5tz4hPuiw4aFL86eAJiAqKcnDC1a6VZCnYHR3-8/exec";
+
+let globalRows = [];
+
+function loadDashboard(){
+  fetch(SCRIPT_URL,{
+    method:"POST",
+    body:JSON.stringify({action:"fullDashboard"})
+  })
+  .then(r=>r.json())
+  .then(d=>{
+
+    let totalOutstanding = 0;
+    let totalPendingMonths = 0;
+
+    dashTable.innerHTML = "";
+    globalRows = d.rows;
+
+    /* SORT: Highest Pending EMI First */
+    globalRows.sort((a,b)=> (b.pendingEmiMonths || 0) - (a.pendingEmiMonths || 0));
+
+    globalRows.forEach(r=>{
+
+      const emiAmt   = Number(r.emiAmount) || 0;
+      const totalEmi = Number(r.tenure) || 0;
+      const paidEmi  = Number(r.paidEmiMonths) || 0;
+      const totalPaidAmount = Number(r.totalPaidAmount) || (paidEmi * emiAmt);
+
+      const totalPayable = emiAmt * totalEmi;
+      const outstanding = totalPayable - totalPaidAmount;
+
+      totalOutstanding += outstanding;
+      totalPendingMonths += r.pendingEmiMonths;
+
+      const partialPaid = totalPaidAmount % emiAmt;
+      const partialRemain = partialPaid > 0 ? (emiAmt - partialPaid) : 0;
+
+      let statusHTML = "";
+      if(outstanding <= 0){
+        statusHTML = `<span class="clear">FULL PAID</span>`;
+      }
+      else if(partialPaid > 0){
+        statusHTML = `<span class="partial">
+            Paid ₹${partialPaid} / ₹${emiAmt}<br>
+            Balance ₹${partialRemain}
+          </span>`;
+      }
+      else{
+        statusHTML = `<span class="${r.overdue ? 'overdue' : 'pending'}">${r.status}</span>`;
+      }
+
+      dashTable.innerHTML += `
+      <tr>
+        <td>${r.loan_id}</td>
+        <td>${r.account}</td>
+        <td>${r.name}</td>
+        <td>${r.mobile}</td>
+        <td>₹ ${r.loanAmount}</td>
+        <td>₹ ${emiAmt}</td>
+        <td class="pending">₹ ${outstanding}</td>
+        <td>${r.tenure}</td>
+        <td>${r.emiStartMonth}</td>
+        <td>${paidEmi}</td>
+        <td class="pending">${r.pendingEmiMonths}</td>
+        <td>${r.pendingMonthsNames || '-'}</td>
+        <td>${statusHTML}</td>
+      </tr>`;
+    });
+
+    sLoan.innerText = d.summary.totalLoanAmount;
+    sInterest.innerText = d.summary.totalInterest;
+    sPayable.innerText = d.summary.totalPayable;
+    sPaid.innerText = d.summary.totalPaid;
+    sOutstanding.innerText = totalOutstanding;
+    sPendingMonths.innerText = totalPendingMonths;
+    sLoans.innerText = globalRows.length;
+
+  })
+  .catch(err=>{
+    alert("Dashboard Load Error");
+    console.error(err);
+  });
+}
+
+/* SEARCH FUNCTION */
+function filterTable(){
+  const input = document.getElementById("searchInput").value.toLowerCase();
+  const rows = document.querySelectorAll("#dashTable tr");
+
+  rows.forEach(row=>{
+    const text = row.innerText.toLowerCase();
+    row.style.display = text.includes(input) ? "" : "none";
+  });
+}
+</script>
+
+</body>
+</html>

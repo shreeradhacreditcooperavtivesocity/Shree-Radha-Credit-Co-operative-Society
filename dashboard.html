@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SRCCS – Master Office Dashboard</title>
+
+<style>
+:root{
+  --primary:#1a237e;
+  --primary-dark:#0d154f;
+  --bg:#eef2f7;
+  --border:#c5cae9;
+  --success:#2e7d32;
+  --danger:#c62828;
+}
+
+*{
+  box-sizing:border-box;
+  font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+  font-size:12px;
+  background:var(--bg);
+  margin:0;
+}
+
+.container{
+  max-width:1300px;
+  margin:20px auto;
+  background:#fff;
+  border:1px solid var(--border);
+  padding:16px;
+}
+
+/* ===== HEADER ===== */
+.header{
+  text-align:center;
+  border-bottom:3px solid var(--primary);
+  padding-bottom:8px;
+}
+
+.header h2{
+  margin:0;
+  font-size:18px;
+  color:var(--primary);
+  letter-spacing:0.5px;
+}
+
+.header p{
+  margin:3px 0;
+  font-size:12px;
+  color:#444;
+}
+
+/* ===== TOP SEARCH ===== */
+.top{
+  display:flex;
+  gap:10px;
+  margin-top:14px;
+}
+
+.top input{
+  flex:1;
+  padding:7px;
+  border:1px solid var(--primary);
+}
+
+.top button{
+  padding:7px 14px;
+  border:none;
+  background:var(--primary);
+  color:#fff;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+.top button:hover{
+  background:var(--primary-dark);
+}
+
+/* ===== SUMMARY ===== */
+.summary{
+  display:grid;
+  grid-template-columns:repeat(10,1fr);
+  gap:8px;
+  margin-top:14px;
+}
+
+.box{
+  border:1px solid var(--border);
+  padding:6px;
+  text-align:center;
+  background:#fafbff;
+}
+
+.label{
+  font-size:10px;
+  color:#555;
+}
+
+.value{
+  font-weight:bold;
+  font-size:13px;
+  color:var(--primary);
+}
+
+/* ===== TABLE ===== */
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:14px;
+}
+
+th{
+  background:#e8eaf6;
+  color:var(--primary);
+  border:1px solid var(--border);
+  padding:6px;
+  font-size:11px;
+}
+
+td{
+  border:1px solid var(--border);
+  padding:5px;
+  text-align:center;
+  font-size:11px;
+}
+
+tr:nth-child(even){
+  background:#fafafa;
+}
+
+.loan-row{
+  background:#fff3f3;
+}
+
+.loan-yes{
+  color:var(--danger);
+  font-weight:bold;
+}
+
+.loan-no{
+  color:#444;
+}
+
+/* ===== CHART ===== */
+.chart{
+  margin-top:18px;
+  border:1px solid var(--border);
+  padding:12px;
+}
+
+.bar-wrap{
+  display:flex;
+  align-items:flex-end;
+  height:120px;
+  gap:60px;
+  justify-content:center;
+}
+
+.bar{
+  width:110px;
+  text-align:center;
+  font-weight:bold;
+}
+
+.bar div{
+  background:var(--primary);
+  color:#fff;
+  width:100%;
+  font-size:11px;
+}
+
+.bar.loan div{
+  background:var(--danger);
+}
+
+/* ===== LOADING ===== */
+.loading{
+  text-align:center;
+  padding:10px;
+  font-weight:bold;
+  color:var(--primary);
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<div class="header">
+<h2>SHREE RADHA CREDIT CO-OPERATIVE SOCIETY LTD.</h2>
+<p>Combined Accounts + Loan Dashboard</p>
+</div>
+
+<div class="top">
+<input id="searchBox" placeholder="Search Account / Name / Mobile">
+<button onclick="toggleLoan()">Only Loan Accounts</button>
+</div>
+
+<div class="summary">
+<div class="box"><div class="label">Total Accounts</div><div id="t_acc" class="value">0</div></div>
+<div class="box"><div class="label">Society Balance</div><div id="t_bal" class="value">0</div></div>
+<div class="box"><div class="label">Positive</div><div id="t_pos" class="value">0</div></div>
+<div class="box"><div class="label">Zero</div><div id="t_zero" class="value">0</div></div>
+<div class="box"><div class="label">Total Credit</div><div id="t_cr" class="value">0</div></div>
+<div class="box"><div class="label">Total Debit</div><div id="t_dr" class="value">0</div></div>
+
+<div class="box"><div class="label">Active Loans</div><div id="l_active" class="value">0</div></div>
+<div class="box"><div class="label">Loan Given</div><div id="l_given" class="value">0</div></div>
+<div class="box"><div class="label">EMI Received</div><div id="l_paid" class="value">0</div></div>
+<div class="box"><div class="label">Outstanding</div><div id="l_out" class="value">0</div></div>
+</div>
+
+<div class="loading" id="loading">Loading Dashboard...</div>
+
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Account</th>
+<th>Name</th>
+<th>Mobile</th>
+<th>Balance</th>
+<th>Loan</th>
+<th>Outstanding</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody id="rows"></tbody>
+</table>
+
+<div class="chart">
+<b>Loan vs Saving Summary</b>
+<div class="bar-wrap">
+<div class="bar">
+<div id="barSaving" style="height:5%">0</div>
+Saving
+</div>
+<div class="bar loan">
+<div id="barLoan" style="height:5%">0</div>
+Loan
+</div>
+</div>
+</div>
+
+</div>
+
+<script>
+
+/* 🔴 YOUR ORIGINAL JS – NOT CHANGED */
+const ACCOUNT_API = "https://script.google.com/macros/s/AKfycbzwrO6tsGWzZCrHhSjdJH3k4eiHNyJd9f9WuaJ3-FWHPX7dhTU1GgbPEPUDiivkiP0YIA/exec";
+const LOAN_API    = "https://script.google.com/macros/s/AKfycbxd2mq_sfnqdQtU6B0LLs4-0bzzrRsE6asiaCnZQt-lBWPksywNWlXJIs2L-oZsUjiM/exec";
+
+let masterData=[];
+let filteredData=[];
+let loanMap={};
+let showLoanOnly=false;
+
+const norm=v=>String(v||"").trim().toUpperCase();
+
+async function loadDashboard(){
+try{
+
+const accRes = await fetch(ACCOUNT_API+"?fn=accountsDashboard");
+const acc = await accRes.json();
+
+const loanRes = await fetch(LOAN_API+"?action=fullDashboard");
+const loan = await loanRes.json();
+
+t_acc.innerText  = acc.summary.totalAccounts;
+t_bal.innerText  = acc.summary.totalBalance;
+t_pos.innerText  = acc.summary.positiveAccounts;
+t_zero.innerText = acc.summary.zeroAccounts;
+t_cr.innerText   = acc.summary.totalCredit;
+t_dr.innerText   = acc.summary.totalDebit;
+
+l_active.innerText = loan.summary.activeLoans;
+l_given.innerText  = loan.summary.totalLoanGiven;
+l_paid.innerText   = loan.summary.totalPaid;
+l_out.innerText    = loan.summary.totalOutstanding;
+
+loan.rows.forEach(l=>{
+loanMap[norm(l.account)] = l;
+});
+
+masterData = acc.rows;
+filteredData = [...masterData];
+
+updateChart(acc.summary.totalBalance,loan.summary.totalOutstanding);
+document.getElementById("loading").style.display="none";
+render();
+
+}catch(err){
+document.getElementById("loading").innerText="API ERROR";
+console.error(err);
+}
+}
+
+function render(){
+rows.innerHTML="";
+
+let data = filteredData.filter(r=>{
+const hasLoan = loanMap[norm(r.account)];
+return showLoanOnly ? hasLoan : true;
+});
+
+data.forEach((r,i)=>{
+const loan = loanMap[norm(r.account)];
+rows.innerHTML+=`
+<tr class="${loan?'loan-row':''}">
+<td>${i+1}</td>
+<td>${r.account}</td>
+<td>${r.name}</td>
+<td>${r.mobile||''}</td>
+<td>${r.balance}</td>
+<td class="${loan?'loan-yes':'loan-no'}">${loan?'YES':'NO'}</td>
+<td>${loan?loan.outstanding:''}</td>
+<td>${loan?loan.status:''}</td>
+</tr>`;
+});
+}
+
+function updateChart(saving,loan){
+const max=Math.max(saving,loan,1);
+barSaving.style.height=(saving/max*100)+"%";
+barLoan.style.height=(loan/max*100)+"%";
+barSaving.innerText=saving;
+barLoan.innerText=loan;
+}
+
+searchBox.addEventListener("input",function(){
+const q=this.value.toLowerCase();
+filteredData = masterData.filter(r=>
+norm(r.account).includes(norm(q)) ||
+String(r.name).toLowerCase().includes(q) ||
+String(r.mobile||"").includes(q)
+);
+render();
+});
+
+function toggleLoan(){
+showLoanOnly=!showLoanOnly;
+render();
+}
+
+loadDashboard();
+
+</script>
+
+</body>
+</html>

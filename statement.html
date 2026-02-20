@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SRCCS – Office Transaction Board</title>
+
+<style>
+@page{size:A4;margin:18mm}
+
+:root{
+  --primary:#1a237e;
+  --primary-dark:#0d154f;
+  --border:#c5cae9;
+  --bg:#eef2f7;
+  --success:#2e7d32;
+}
+
+*{
+  box-sizing:border-box;
+  font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+  font-size:12px;
+  background:var(--bg);
+  color:#000;
+  margin:0;
+}
+
+.container{
+  max-width:900px;
+  margin:20px auto;
+  background:#fff;
+  border:1px solid var(--border);
+  padding:16px;
+}
+
+/* ===== SCREEN HEADER ===== */
+.header{
+  text-align:center;
+  border-bottom:3px solid var(--primary);
+  padding-bottom:8px;
+}
+
+.header h2{
+  margin:0;
+  font-size:17px;
+  font-weight:bold;
+  color:var(--primary);
+}
+
+.header p{
+  margin:3px 0;
+  font-size:11px;
+}
+
+/* ===== PRINT HEADER ===== */
+.print-header{
+  display:none;
+  align-items:center;
+  gap:12px;
+}
+
+.print-header img{
+  width:65px;
+  height:65px;
+}
+
+.print-header .head-text{
+  text-align:center;
+  flex:1;
+}
+
+.print-header .head-text h2{
+  margin:0;
+  font-size:16px;
+  color:var(--primary);
+}
+
+.print-header .head-text p{
+  margin:1px 0;
+  font-size:10px;
+}
+
+/* ===== GRID ===== */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin-top:12px;
+}
+
+label{
+  font-size:11px;
+  font-weight:bold;
+}
+
+input,textarea,select{
+  width:100%;
+  padding:6px 5px;
+  font-size:12px;
+  border:1px solid var(--primary);
+  background:#fff;
+}
+
+textarea{
+  resize:none;
+  height:40px;
+}
+
+input[readonly],textarea[readonly]{
+  background:#f3f4f9;
+}
+
+/* ===== PHOTO ===== */
+.photo-box{
+  border:1px solid var(--border);
+  height:95px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#fafbff;
+}
+
+.photo-box img{
+  max-width:100%;
+  max-height:100%;
+}
+
+/* ===== STATEMENT INFO ===== */
+.stmt-info{
+  display:none;
+  font-size:11px;
+  line-height:1.5;
+  margin:8px 0;
+  justify-content:space-between;
+}
+
+.stmt-info div{
+  width:48%;
+}
+
+/* ===== TABLE ===== */
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:12px;
+  font-size:11px;
+}
+
+th{
+  background:#e8eaf6;
+  color:var(--primary);
+  border:1px solid var(--border);
+  padding:6px;
+}
+
+td{
+  border:1px solid var(--border);
+  padding:6px;
+  vertical-align:top;
+}
+
+.num{text-align:right}
+.mode{color:var(--success);font-weight:bold}
+
+/* ===== BUTTON ===== */
+button{
+  margin-top:12px;
+  padding:8px 18px;
+  font-size:13px;
+  font-weight:bold;
+  border:none;
+  background:var(--primary);
+  color:#fff;
+  cursor:pointer;
+}
+
+button:hover{
+  background:var(--primary-dark);
+}
+
+/* ===== PRINT ===== */
+@media print{
+  body{background:#fff}
+  .container{border:none}
+  .header{display:none}
+  .print-header{display:flex}
+  .grid,button,h3,select,textarea,input{display:none!important}
+  .stmt-info{display:flex!important}
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<!-- PRINT HEADER -->
+<div class="print-header">
+  <img src="https://lh3.googleusercontent.com/a/ACg8ocK6X1JwGNzxRimDgs3cDwFGOIgNKQhMh-b7kqbo0a1Er9fTof8=s360-c-no">
+  <div class="head-text">
+    <h2>SHRI RADHA CREDIT CO-OPERATIVE SOCIETY LTD.</h2>
+    <p>Address: In front of Chatrawas, Gram Panchayat Gujri</p>
+    <p>Reg. No.: DR/DHR/151716</p>
+    <p>Mob: 83700 22176, 8889137464</p>
+    <p>District Dhar – 454552</p>
+  </div>
+</div>
+
+<!-- SCREEN HEADER -->
+<div class="header">
+  <h2>SHREE RADHA CREDIT CO-OPERATIVE SOCIETY LTD.</h2>
+  <p>Reg. No.: DR/DHR/151716 – Office Transaction Board</p>
+</div>
+
+<!-- BASIC -->
+<div class="grid">
+  <div><label>Account No</label><input id="account" onblur="loadAccount()"></div>
+  <div><label>Status</label><input id="c_status" readonly></div>
+  <div><label>Current Balance</label><input id="balance" readonly></div>
+  <div><button onclick="window.print()">PRINT / PDF</button></div>
+</div>
+
+<!-- CUSTOMER DETAILS -->
+<div class="grid">
+  <div><label>Full Name</label><input id="c_name" readonly></div>
+  <div><label>Father / Husband</label><input id="c_father" readonly></div>
+  <div><label>Mobile</label><input id="c_mobile" readonly></div>
+  <div><label>Aadhaar</label><input id="c_aadhaar" readonly></div>
+
+  <div><label>Gender</label><input id="c_gender" readonly></div>
+  <div><label>PIN</label><input id="c_pin" readonly></div>
+  <div><label>Nominee</label><input id="c_nominee" readonly></div>
+  <div><label>Relation</label><input id="c_relation" readonly></div>
+
+  <div style="grid-column:span 4">
+    <label>Address</label>
+    <textarea id="c_address" readonly></textarea>
+  </div>
+</div>
+
+<!-- PHOTO -->
+<div class="grid">
+  <div><label>Photo</label><div class="photo-box"><img id="c_photo"></div></div>
+  <div><label>Signature</label><div class="photo-box"><img id="c_signature"></div></div>
+</div>
+
+<hr>
+
+<h3>Office Transaction Entry</h3>
+<div class="grid">
+  <div>
+    <label>Transaction Type</label>
+    <select id="type">
+      <option value="credit">Credit</option>
+      <option value="debit">Debit</option>
+    </select>
+  </div>
+  <div><label>Amount (₹)</label><input id="amount" type="number"></div>
+  <div><label>Agent / Operator ID</label><input id="agent"></div>
+  <div>
+    <label>Payment Mode</label>
+    <select id="mode">
+      <option>Cash</option>
+      <option>Bank</option>
+      <option>UPI</option>
+    </select>
+  </div>
+  <div style="grid-column:span 4">
+    <label>Remark / Narration</label>
+    <textarea id="remarks"></textarea>
+  </div>
+</div>
+
+<button onclick="saveTxn()">SAVE TRANSACTION</button>
+
+<hr>
+
+<div class="stmt-info">
+  <div>
+    Account No : <b id="s_acc"></b><br>
+    Name : <b id="s_name"></b><br>
+    Father/Husband : <b id="s_father"></b><br>
+    Mobile : <b id="s_mobile"></b>
+  </div>
+  <div>
+    Gender : <b id="s_gender"></b><br>
+    Address : <b id="s_address"></b><br>
+    PIN : <b id="s_pin"></b><br>
+    Nominee : <b id="s_nominee"></b><br>
+    <b>Closing Balance : ₹ <span id="s_balance"></span></b>
+  </div>
+</div>
+
+<h3>Transaction Statement</h3>
+<table>
+<thead>
+<tr>
+  <th>Date</th>
+  <th>Post</th>
+  <th>Details</th>
+  <th>Chq</th>
+  <th>Debit</th>
+  <th>Credit</th>
+  <th>Balance</th>
+</tr>
+</thead>
+<tbody id="rows"></tbody>
+</table>
+
+<div id="msg"></div>
+
+</div>
+
+<script>
+/* 🔹 ORIGINAL JS – NOT CHANGED */
+const API="https://script.google.com/macros/s/AKfycbwgVPq77mRKDO00seDAU9XreBsvMwGxhM40NGgosbLirXUaquuFp7VpYzscunHgsqW5Ww/exec";
+
+function loadAccount(){
+  if(!account.value) return;
+
+  fetch(API,{
+    method:"POST",
+    body:JSON.stringify({action:"getAccountInfo",account:account.value.trim()})
+  })
+  .then(r=>r.json())
+  .then(d=>{
+    if(!d.success || !d.customer){
+      alert("❌ Account not found");
+      return;
+    }
+
+    const c=d.customer;
+
+    c_name.value=c.name||"";
+    c_father.value=c.father||"";
+    c_mobile.value=c.mobile||"";
+    c_aadhaar.value=c.aadhaar||"";
+    c_gender.value=c.gender||"";
+    c_pin.value=c.pin||"";
+    c_nominee.value=c.nominee||"";
+    c_relation.value=c.relation||"";
+    c_address.value=c.address||"";
+    c_status.value=c.status||"";
+    balance.value=d.balance||0;
+
+    c_photo.src=c.photo||"";
+    c_signature.src=c.signature||"";
+
+    s_acc.innerText=account.value;
+    s_name.innerText=c.name||"";
+    s_father.innerText=c.father||"";
+    s_mobile.innerText=c.mobile||"";
+    s_gender.innerText=c.gender||"";
+    s_address.innerText=c.address||"";
+    s_pin.innerText=c.pin||"";
+    s_nominee.innerText=c.nominee||"";
+    s_balance.innerText=d.balance||0;
+
+    loadStatement();
+  });
+}
+
+function loadStatement(){
+  fetch(API,{
+    method:"POST",
+    body:JSON.stringify({action:"getStatement",account:account.value.trim()})
+  })
+  .then(r=>r.json())
+  .then(d=>{
+    rows.innerHTML="";
+    (d.transactions||[]).forEach(t=>{
+      rows.innerHTML+=`
+      <tr>
+        <td>${t.date}</td>
+        <td>${t.postDate||t.date}</td>
+        <td>
+          <b>${t.type.toUpperCase()}</b><br>
+          Agent : ${t.agent}<br>
+          Voucher : ${t.voucher}<br>
+          Mode : <span class="mode">${t.mode}</span><br>
+          ${t.remarks||""}
+        </td>
+        <td>-</td>
+        <td class="num">${t.type=="debit"?t.amount:""}</td>
+        <td class="num">${t.type=="credit"?t.amount:""}</td>
+        <td class="num">${t.balance}</td>
+      </tr>`;
+    });
+  });
+}
+
+function saveTxn(){
+  if(!account.value){alert("Account required");return;}
+
+  fetch(API,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"addLedger",
+      account:account.value.trim(),
+      amount:amount.value,
+      type:type.value,
+      agent:agent.value,
+      mode:mode.value,
+      remarks:remarks.value
+    })
+  })
+  .then(r=>r.json())
+  .then(d=>{
+    balance.value=d.balance||0;
+    amount.value="";
+    remarks.value="";
+    loadStatement();
+  });
+}
+</script>
+
+</body>
+</html>

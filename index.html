@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SRCCS – Office Desktop</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+<style>
+*{
+  box-sizing:border-box;
+  font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+  margin:0;
+  height:100vh;
+  overflow:hidden;
+  background:#eef2f7;
+}
+
+/* ================= SIDEBAR ================= */
+.sidebar{
+  width:260px;
+  height:100vh;
+  position:fixed;
+  left:0;
+  top:0;
+  background:#1a237e;
+  color:#fff;
+  overflow-y:auto;
+  border-right:3px solid #0d154f;
+}
+
+.sidebar h2{
+  margin:0;
+  padding:16px;
+  text-align:center;
+  background:#0d154f;
+  font-size:16px;
+  letter-spacing:0.5px;
+}
+
+.menu{
+  list-style:none;
+  margin:0;
+  padding:0;
+}
+
+.menu li{
+  padding:11px 16px;
+  display:flex;
+  gap:10px;
+  align-items:center;
+  font-size:14px;
+  cursor:pointer;
+  border-bottom:1px solid rgba(255,255,255,.15);
+}
+
+.menu li:hover{
+  background:#283593;
+}
+
+.menu i{
+  width:18px;
+  text-align:center;
+}
+
+/* ================= DESKTOP ================= */
+.desktop{
+  margin-left:260px;
+  height:100vh;
+  position:relative;
+  background:#f4f6fb;
+  overflow:hidden;
+}
+
+/* ================= WINDOW ================= */
+.window{
+  position:absolute;
+  width:500px;
+  height:330px;
+  background:#ffffff;
+  border:1px solid #c5cae9;
+  box-shadow:0 10px 25px rgba(0,0,0,.25);
+  resize:both;
+  overflow:hidden;
+  min-width:300px;
+  min-height:200px;
+}
+
+.window.active{
+  border:2px solid #1a237e;
+}
+
+/* ================= HEADER ================= */
+.window-header{
+  height:36px;
+  background:#1a237e;
+  color:#fff;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:0 10px;
+  cursor:move;
+}
+
+.window-header span{
+  font-size:13px;
+  font-weight:bold;
+  letter-spacing:0.3px;
+}
+
+.actions i{
+  margin-left:12px;
+  cursor:pointer;
+}
+
+.actions i:hover{
+  color:#ffcc00;
+}
+
+/* ================= CONTENT ================= */
+.window iframe{
+  width:100%;
+  height:calc(100% - 36px);
+  border:none;
+}
+
+.hidden{
+  display:none;
+}
+
+/* ================= PRINT CONTROL ================= */
+@media print{
+
+  body *{
+    visibility:hidden !important;
+  }
+
+  iframe{
+    position:absolute !important;
+    left:0 !important;
+    top:0 !important;
+    width:100% !important;
+    height:100% !important;
+    visibility:visible !important;
+  }
+
+}
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+<h2>SRCCS SYSTEM</h2>
+<ul class="menu">
+
+<li onclick="openWin('Dashboard','dashboard.html')"><i class="fa fa-chart-line"></i>Dashboard</li>
+<li onclick="openWin('Collection','collection.html')"><i class="fa fa-hand-holding-dollar"></i>Collection</li>
+<li onclick="openWin('Loan Dashboard','loan-dashboard.html')"><i class="fa fa-coins"></i>Loan Dashboard</li>
+<li onclick="openWin('Cash Book','cashbook.html')"><i class="fa fa-book"></i>Cash Book</li>
+<li onclick="openWin('Transactions','statement.html')"><i class="fa fa-file-lines"></i>Transactions / Statement</li>
+<li onclick="openWin('New Account','new-account.html')"><i class="fa fa-user-plus"></i>New Account Opening</li>
+<li onclick="openWin('Password Generated','password.html')"><i class="fa fa-lock"></i>Password Generated</li>
+<li onclick="openWin('Cash Book Dashboard','cashbook-dashboard.html')"><i class="fa fa-table"></i>Cash Book Dashboard</li>
+<li onclick="openWin('Loan Registration','loan-registration.html')"><i class="fa fa-file-signature"></i>Loan Registration</li>
+<li onclick="openWin('Loan Approval','loan-approval.html')"><i class="fa fa-check-circle"></i>Loan Approval</li>
+<li onclick="openWin('EMI Search','emi-search.html')"><i class="fa fa-search"></i>EMI Search / Statement</li>
+<li onclick="openWin('Calculator','calculator.html')"><i class="fa fa-calculator"></i>Calculator</li>
+<li onclick="openWin('FD RD','fd-rd.html')"><i class="fa fa-piggy-bank"></i>FD / RD</li>
+<li onclick="openWin('Daily Collection','daily-collection.html')"><i class="fa fa-calendar-day"></i>Daily Collection Entries</li>
+<li onclick="openWin('Account Holder','account-holder.html')"><i class="fa fa-id-card"></i>Account Holder Details</li>
+<li onclick="openWin('Agent Transactions','agent-transactions.html')"><i class="fa fa-user-tie"></i>Agent Transactions</li>
+<li onclick="openWin('Bill Book','bill-book.html')"><i class="fa fa-receipt"></i>Bill Book</li>
+<li onclick="openWin('Letter Pad','letter-pad.html')"><i class="fa fa-envelope"></i>Letter Pad</li>
+<li onclick="openWin('Loan NOC','loan-noc.html')"><i class="fa fa-file"></i>Loan NOC</li>
+<li onclick="openWin('Loan Application','loan-application.html')"><i class="fa fa-file-contract"></i>Loan Application Form</li>
+<li onclick="openWin('Bank Signature','bank-signature.html')"><i class="fa fa-pen-fancy"></i>Bank Signature Form</li>
+<li onclick="openWin('Terms','terms.html')"><i class="fa fa-scroll"></i>Terms & Conditions</li>
+<li onclick="openWin('Office Notices','office-notice.html')"><i class="fa fa-bullhorn"></i>Office Notices</li>
+<li onclick="openWin('Section Letter','section-letter.html')"><i class="fa fa-envelope-open-text"></i>Section Letter</li>
+<li onclick="openWin('Other','other1.html')"><i class="fa fa-folder"></i>Other</li>
+<li onclick="openWin('Other 2','other2.html')"><i class="fa fa-folder"></i>Other 2</li>
+<li onclick="openWin('Other 3','other3.html')"><i class="fa fa-folder"></i>Other 3</li>
+<li onclick="openWin('Other 4','other4.html')"><i class="fa fa-folder"></i>Other 4</li>
+<li onclick="openWin('Other 5','other5.html')"><i class="fa fa-folder"></i>Other 5</li>
+
+</ul>
+</div>
+
+<div class="desktop" id="desktop"></div>
+
+<script>
+let zIndex = 100;
+
+function openWin(title,file){
+  const win = document.createElement("div");
+  win.className = "window active";
+  win.style.left = (Math.random()*200+40)+"px";
+  win.style.top  = (Math.random()*120+40)+"px";
+  win.style.zIndex = ++zIndex;
+
+  win.innerHTML = `
+    <div class="window-header">
+      <span>${title}</span>
+      <div class="actions">
+        <i class="fa fa-minus" title="Minimize"></i>
+        <i class="fa fa-square" title="Maximize"></i>
+        <i class="fa fa-times" title="Close"></i>
+      </div>
+    </div>
+    <iframe loading="lazy" src="${file}"></iframe>
+  `;
+
+  desktop.appendChild(win);
+  activate(win);
+  drag(win);
+  controls(win);
+}
+
+function activate(win){
+  document.querySelectorAll(".window").forEach(w=>w.classList.remove("active"));
+  win.classList.add("active");
+  win.style.zIndex = ++zIndex;
+  win.onclick = ()=>activate(win);
+}
+
+function drag(win){
+  const h = win.querySelector(".window-header");
+  let d=false,x=0,y=0;
+  h.onmousedown=e=>{
+    d=true;
+    x=e.clientX-win.offsetLeft;
+    y=e.clientY-win.offsetTop;
+    activate(win);
+  };
+  document.onmousemove=e=>{
+    if(!d) return;
+    win.style.left=(e.clientX-x)+"px";
+    win.style.top =(e.clientY-y)+"px";
+  };
+  document.onmouseup=()=>d=false;
+}
+
+function controls(win){
+  const [min,max,close] = win.querySelectorAll(".actions i");
+  const frame = win.querySelector("iframe");
+  let maxed=false,old={};
+
+  min.onclick=e=>{
+    e.stopPropagation();
+    frame.classList.toggle("hidden");
+  };
+
+  max.onclick=e=>{
+    e.stopPropagation();
+    if(!maxed){
+      old={w:win.style.width,h:win.style.height,l:win.style.left,t:win.style.top};
+      win.style.width="100%";
+      win.style.height="100%";
+      win.style.left="0";
+      win.style.top="0";
+      maxed=true;
+    }else{
+      win.style.width=old.w;
+      win.style.height=old.h;
+      win.style.left=old.l;
+      win.style.top=old.t;
+      maxed=false;
+    }
+  };
+
+  close.onclick=e=>{
+    e.stopPropagation();
+    win.remove();
+  };
+}
+</script>
+
+</body>
+</html>
