@@ -136,11 +136,44 @@ button:hover{
   .container{border:none;margin:0;box-shadow:none}
   button{display:none}
 }
+
+.loader-overlay{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(255,255,255,0.7);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
+
+.loader{
+  border:6px solid #f3f3f3;
+  border-top:6px solid var(--primary);
+  border-radius:50%;
+  width:50px;
+  height:50px;
+  animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+  0%{transform:rotate(0deg);}
+  100%{transform:rotate(360deg);}
+}
 </style>
 
 </head>
 
 <body>
+
+  <!-- ================== LOADER ADD ================== -->
+<div class="loader-overlay" id="loader">
+  <div class="loader"></div>
+</div>
+
 <div class="container">
 
 <div class="header">
@@ -315,116 +348,172 @@ button:hover{
 const API="https://script.google.com/macros/s/AKfycbyGEdhqMfixORWu6FGXWCdBhxoquLiGfL8vua3hnGmaWXeKeuVPcCsjec2VRXTFFkFAOw/exec";
 let DOCS={};
 
+function showLoader(btn){
+ document.getElementById("loader").style.display="flex";
+ if(btn) btn.disabled=true;
+}
+
+function hideLoader(btn){
+ document.getElementById("loader").style.display="none";
+ if(btn) btn.disabled=false;
+}
+
 function encode(i,k){
- const f=i.files[0]; if(!f) return;
+ const f=i.files[0]; 
+ if(!f) return;
  const r=new FileReader();
- r.onload=()=>{DOCS[k]=r.result;document.getElementById(k+"_prev").innerText="✔ Uploaded";};
+ r.onload=()=>{
+   DOCS[k]=r.result;
+   document.getElementById(k+"_prev").innerText="✔ Uploaded";
+ };
  r.readAsDataURL(f);
 }
 
+/* ================= SAVE LOAN ================= */
 function saveLoan(){
- fetch(API,{method:"POST",body:JSON.stringify({
-  action:"save",
-  society_account:society_account.value,
-  applicant_name:applicant_name.value,
-  father_name:father_name.value,
-  mother_name:mother_name.value,
-  gender:gender.value,
-  dob:dob.value,
-  age:age.value,
-  marital:marital.value,
-  category:category.value,
-  mobile:mobile.value,
-  alt_mobile:alt_mobile.value,
-  email:email.value,
-  address:address.value,
-  city:city.value,
-  pincode:pincode.value,
-  aadhaar:aadhaar.value,
-  pan:pan.value,
-  voter:voter.value,
-  dl:dl.value,
-  occupation:occupation.value,
-  business:business.value,
-  monthly_income:monthly_income.value,
-  annual_income:annual_income.value,
-  loan_type:loan_type.value,
-  loan_amount:loan_amount.value,
-  loan_purpose:loan_purpose.value,
-  tenure:tenure.value,
-  interest:interest.value,
-  processing_fee:processing_fee.value,
-  bank_holder:bank_holder.value,
-  bank_name:bank_name.value,
-  bank_account:bank_account.value,
-  ifsc:ifsc.value,
-  branch:branch.value,
-  g1_name:g1_name.value,
-  g1_relation:g1_relation.value,
-  g1_mobile:g1_mobile.value,
-  g1_aadhaar:g1_aadhaar.value,
-  g1_pan:g1_pan.value,
-  place:place.value,
-  dec_date:dec_date.value,
-  id_proof:DOCS.id_proof||"",
-  income_proof:DOCS.income_proof||"",
-  passbook:DOCS.passbook||""
- })}).then(r=>r.json()).then(d=>{
-  loan_id.value=d.loanId;
-  alert("Loan Saved : "+d.loanId);
+
+ const btn=document.querySelector("button[type='submit']");
+ showLoader(btn);
+
+ fetch(API,{
+  method:"POST",
+  body:JSON.stringify({
+   action:"save",
+   society_account:society_account.value,
+   applicant_name:applicant_name.value,
+   father_name:father_name.value,
+   mother_name:mother_name.value,
+   gender:gender.value,
+   dob:dob.value,
+   age:age.value,
+   marital:marital.value,
+   category:category.value,
+   mobile:mobile.value,
+   alt_mobile:alt_mobile.value,
+   email:email.value,
+   address:address.value,
+   city:city.value,
+   pincode:pincode.value,
+   aadhaar:aadhaar.value,
+   pan:pan.value,
+   voter:voter.value,
+   dl:dl.value,
+   occupation:occupation.value,
+   business:business.value,
+   monthly_income:monthly_income.value,
+   annual_income:annual_income.value,
+   loan_type:loan_type.value,
+   loan_amount:loan_amount.value,
+   loan_purpose:loan_purpose.value,
+   tenure:tenure.value,
+   interest:interest.value,
+   processing_fee:processing_fee.value,
+   bank_holder:bank_holder.value,
+   bank_name:bank_name.value,
+   bank_account:bank_account.value,
+   ifsc:ifsc.value,
+   branch:branch.value,
+   g1_name:g1_name.value,
+   g1_relation:g1_relation.value,
+   g1_mobile:g1_mobile.value,
+   g1_aadhaar:g1_aadhaar.value,
+   g1_pan:g1_pan.value,
+   place:place.value,
+   dec_date:dec_date.value,
+   id_proof:DOCS.id_proof||"",
+   income_proof:DOCS.income_proof||"",
+   passbook:DOCS.passbook||""
+  })
+ })
+ .then(r=>r.json())
+ .then(d=>{
+   hideLoader(btn);
+   if(d.loanId){
+     loan_id.value=d.loanId;
+     alert("Loan Saved : "+d.loanId);
+   }else{
+     alert("Save Failed");
+   }
+ })
+ .catch(()=>{
+   hideLoader(btn);
+   alert("Server Error");
  });
 }
 
+/* ================= SEARCH LOAN ================= */
 function searchLoan(){
- fetch(API,{method:"POST",body:JSON.stringify({action:"search",query:search.value})})
- .then(r=>r.json()).then(d=>{
-  if(!d.found){alert("Not Found");return;}
-  const r=d.row;
-  loan_id.value=r[1];
-  society_account.value=r[2];
-  applicant_name.value=r[3];
-  father_name.value=r[4];
-  mother_name.value=r[5];
-  gender.value=r[6];
-  dob.value=r[7];
-  age.value=r[8];
-  marital.value=r[9];
-  category.value=r[10];
-  mobile.value=r[11];
-  alt_mobile.value=r[12];
-  email.value=r[13];
-  address.value=r[14];
-  city.value=r[15];
-  pincode.value=r[16];
-  aadhaar.value=r[17];
-  pan.value=r[18];
-  voter.value=r[19];
-  dl.value=r[20];
-  occupation.value=r[21];
-  business.value=r[22];
-  monthly_income.value=r[23];
-  annual_income.value=r[24];
-  loan_type.value=r[25];
-  loan_amount.value=r[26];
-  loan_purpose.value=r[27];
-  tenure.value=r[28];
-  interest.value=r[29];
-  processing_fee.value=r[30];
-  bank_holder.value=r[31];
-  bank_name.value=r[32];
-  bank_account.value=r[33];
-  ifsc.value=r[34];
-  branch.value=r[35];
-  g1_name.value=r[36];
-  g1_relation.value=r[37];
-  g1_mobile.value=r[38];
-  g1_aadhaar.value=r[39];
-  g1_pan.value=r[40];
-  place.value=r[41];
-  dec_date.value=r[42];
+
+ const btn=document.querySelector("button[onclick='searchLoan()']");
+ showLoader(btn);
+
+ fetch(API,{
+   method:"POST",
+   body:JSON.stringify({
+     action:"search",
+     query:search.value
+   })
+ })
+ .then(r=>r.json())
+ .then(d=>{
+
+   hideLoader(btn);
+
+   if(!d.found){
+     alert("Not Found");
+     return;
+   }
+
+   const r=d.row;
+
+   loan_id.value=r[1];
+   society_account.value=r[2];
+   applicant_name.value=r[3];
+   father_name.value=r[4];
+   mother_name.value=r[5];
+   gender.value=r[6];
+   dob.value=r[7];
+   age.value=r[8];
+   marital.value=r[9];
+   category.value=r[10];
+   mobile.value=r[11];
+   alt_mobile.value=r[12];
+   email.value=r[13];
+   address.value=r[14];
+   city.value=r[15];
+   pincode.value=r[16];
+   aadhaar.value=r[17];
+   pan.value=r[18];
+   voter.value=r[19];
+   dl.value=r[20];
+   occupation.value=r[21];
+   business.value=r[22];
+   monthly_income.value=r[23];
+   annual_income.value=r[24];
+   loan_type.value=r[25];
+   loan_amount.value=r[26];
+   loan_purpose.value=r[27];
+   tenure.value=r[28];
+   interest.value=r[29];
+   processing_fee.value=r[30];
+   bank_holder.value=r[31];
+   bank_name.value=r[32];
+   bank_account.value=r[33];
+   ifsc.value=r[34];
+   branch.value=r[35];
+   g1_name.value=r[36];
+   g1_relation.value=r[37];
+   g1_mobile.value=r[38];
+   g1_aadhaar.value=r[39];
+   g1_pan.value=r[40];
+   place.value=r[41];
+   dec_date.value=r[42];
+ })
+ .catch(()=>{
+   hideLoader(btn);
+   alert("Server Error");
  });
 }
 </script>
-
 </body>
 </html>
