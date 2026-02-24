@@ -2,247 +2,281 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>SRCCS – Complete Transaction Dashboard</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SRCCS Day Collections</title>
 
 <style>
-body{margin:0;font-family:Arial;background:#f2f4f7;}
-.header{background:#0d47a1;color:#fff;padding:15px;text-align:center;font-size:20px;font-weight:bold;}
-.container{padding:20px;max-width:1400px;margin:auto;}
-.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:15px;}
-input,button{padding:8px;font-size:14px;}
-button{background:#0d47a1;color:#fff;border:none;cursor:pointer;}
-button:hover{opacity:0.9;}
-.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:20px;}
-.card{background:#fff;padding:15px;border-radius:6px;text-align:center;font-weight:bold;box-shadow:0 2px 6px rgba(0,0,0,0.1);}
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#f4f6fa;
+}
+
+.header{
+  background:#0d47a1;
+  color:white;
+  padding:15px;
+  text-align:center;
+  font-weight:bold;
+}
+
+.container{
+  padding:15px;
+}
+
+.filters{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-bottom:15px;
+}
+
+input,button{
+  padding:8px;
+  border-radius:6px;
+  border:1px solid #ccc;
+}
+
+button{
+  background:#0d47a1;
+  color:white;
+  border:none;
+  cursor:pointer;
+}
+
+button:hover{
+  opacity:0.9;
+}
+
+button:disabled{
+  opacity:0.6;
+  cursor:not-allowed;
+}
+
+/* 🔵 Loader */
+.loader-overlay{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(255,255,255,0.7);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:999;
+}
+
+.loader{
+  border:6px solid #f3f3f3;
+  border-top:6px solid #0d47a1;
+  border-radius:50%;
+  width:50px;
+  height:50px;
+  animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+  0%{transform:rotate(0deg);}
+  100%{transform:rotate(360deg);}
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:10px;
+  margin-top:10px;
+}
+
+.card{
+  background:white;
+  padding:15px;
+  border-radius:8px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.1);
+  text-align:center;
+}
+
+.value{
+  font-size:18px;
+  font-weight:bold;
+  margin-top:5px;
+}
+
 .credit{color:green;}
 .debit{color:red;}
 .net{color:#0d47a1;}
-table{width:100%;border-collapse:collapse;background:#fff;}
-th,td{padding:8px;border:1px solid #ddd;text-align:center;font-size:13px;}
-th{background:#e3f2fd;}
-.accountLink{color:#0d47a1;cursor:pointer;font-weight:bold;}
-.locationLink{color:#e65100;cursor:pointer;font-weight:bold;}
-canvas{background:#fff;padding:10px;margin-top:20px;}
-@media print{.filters,button{display:none;}}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:20px;
+  background:white;
+}
+
+th,td{
+  border:1px solid #ddd;
+  padding:6px;
+  font-size:13px;
+}
+
+th{
+  background:#0d47a1;
+  color:white;
+}
+
+.error{
+  color:red;
+  margin-top:10px;
+  font-size:14px;
+}
+
+@media print{
+  .filters, .error{
+    display:none;
+  }
+}
 </style>
 </head>
 
 <body>
 
-<div class="header">🏦 SRCCS – Complete Transaction Report</div>
+<div class="loader-overlay" id="loader">
+  <div class="loader"></div>
+</div>
+
+<div class="header">
+🏦 SRCCS Day Collection Dashboard
+</div>
 
 <div class="container">
 
 <div class="filters">
-<input type="date" id="fromDate">
-<input type="date" id="toDate">
-<input type="text" id="account" placeholder="Account No">
-<input type="text" id="agent" placeholder="Agent ID">
-<button onclick="loadData()">Search</button>
-<button onclick="downloadExcel()">Excel</button>
-<button onclick="window.print()">Print</button>
+  <input type="date" id="fromDate">
+  <input type="date" id="toDate">
+  <input type="text" id="agentId" placeholder="Agent ID">
+  <button id="searchBtn" onclick="loadData()">Search</button>
+  <button onclick="window.print()">Print</button>
 </div>
 
-<div class="summary">
-<div class="card">Total Transactions<br><span id="totalTxn">0</span></div>
-<div class="card">Total Accounts<br><span id="totalAccounts">0</span></div>
-<div class="card credit">Total Credit<br>₹<span id="totalCredit">0</span></div>
-<div class="card debit">Total Debit<br>₹<span id="totalDebit">0</span></div>
-<div class="card net">Net Amount<br>₹<span id="netAmount">0</span></div>
+<div class="grid">
+  <div class="card">
+    Total Credit
+    <div class="value credit" id="totalCredit">0</div>
+  </div>
+  <div class="card">
+    Total Debit
+    <div class="value debit" id="totalDebit">0</div>
+  </div>
+  <div class="card">
+    Net Collection
+    <div class="value net" id="netCollection">0</div>
+  </div>
+  <div class="card">
+    Transactions
+    <div class="value" id="txnCount">0</div>
+  </div>
 </div>
 
-<div style="overflow:auto;">
-<table id="txnTable">
-<thead>
-<tr>
-<th>Date</th>
-<th>Account</th>
-<th>Name</th>
-<th>Agent</th>
-<th>Location</th>
-<th>Credit</th>
-<th>Debit</th>
-<th>Balance</th>
-<th>Voucher</th>
-<th>Mode</th>
-<th>Remark</th>
-</tr>
-</thead>
-<tbody></tbody>
+<div class="error" id="errorBox"></div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Account</th>
+      <th>Name</th>
+      <th>Agent</th>
+      <th>Type</th>
+      <th>Amount</th>
+      <th>Balance</th>
+    </tr>
+  </thead>
+  <tbody id="tableBody"></tbody>
 </table>
-</div>
 
-<!-- ✅ GRAPH MOVED BELOW TABLE -->
-<canvas id="chart" height="80"></canvas>
-
-</div>
-
-<!-- MAP POPUP -->
-<div id="mapModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;
-background:rgba(0,0,0,0.6);justify-content:center;align-items:center;z-index:9999;">
-
-<div style="background:#fff;width:90%;max-width:800px;height:500px;position:relative;border-radius:8px;overflow:hidden;">
-
-<button onclick="closeMap()"
-style="position:absolute;top:10px;right:10px;background:red;color:#fff;border:none;padding:5px 10px;cursor:pointer;">
-Close
-</button>
-
-<iframe id="mapFrame" width="100%" height="100%" style="border:0;"></iframe>
-
-</div>
 </div>
 
 <script>
 
-const API_URL = "https://script.google.com/macros/s/AKfycbzNjQqpcp3C0AtciEIacnNr6RujXmm2UyQ2vdHB9dtUokLP4lXcKAlDVWH9Dff_f4zyzA/exec";
-let globalData = [];
-let chartInstance = null;
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzFqFqkVFopYWSnokZMQw7GrL3gces47jqH-KfKqM64LrIZio3AYTKLN-qBWEopmVTLyw/exec";
+const BASE_URL = SCRIPT_URL + "?fn=txnList";
 
-function formatDate(d){
- const date = new Date(d);
- return ("0"+date.getDate()).slice(-2)+"-"+("0"+(date.getMonth()+1)).slice(-2)+"-"+date.getFullYear();
-}
+async function loadData(){
 
-function loadData(){
+  const loader = document.getElementById("loader");
+  const btn = document.getElementById("searchBtn");
 
- const from = document.getElementById("fromDate").value;
- const to   = document.getElementById("toDate").value;
- const account = document.getElementById("account").value.trim();
- const agent   = document.getElementById("agent").value.trim();
+  loader.style.display = "flex";
+  btn.disabled = true;
+  btn.innerText = "Loading...";
 
- let url = API_URL + "?fn=txnList";
+  document.getElementById("errorBox").innerText = "";
 
- if(from) url += "&from="+formatDate(from);
- if(to)   url += "&to="+formatDate(to);
- if(account) url += "&account="+encodeURIComponent(account);
- if(agent)   url += "&agent="+encodeURIComponent(agent);
+  const from = document.getElementById("fromDate").value;
+  const to = document.getElementById("toDate").value;
+  const agent = document.getElementById("agentId").value;
 
- fetch(url)
- .then(res=>res.json())
- .then(data=>{
+  const url = BASE_URL +
+              "&from=" + encodeURIComponent(from) +
+              "&to=" + encodeURIComponent(to) +
+              "&agent=" + encodeURIComponent(agent);
 
-  globalData = data.transactions;
-  const tbody = document.querySelector("#txnTable tbody");
-  tbody.innerHTML = "";
+  try{
 
-  let totalCredit=0,totalDebit=0;
-  let accountSet = new Set();
+    const res = await fetch(url);
+    if(!res.ok) throw new Error("Server not responding");
 
-  data.transactions.forEach(tx=>{
+    const data = await res.json();
+    if(!data.success) throw new Error("API returned error");
 
-    accountSet.add(tx.account);
+    let totalCredit = 0;
+    let totalDebit = 0;
 
-    let credit="",debit="";
+    const tbody = document.getElementById("tableBody");
+    tbody.innerHTML = "";
 
-    if(tx.type==="credit"){
-      credit=tx.amount;
-      totalCredit+=tx.amount;
-    }else{
-      debit=tx.amount;
-      totalDebit+=tx.amount;
-    }
+    data.transactions.forEach(txn=>{
 
-    tbody.innerHTML+=`
-    <tr>
-      <td>${tx.postDate}</td>
-      <td><span class="accountLink" onclick="filterAccount('${tx.account}')">${tx.account}</span></td>
-      <td>${tx.name}</td>
-      <td>${tx.agent}</td>
-      <td><span class="locationLink" onclick="openMap('${tx.location}')">${tx.location}</span></td>
-      <td class="credit">${credit}</td>
-      <td class="debit">${debit}</td>
-      <td>${tx.balance}</td>
-      <td>${tx.voucher}</td>
-      <td>${tx.mode}</td>
-      <td>${tx.remark}</td>
-    </tr>`;
-  });
+      if(txn.type === "credit")
+        totalCredit += Number(txn.amount);
+      else
+        totalDebit += Number(txn.amount);
 
-  const net = totalCredit-totalDebit;
+      tbody.innerHTML += `
+        <tr>
+          <td>${txn.postDate}</td>
+          <td>${txn.account}</td>
+          <td>${txn.name}</td>
+          <td>${txn.agent}</td>
+          <td>${txn.type}</td>
+          <td>₹ ${txn.amount}</td>
+          <td>₹ ${txn.balance}</td>
+        </tr>
+      `;
+    });
 
-  document.getElementById("totalTxn").innerText = data.transactions.length;
-  document.getElementById("totalAccounts").innerText = accountSet.size;
-  document.getElementById("totalCredit").innerText = totalCredit;
-  document.getElementById("totalDebit").innerText = totalDebit;
-  document.getElementById("netAmount").innerText = net;
+    document.getElementById("totalCredit").innerText =
+      totalCredit.toLocaleString();
 
-  drawChart(totalCredit,totalDebit);
+    document.getElementById("totalDebit").innerText =
+      totalDebit.toLocaleString();
 
- });
+    document.getElementById("netCollection").innerText =
+      (totalCredit-totalDebit).toLocaleString();
 
-}
+    document.getElementById("txnCount").innerText =
+      data.transactions.length;
 
-function filterAccount(acc){
- document.getElementById("account").value = acc;
- loadData();
-}
+  }catch(err){
+    document.getElementById("errorBox").innerText =
+      "Connection Error: " + err.message;
+  }
 
-function drawChart(credit,debit){
-
- if(chartInstance){
-   chartInstance.destroy();
- }
-
- const ctx = document.getElementById('chart');
-
- chartInstance = new Chart(ctx,{
-   type:'bar',
-   data:{
-     labels:['Credit','Debit'],
-     datasets:[{
-       data:[credit,debit],
-       backgroundColor:['green','red']
-     }]
-   }
- });
-
-}
-
-function downloadExcel(){
-
- let csv="Date,Account,Name,Agent,Location,Credit,Debit,Balance,Voucher,Mode,Remark\n";
-
- globalData.forEach(tx=>{
-   let credit = tx.type==="credit"?tx.amount:"";
-   let debit  = tx.type==="debit"?tx.amount:"";
-   csv+=`${tx.postDate},${tx.account},${tx.name},${tx.agent},${tx.location},${credit},${debit},${tx.balance},${tx.voucher},${tx.mode},${tx.remark}\n`;
- });
-
- const blob=new Blob([csv],{type:'text/csv'});
- const link=document.createElement("a");
- link.href=URL.createObjectURL(blob);
- link.download="Transaction_Report.csv";
- link.click();
-}
-
-function openMap(location){
-
- if(!location){
-   alert("No location available");
-   return;
- }
-
- let mapURL="";
-
- if(location.includes(",")){
-   mapURL="https://maps.google.com/maps?q="+location+"&output=embed";
- }else{
-   mapURL="https://maps.google.com/maps?q="+encodeURIComponent(location)+"&output=embed";
- }
-
- document.getElementById("mapFrame").src=mapURL;
- document.getElementById("mapModal").style.display="flex";
-}
-
-function closeMap(){
- document.getElementById("mapModal").style.display="none";
- document.getElementById("mapFrame").src="";
+  loader.style.display = "none";
+  btn.disabled = false;
+  btn.innerText = "Search";
 }
 
 </script>
-
 </body>
 </html>
