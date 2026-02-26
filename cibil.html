@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SRCCS – Ultimate Loan Eligibility System</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<style>
+body{font-family:Arial;background:#f4f6fa;margin:0;}
+.header{background:#003366;color:#fff;padding:15px;text-align:center;font-weight:bold;}
+.container{max-width:1200px;margin:20px auto;background:#fff;padding:20px;}
+input,button{padding:8px;margin:5px;}
+button{background:#003366;color:#fff;border:none;cursor:pointer;}
+
+.section{margin-top:20px;}
+.section h3{background:#e9eff7;padding:8px;border-left:4px solid #003366;}
+
+table{width:100%;border-collapse:collapse;margin-top:10px;}
+th,td{border:1px solid #ccc;padding:6px;font-size:13px;text-align:center;}
+th{background:#f5f7fb;}
+
+.running{background:#f8d7da;}
+.closed{background:#d4edda;}
+.due{background:#fff3cd;}
+
+.badge{padding:10px;font-weight:bold;text-align:center;border-radius:5px;margin-top:10px;}
+.high{background:#d4edda;color:#155724;}
+.medium{background:#fff3cd;color:#856404;}
+.low{background:#f8d7da;color:#721c24;}
+
+.gauge{width:200px;height:200px;border-radius:50%;
+display:flex;align-items:center;justify-content:center;
+font-size:22px;font-weight:bold;margin:auto;}
+
+.statusBox{padding:10px;margin-top:10px;font-weight:bold;text-align:center;border-radius:5px;}
+.green{background:#d4edda;color:#155724;}
+.red{background:#f8d7da;color:#721c24;}
+
+@media print{
+button,input{display:none;}
+body{background:#fff;}
+}
+
+/* LOADER */
+.loader-overlay{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(255,255,255,0.7);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
+
+.loader{
+  border:6px solid #f3f3f3;
+  border-top:6px solid #003366;
+  border-radius:50%;
+  width:55px;
+  height:55px;
+  animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+  0%{transform:rotate(0deg);}
+  100%{transform:rotate(360deg);}
+}
+</style>
+</head>
+
+<body>
+	<div class="loader-overlay" id="loader">
+  <div class="loader"></div>
+</div>
+
+<div class="header">🏦 SRCCS – Ultimate Loan Eligibility Board</div>
+
+<div class="container">
+
+<input type="text" id="account" placeholder="Enter Account Number">
+<button onclick="generateReport()">Generate Report</button>
+<button onclick="window.print()">Print</button>
+
+<div id="report" style="display:none">
+<!-- CUSTOMER INFO -->
+<div class="section">
+<h3>Customer Details</h3>
+<table>
+<tr><th>Name</th><td id="custName"></td></tr>
+<tr><th>Mobile Number</th><td id="custMobile"></td></tr>
+<tr><th>Account Number</th><td id="custAccount"></td></tr>
+</table>
+</div>
+<!-- TRANSACTION -->
+<div class="section">
+<h3>Transaction Analysis</h3>
+<table>
+<tr><th>Total Withdraw Count</th><td id="withdrawCount"></td></tr>
+<tr><th>Total Withdraw Amount</th><td id="withdrawAmount"></td></tr>
+<tr><th>Total Deposit</th><td id="deposit"></td></tr>
+<tr><th>Running Balance</th><td id="balance"></td></tr>
+<tr><th>Active Days (30)</th><td id="activeDays"></td></tr>
+<tr><th>Missed Days</th><td id="missedDays"></td></tr>
+<tr><th>Daily Record</th><td id="dailyStatus"></td></tr>
+</table>
+</div>
+
+<!-- LOAN HISTORY -->
+<div class="section">
+<h3>Loan History</h3>
+<table id="loanTable">
+<thead>
+<tr>
+<th>Loan ID</th>
+<th>Start</th>
+<th>Amount</th>
+<th>EMI</th>
+<th>Tenure</th>
+<th>Paid</th>
+<th>Outstanding</th>
+<th>Pending EMI</th>
+<th>Penalty</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+</div>
+
+<!-- ELIGIBILITY -->
+<div class="section">
+<h3>Eligibility Calculation</h3>
+<table>
+<tr><th>Total Loans Taken</th><td id="loanCount"></td></tr>
+<tr><th>2.2 Ratio Limit</th><td id="limit"></td></tr>
+<tr><th>Total Outstanding + Penalty</th><td id="totalOutstanding"></td></tr>
+<tr><th>Recommended Top-Up</th><td id="recommended"></td></tr>
+<tr><th>Loan Block Status</th><td id="blockStatus"></td></tr>
+<tr><th>Final Score</th><td id="score"></td></tr>
+</table>
+
+<div id="eligibilityStatus" class="statusBox"></div>
+</div>
+
+<!-- SCORE -->
+<div class="section">
+<h3>Credit Score</h3>
+<div class="gauge" id="gauge">0</div>
+<div id="riskBadge" class="badge"></div>
+</div>
+
+<!-- QR -->
+<div class="section">
+<h3>QR Verification</h3>
+<div id="qrcode"></div>
+</div>
+
+</div>
+</div>
+
+<script>
+const TXN_API="https://script.google.com/macros/s/AKfycbxxE0TrRjLlcS5C87aMEimxlWH-MbO-ss8PAjVqzqkcDyn8dNrrEGDbcZg-6AkkieKing/exec";
+const LOAN_API="https://script.google.com/macros/s/AKfycbzyzIrsx4_ULDTquVqOxO-UHIuKSB6nY7sm4r1i0pQxHxB6SYYpOVXseR-8ABSwMAg_/exec";
+
+function showLoader(btn){
+  document.getElementById("loader").style.display="flex";
+  if(btn) btn.disabled=true;
+}
+
+function hideLoader(btn){
+  document.getElementById("loader").style.display="none";
+  if(btn) btn.disabled=false;
+}
+
+async function generateReport(){
+
+const btn=document.querySelector("button[onclick='generateReport()']");
+let acc=document.getElementById("account").value.trim();
+if(!acc) return alert("Enter Account");
+
+showLoader(btn);
+
+try{
+
+/* ================= TRANSACTION ================= */
+let txnRes=await fetch(TXN_API+"?fn=getStatement&account="+acc);
+let txnData=await txnRes.json();
+if(!txnData.success) throw new Error("Account not found");
+
+let txns=txnData.transactions || [];
+let balance=txnData.balance || 0;
+
+let withdrawCount=0, withdrawAmount=0, deposit=0;
+
+txns.forEach(t=>{
+ if(t.type==="debit"){
+   withdrawCount++;
+   withdrawAmount+=Number(t.amount);
+ }else{
+   deposit+=Number(t.amount);
+ }
+});
+
+/* ================= 30 DAY ACTIVITY ================= */
+let today=new Date();
+let last30=new Date();
+last30.setDate(today.getDate()-30);
+
+let activeSet=new Set();
+
+txns.forEach(t=>{
+ let d=parseDate(t.postDate);
+ if(d && d>=last30){
+   activeSet.add(t.postDate);
+ }
+});
+
+let activeDays=activeSet.size;
+let missedDays=30-activeDays;
+let dailyStatus=missedDays>=5?"NEGATIVE":"POSITIVE";
+
+/* ================= LOAN DATA ================= */
+let loanRes=await fetch(LOAN_API,{
+ method:"POST",
+ body:JSON.stringify({action:"fullDashboard"})
+});
+
+let loanData=await loanRes.json();
+let allLoans=loanData.rows || [];
+
+let loans=allLoans.filter(r=>r.account===acc);
+
+let tbody=document.querySelector("#loanTable tbody");
+tbody.innerHTML="";
+
+let totalOutstanding=0;
+let overdueFound=false;
+
+loans.forEach(l=>{
+
+ let paid=l.loanAmount-l.outstanding;
+ let penalty=l.pendingEmiMonths*50;
+ totalOutstanding+=l.outstanding+penalty;
+
+ let rowClass="";
+ if(l.outstanding>0 && l.status==="OVERDUE 30+ DAYS"){
+   rowClass="running";
+   overdueFound=true;
+ }
+ else if(l.outstanding>0){
+   rowClass="due";
+ }
+ else{
+   rowClass="closed";
+ }
+
+ tbody.innerHTML+=`
+ <tr class="${rowClass}">
+ <td>${l.loan_id}</td>
+ <td>${l.emiStartMonth}</td>
+ <td>₹${l.loanAmount}</td>
+ <td>₹${l.emiAmount}</td>
+ <td>${l.tenure}</td>
+ <td>₹${paid}</td>
+ <td>₹${l.outstanding}</td>
+ <td>${l.pendingEmiMonths}</td>
+ <td>₹${penalty}</td>
+ <td>${l.status}</td>
+ </tr>`;
+});
+
+/* ================= LIMIT & RECOMMEND ================= */
+let limit=balance*2.2;
+let recommended=limit-totalOutstanding;
+if(recommended<0) recommended=0;
+
+let blockStatus=overdueFound?"BLOCKED – Overdue Loan":"ALLOWED";
+if(overdueFound) recommended=0;
+
+/* ================= SCORE ================= */
+let score=0;
+if(withdrawCount<5) score+=20;
+if(missedDays<5) score+=30;
+if(!overdueFound) score+=30;
+if(balance>10000) score+=20;
+
+let degree=score*3.6;
+let gauge=document.getElementById("gauge");
+gauge.style.background=`conic-gradient(#28a745 ${degree}deg,#ddd ${degree}deg)`;
+gauge.innerText=score;
+
+let badge=document.getElementById("riskBadge");
+
+if(score>=80){
+ badge.className="badge high";
+ badge.innerText="LOW RISK";
+}
+else if(score>=50){
+ badge.className="badge medium";
+ badge.innerText="MEDIUM RISK";
+}
+else{
+ badge.className="badge low";
+ badge.innerText="HIGH RISK";
+}
+
+/* ================= ELIGIBILITY ================= */
+let el=document.getElementById("eligibilityStatus");
+
+if(score>=60 && !overdueFound){
+ el.className="statusBox green";
+ el.innerText="ELIGIBLE";
+}else{
+ el.className="statusBox red";
+ el.innerText="NOT ELIGIBLE";
+}
+
+/* ================= QR ================= */
+document.getElementById("qrcode").innerHTML="";
+new QRCode(document.getElementById("qrcode"),{
+ text:JSON.stringify({
+   account:acc,
+   score:score,
+   recommended:recommended
+ }),
+ width:120,
+ height:120
+});
+
+/* ================= DISPLAY ================= */
+document.getElementById("custName").innerText=txnData.name || "-";
+document.getElementById("custMobile").innerText=txnData.mobile || "-";
+document.getElementById("custAccount").innerText=acc;
+document.getElementById("withdrawCount").innerText=withdrawCount;
+document.getElementById("withdrawAmount").innerText="₹"+withdrawAmount;
+document.getElementById("deposit").innerText="₹"+deposit;
+document.getElementById("balance").innerText="₹"+balance;
+document.getElementById("activeDays").innerText=activeDays;
+document.getElementById("missedDays").innerText=missedDays;
+document.getElementById("dailyStatus").innerText=dailyStatus;
+
+document.getElementById("loanCount").innerText=loans.length;
+document.getElementById("limit").innerText="₹"+limit.toFixed(0);
+document.getElementById("totalOutstanding").innerText="₹"+totalOutstanding;
+document.getElementById("recommended").innerText="₹"+recommended.toFixed(0);
+document.getElementById("blockStatus").innerText=blockStatus;
+document.getElementById("score").innerText=score+"/100";
+
+document.getElementById("report").style.display="block";
+
+}catch(err){
+ alert("Error: "+err.message);
+}
+
+hideLoader(btn);
+}
+
+/* ================= DATE PARSER ================= */
+function parseDate(str){
+ if(!str) return null;
+ let p=str.split("-");
+ return new Date(p[2],p[1]-1,p[0]);
+}
+</script>
+
+</body>
+</html>
