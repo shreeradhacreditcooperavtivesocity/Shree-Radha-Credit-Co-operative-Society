@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -20,7 +21,38 @@ body{
   background:#eef2f7;
 }
 
-/* ================= SIDEBAR ================= */
+/* ===== LOGIN ===== */
+#loginBox{
+  position:fixed;
+  inset:0;
+  background:#0d47a1;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
+}
+.loginCard{
+  background:#fff;
+  padding:30px;
+  width:320px;
+  border-radius:10px;
+  text-align:center;
+}
+.loginCard input{
+  width:100%;
+  padding:10px;
+  margin:10px 0;
+}
+.loginCard button{
+  width:100%;
+  padding:10px;
+  background:#0d47a1;
+  color:#fff;
+  border:none;
+  cursor:pointer;
+}
+
+/* ===== ORIGINAL CSS (UNCHANGED) ===== */
 .sidebar{
   width:260px;
   height:100vh;
@@ -67,16 +99,33 @@ body{
   text-align:center;
 }
 
-/* ================= DESKTOP ================= */
+/* ===== TOP BAR ADD ===== */
+.topbar{
+  position:fixed;
+  left:260px;
+  right:0;
+  top:0;
+  height:40px;
+  background:#0d154f;
+  color:#fff;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:0 15px;
+  z-index:1000;
+}
+
+/* ===== DESKTOP UPDATE ===== */
 .desktop{
   margin-left:260px;
-  height:100vh;
+  margin-top:40px;
+  height:calc(100vh - 40px);
   position:relative;
   background:#f4f6fb;
   overflow:hidden;
 }
 
-/* ================= WINDOW ================= */
+/* ===== WINDOW ORIGINAL ===== */
 .window{
   position:absolute;
   width:500px;
@@ -94,7 +143,6 @@ body{
   border:2px solid #1a237e;
 }
 
-/* ================= HEADER ================= */
 .window-header{
   height:36px;
   background:#1a237e;
@@ -109,7 +157,6 @@ body{
 .window-header span{
   font-size:13px;
   font-weight:bold;
-  letter-spacing:0.3px;
 }
 
 .actions i{
@@ -121,7 +168,6 @@ body{
   color:#ffcc00;
 }
 
-/* ================= CONTENT ================= */
 .window iframe{
   width:100%;
   height:calc(100% - 36px);
@@ -132,28 +178,26 @@ body{
   display:none;
 }
 
-/* ================= PRINT CONTROL ================= */
-@media print{
-
-  body *{
-    visibility:hidden !important;
-  }
-
-  iframe{
-    position:absolute !important;
-    left:0 !important;
-    top:0 !important;
-    width:100% !important;
-    height:100% !important;
-    visibility:visible !important;
-  }
-
-}
 </style>
+
 </head>
 
 <body>
 
+<!-- ===== LOGIN ===== -->
+
+<div id="loginBox">
+  <div class="loginCard">
+    <h2>SRCCS Login</h2>
+    <input id="email" placeholder="Email">
+    <input id="pass" type="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+  </div>
+</div>
+
+<!-- ===== SYSTEM START ===== -->
+
+<div id="system" style="display:none;">
 <div class="sidebar">
 <h2>SRCCS SYSTEM</h2>
 <ul class="menu">
@@ -191,12 +235,69 @@ body{
 </ul>
 </div>
 
+<div class="topbar">
+  <div id="userInfo"></div>
+  <button onclick="logout()">Logout</button>
+</div>
+
 <div class="desktop" id="desktop"></div>
 
+</div>
+
 <script>
+
+/* ===== API ===== */
+const API = "https://script.google.com/macros/s/AKfycbwcLcIqfv5_vLGRO94q60h5StiBW3B5VVxpPx1OrxrpfK7-eylzponj9atVde5WhZuyoA/exec";
+
+/* ===== AUTO LOGIN ===== */
+if(localStorage.getItem("email")){
+  showSystem();
+}
+
+/* ===== LOGIN ===== */
+function login(){
+  const email = document.getElementById("email").value;
+  const pass  = document.getElementById("pass").value;
+
+  fetch(API + "?fn=login&email=" + email + "&pass=" + pass)
+  .then(res=>res.json())
+  .then(res=>{
+    if(res.success){
+      localStorage.setItem("name", res.name);
+      localStorage.setItem("email", res.email);
+      localStorage.setItem("role", res.role);
+      showSystem();
+    }else{
+      alert("Invalid Login");
+    }
+  });
+}
+
+/* ===== SHOW SYSTEM ===== */
+function showSystem(){
+  document.getElementById("loginBox").style.display="none";
+  document.getElementById("system").style.display="block";
+  document.getElementById("userInfo").innerText =
+    localStorage.getItem("name")+" ("+localStorage.getItem("role")+")";
+}
+
+/* ===== LOGOUT ===== */
+function logout(){
+  localStorage.clear();
+  location.reload();
+}
+
+/* ===== ORIGINAL WINDOW SYSTEM FULL ===== */
 let zIndex = 100;
 
 function openWin(title,file){
+
+  if(!localStorage.getItem("email")){
+    alert("Session expired");
+    location.reload();
+    return;
+  }
+
   const win = document.createElement("div");
   win.className = "window active";
   win.style.left = (Math.random()*200+40)+"px";
@@ -207,12 +308,12 @@ function openWin(title,file){
     <div class="window-header">
       <span>${title}</span>
       <div class="actions">
-        <i class="fa fa-minus" title="Minimize"></i>
-        <i class="fa fa-square" title="Maximize"></i>
-        <i class="fa fa-times" title="Close"></i>
+        <i class="fa fa-minus"></i>
+        <i class="fa fa-square"></i>
+        <i class="fa fa-times"></i>
       </div>
     </div>
-    <iframe loading="lazy" src="${file}"></iframe>
+    <iframe src="${file}"></iframe>
   `;
 
   desktop.appendChild(win);
@@ -278,8 +379,8 @@ function controls(win){
     win.remove();
   };
 }
+
 </script>
 
 </body>
 </html>
-
