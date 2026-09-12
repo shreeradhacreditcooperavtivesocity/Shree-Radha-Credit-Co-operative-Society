@@ -42,6 +42,40 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .ua{width:28px;height:28px;border-radius:50%;background:var(--p);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:10px}
 .ui .uid{font-size:11px;font-weight:600}.ui .rl{font-size:9.5px;color:var(--tm)}
 .content{flex:1;overflow-y:auto;padding:12px 16px}
+/* ===== Multi-work tabs (multiple forms open at once) ===== */
+.ws-tabs{display:flex;align-items:center;gap:0;background:#fff;border-bottom:1px solid var(--bd);padding:0 8px;flex-shrink:0;overflow-x:auto;min-height:34px}
+.ws-tabs::-webkit-scrollbar{height:3px}
+.ws-tab{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;font-size:11px;font-weight:600;color:var(--tm);cursor:pointer;border:none;background:transparent;border-bottom:2px solid transparent;white-space:nowrap;font-family:inherit}
+.ws-tab:hover{color:var(--p);background:#FCE4EC}
+.ws-tab.on{color:var(--p);border-bottom-color:var(--p);background:#FFF8F9}
+.ws-tab .x{font-size:13px;opacity:.45;margin-left:2px;line-height:1;padding:0 2px}
+.ws-tab .x:hover{opacity:1;color:var(--er)}
+.ws-tab-new{margin-left:4px;padding:4px 8px;font-size:14px;font-weight:700;color:var(--p);border:1px dashed #e0c4ca;border-radius:4px;background:#fff;cursor:pointer}
+.ws-tab-new:hover{background:#FCE4EC}
+.ws-hint{font-size:9.5px;color:var(--tm);margin-left:auto;padding-right:6px;white-space:nowrap}
+/* Due / Overdue EMI blink */
+@keyframes emiBlink {
+  0%,100%{background-color:#FEE2E2;box-shadow:inset 3px 0 0 #DC2626}
+  50%{background-color:#FECACA;box-shadow:inset 3px 0 0 #991B1B}
+}
+@keyframes emiBlinkSoft {
+  0%,100%{background-color:#FEF3C7}
+  50%{background-color:#FDE68A}
+}
+tr.emi-overdue-blink td{animation:emiBlink 1.2s ease-in-out infinite}
+tr.emi-due-today-blink td{animation:emiBlinkSoft 1.4s ease-in-out infinite}
+.ld-penalty{color:#DC2626;font-weight:700}
+.ld-emi-amt{color:#8B1538;font-weight:700}
+.due-popup-ov{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:2000;display:none;align-items:center;justify-content:center;padding:16px}
+.due-popup-ov.show{display:flex}
+.due-popup{background:#fff;border-radius:12px;max-width:720px;width:96%;max-height:82vh;overflow:auto;box-shadow:0 12px 40px rgba(0,0,0,.3)}
+.due-popup .dp-h{background:linear-gradient(135deg,#8B1538,#C2185B);color:#fff;padding:14px 16px;display:flex;justify-content:space-between;align-items:center}
+.due-popup .dp-h h3{margin:0;font-size:15px}
+.due-popup .dp-b{padding:12px 16px}
+.due-popup table{width:100%;border-collapse:collapse;font-size:11.5px}
+.due-popup th{background:#F5E6EA;color:#6B0F2A;padding:6px 8px;text-align:left}
+.due-popup td{padding:6px 8px;border-bottom:1px solid #f0e4e7}
+.due-popup .dp-f{padding:10px 16px;border-top:1px solid #eee;display:flex;justify-content:flex-end;gap:8px}
 .content::-webkit-scrollbar{width:5px}
 .content::-webkit-scrollbar-thumb{background:#ccc;border-radius:3px}
 .pv{display:none}.pv.active{display:block}
@@ -509,119 +543,121 @@ table.tn td{padding:6px 10px;font-size:11px;border-bottom:1px solid #F0F0F0}
 <aside class="sidebar">
 <div class="sb-logo"><div class="li"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAL5ElEQVR42u2be5RVVR3HP3ufcx8zd2BmQBBNQEDQKUkRDDVEBhEDUsvs/bSVhvSyYLSWj17msuVitUpNy0qX2ouylWYZldBaBhSS0otS4qWpvGGYuTP3cc7+9cc+59xz7ozFNDMXzDmsy7r3zr737P3dv9/39/39fvsqY4zwCr40r/BrCIAhAIYAGALgiF/iG4zvg9Q+ILlHbtWCMQalNdp17FuA8Ty04/z/WoAYg/F8lNY4rovWmm1r/8hTK34GxuC4dk+M79dkPqpWQsj4PkqpaHeLHXn+9vCvWX/PCjavXkfJdHHi9Bm0fuoKpr39YpSjERGM7w+qRdQEAKVU9Hz301vYcP9PeOr7D7Fr6z9RaDLpBpRWFAp5DB4TZkyndemHOf1tb0Rpba3GmEEBYnABCEit2JHnrw+tZN23fsDmx9dQpkBONZOuz2J8H/ENgqC0RilFd6ETg8/Ema+jdemVnH7ZIlAKYwwywEAMPgBKkd+zn78/uooX/vwP9m7exot/+gd7n92OIGTTDShld1kCKlTaQSkoFDrx8Tnp7LNoXfZhXnvpAutOAwhEvwEQEZS188NyAYD8/oNs+e06/nDPCv7+yGMIhmy2ISK+cEJaa1AEFmGYPOssWpctZuolFw4YEP0GIFyc7/kgBpRCBY8QFBFBjAEBpVViwptXr+Vny25i25MbyGVHJNhfEBCi8YViJ4Jh8uzXM3fZYl5z0bx+A9FvADp376OuuRE3neqV+cUIKCL/jgOiUGjXodxd5MGPXMeae+6jPtsccQICBMajsECIQHexA4Apc2Yx75qrOGVBa+V+AtrRgw+AiKC15s5572Hv9i2Mm3Y6Y06dwvFTWxjdMonm8SeQrq9LfMb3PGsdWidA0o6DUooHP3IDq79+Fw3ZkRjfq6w+xicScAQIhWIHoGmZN5u5yxZz8oXnRXOrGQC3z3orm9asIkUGnzIal0w6R9MJxzFq8gSOO+0UJs6eycTXn0ld0/AIiLi5hu6hXYdvvuF9/GXlr8hlmxLuoCK3qCxQORoECqUOFJqW+XOY23YVk+eeY43nP/DSgAFwx3lvZ/Pv1lBfNxxjBBGDX/bw/TI+ZQweGpeRY8cx9U3zmbXkA4w+ZZKVwbEJim/Qjqb9hV3cetp8Cu0daJ2yvIKqACASkWT4ptYaAYrFPCW6+eC93+TM91+GX/YimT1oUlhZFsL3fIzn2YVoTSqdoT47nIa6kdRlhnHouV2suu0uls9YwGM3324nbSTSCsrR+J5H46vGcH7bEgpepx1jtzzYdancM+QGqZBgrqEJRzkc2PF8zF5qmQuIVB5GMJ6PKXuIMbjpNMPqjsEUDT++7npWXPkZdCB3IzAdBxFh5hXvYOTocZRLhUR4rXZtRSXSKFSQUdIrIQ8aAKFJql5NI+G41ve1orH+OFbdfSdr73oA7TiRrytlF1E/oomWhXMpmi4LUvgV8e+WMFBKJWSGxNoHrx4wC4gmWE08yj5CkESsv9frRlbdcielfJclxHB7A7AmtZ4V7WziK1VsqFTfnMM2/f4DID2fKqUqLyQ+RCXGiTGk3Az7djzL8xs32Z03JgaYYsSEsTikMcbvLb3oqTADYATpU13F7R/7xddrfb8idsLNVwl3sarIKkJPlTj4rxcTXxSOT+fqcXBDs0KRWHmMEBWocNHS0/0G2wXCCatol4PJqAowEgKkrDlHnxCNm0lXGZZdhNddQPCDwfazkcwO79fLVkvf1t9/F6gsqKf/C0nmSvCi75NN5Ti2ZbL9q1YJDjiw43k8SrYeEBM/EiPe6HmVZK5pSUwSVhD8ryqvlaNROiCyYBeddJp8+SCT5pzN6JMn2mpRTB6jFNvXPYlg8wUlsYgT+hbSc7VK9Xn+/eYAxBq5UmASktUuulTsAjSukwIUYgwdpX2MGD2WN331swkdICJoR1Pq6mbTI4+RUvWWBCPRY/29ArUgKhYF/gdN6/bXBaSKnSWGjxHD+DOnU2g/RMfOPYhvSDfmOHX2G1j0+TZGTZmA8U20+8bzcNNpnvjOj9i5/Rly2WZrHQnQVeIu4VsS/au1BfSIBIElaodyMc8ly69j3FnTOPTCLsQIdSMaqWscXimUBov3y2XcdJo9T2/lkRu/TMZtsCmzzWoSUSDygiqxZQlS9YkJBqgvUAlJYRSwzwxdB9pxUimax5/QIy1GKn0AN51m75Yd3H3x5XQfaCeTySG+XymqxElUxV9Lj7kIR0AJQiyxCQjPx9B98BCI4JXKGN+PqrthQ8RJpRBj2HD/T7j93EvZ/cwWMpmclcexAkqUY4QKS8KFqh7LVTURQr0kJXF6spAY9m191o4IqkJxO9706Gq2r9nApl+s5rmNG3FVhmwmhx/0EOLFjTD+Vxc7JCk5+xwL+02CCUqq8kmXFNsefyJQfk6iCuS4Ln/96a/55d3LGcHxZDPDK+2y2BeFC0/KX4mMIckDfQ8Dur8kKDHhLxL7gzFk3Qa2rl3P7qe3oLUNgXYR9rYLv9TGuGOnotIOIqaXUpYEpp4UQL0p0f9VBwyYFO4Ne51y6Sq0s+aO+62LhOasFX7Zo2HUCM656n10ldrRQZ2v96BeCXGR8vsvEammJKji+yCV/Nz3PLLOMJ6470e0P7/TVnVDKwhaXud+4nJGHz+JcrkQWYbEMVCxfPq/9BsSJFlrAIjNtaLTwE2nOdS+i7V33IdSypbBAiswvqGuaTjnf2YJRT8fkWQiyw0aLyqWSEUtB5He/b6W2aDj6gpRVVmuDoqdWWcY6+7+Pp179qFdpwKCozHGMPND72DsKadRLOUDslSx6p+KZL+qzsFVFQtXW2MtACi0d2LEQ7tuovkR0aMxuOkM+/c+x7q7vhtYgYlMWHxDKpth/uevxjOlZGKlonLAS1hdterruxLsXzosQstF55PNDaMjvwfjeTiuW4nhsZJ3xmlg3Z0P0H2g3VpBYLratTXB0y9bxJRzzqW7eMjW+5VKqJooE0RVgSyVoQm6HGQAlLasfuHnrqZt42+Y96mPkm1uoKN7L365bC0iJmZS6Sy7X9zG+m+viHY+ngUqrVh4c5slwkRRUyXdPCp9xcSn9NI9qYkLBFXcY04azyXLb2TpUytZcP015I4dQb57H16phE65EeGldT2P33YvxY68bViEVuA4GM9n0nkzOeMtl9BVOhh1jlSPmm+YGfReBVI1L4lpjfFtN6hp7HEs/GIbSzeu5OKbbqRx/Bjy3fspF4torclkc+x89hk23PdgUAI3VTsrLLh5GXX1Tfh+ufc+n0jMPcIudMwi+hgGBiYMatvlNcYCMezYY7jguo+x7KmVXPaVmxk1ZTz5wn5KXXmyqQZ+97V7KXd12y5uJI40xvcZNXkCs5dcTne5PbCCoBZYBYLEQ+CRjALVwiQORH1zI+dd/SGWPvlL3vWNrzBm6hS8comtz6xn4w8fiayn8nkrjlo/vZiRY0604shRxEWGijN9WHqLWcIRTIdfGoh0rp6zr3w3n3zi57z3gds5acY5PHrDctsAjUWEkCtyI5uZf/3HKfh5tNKxwBZwvHrJ/ksAhj6yAFQDIcbgex5OJs30d7+ZtvW/YtEt17Jny46gMFLZMe1YV5h5xTuZ8NoZFIqdUWU4ucu9FGcdB18Er1g6OgCIRwvtOEEX2UMQpr/nzYw949QgBCYrwiKCm06x6JZr8cVPkFpc6KgINAelFZ2d+3FVilEnTzzs7LC2J0VDIMSWxeQlmphhWGxZMIfT3riIfNGGxeocUTsOWmu6Cu2US0XOuPQi2n6/kjPeefFhnytUR+tPZsTYcwY7N23m1mkX4uiUrTkaE50MKRY70Di8etH5zL12CRPPfV1QijCHdTrkqAYgXjn6xQ3Lefimz9GgjkEpTcl02SMxF8yh9ZqrmDJvVjQ+DKmHbZRH9Y+mgnivtWblF77K77/1PUodnbxq2lRa2xbTsrByOgwJzgz11StfLr8aU0pR7MjT3d5O0wnHR6YuRvp0LO5lC0DoDiE/mKPlqGxtPUKi06YDdbm8jC6V6MUPzDX0o6khAIYAGAJgCIBX8vVvvVkVYnnnbD8AAAAASUVORK5CYII=" alt="SR"></div><div class="lt">SHREE RADHA<span>Credit Co-operative</span></div></div>
 <nav class="sb-nav" id="sideNav">
-<a class="ni active" data-p="dashboard" onclick="go('dashboard')"><span class="ic">🏠</span><span class="lb">Dashboard</span></a>
+<a class="ni active" data-p="dashboard" onclick="go('dashboard',event)"><span class="ic">🏠</span><span class="lb">Dashboard</span></a>
 <div class="ns">CUSTOMER</div>
-<a class="ni" data-p="new-customer" onclick="go('new-customer')"><span class="ic">👤</span><span class="lb">New Customer</span></a>
-<a class="ni" data-p="customer-login" onclick="go('customer-login')"><span class="ic">🔑</span><span class="lb">Customer Login</span></a>
-<a class="ni" data-p="customer-search" onclick="go('customer-search')"><span class="ic">🔍</span><span class="lb">Customer Search</span></a>
-<a class="ni" data-p="customer-list" onclick="go('customer-list')"><span class="ic">📋</span><span class="lb">Customer List</span></a>
-<a class="ni" data-p="kyc" onclick="go('kyc')"><span class="ic">✅</span><span class="lb">KYC Verification</span></a>
-<a class="ni" data-p="sig-verify" onclick="go('sig-verify')"><span class="ic">✍️</span><span class="lb">Signature Verification</span></a>
-<a class="ni" data-p="cust-docs" onclick="go('cust-docs')"><span class="ic">📂</span><span class="lb">Customer Documents</span></a>
+<a class="ni" data-p="new-customer" onclick="go('new-customer',event)"><span class="ic">👤</span><span class="lb">New Customer</span></a>
+<a class="ni" data-p="customer-update" onclick="go('customer-update',event)"><span class="ic">✏️</span><span class="lb">Profile Update</span></a>
+<a class="ni" data-p="customer-login" onclick="go('customer-login',event)"><span class="ic">🔑</span><span class="lb">Customer Login</span></a>
+<a class="ni" data-p="customer-search" onclick="go('customer-search',event)"><span class="ic">🔍</span><span class="lb">Customer Search</span></a>
+<a class="ni" data-p="customer-list" onclick="go('customer-list',event)"><span class="ic">📋</span><span class="lb">Customer List</span></a>
+<a class="ni" data-p="kyc" onclick="go('kyc',event)"><span class="ic">✅</span><span class="lb">KYC Verification</span></a>
+<a class="ni" data-p="sig-verify" onclick="go('sig-verify',event)"><span class="ic">✍️</span><span class="lb">Signature Verification</span></a>
+<a class="ni" data-p="cust-docs" onclick="go('cust-docs',event)"><span class="ic">📂</span><span class="lb">Customer Documents</span></a>
 <div class="ns">ACCOUNTS</div>
-<a class="ni" data-p="account-opening" onclick="go('account-opening')"><span class="ic">🏦</span><span class="lb">Account Opening</span></a>
-<a class="ni" data-p="savings" onclick="go('savings')"><span class="ic">💰</span><span class="lb">Savings Account</span></a>
-<a class="ni" data-p="current" onclick="go('current')"><span class="ic">💼</span><span class="lb">Current Account</span></a>
-<a class="ni" data-p="fd" onclick="go('fd')"><span class="ic">📦</span><span class="lb">Fixed Deposit (FD)</span></a>
-<a class="ni" data-p="rd" onclick="go('rd')"><span class="ic">🔄</span><span class="lb">Recurring Deposit (RD)</span></a>
-<a class="ni" data-p="daily-dep" onclick="go('daily-dep')"><span class="ic">📅</span><span class="lb">Daily Deposit</span></a>
-<a class="ni" data-p="weekly-dep" onclick="go('weekly-dep')"><span class="ic">📅</span><span class="lb">Weekly Deposit</span></a>
-<a class="ni" data-p="monthly-dep" onclick="go('monthly-dep')"><span class="ic">📅</span><span class="lb">Monthly Deposit</span></a>
-<a class="ni" data-p="interest-pay" onclick="go('interest-pay')"><span class="ic">💵</span><span class="lb">Interest Pay</span></a>
-<a class="ni" data-p="account-closing" onclick="go('account-closing')"><span class="ic">🔒</span><span class="lb">Account Closing</span></a>
+<a class="ni" data-p="account-opening" onclick="go('account-opening',event)"><span class="ic">🏦</span><span class="lb">Account Opening</span></a>
+<a class="ni" data-p="savings" onclick="go('savings',event)"><span class="ic">💰</span><span class="lb">Savings Account</span></a>
+<a class="ni" data-p="current" onclick="go('current',event)"><span class="ic">💼</span><span class="lb">Current Account</span></a>
+<a class="ni" data-p="fd" onclick="go('fd',event)"><span class="ic">📦</span><span class="lb">Fixed Deposit (FD)</span></a>
+<a class="ni" data-p="rd" onclick="go('rd',event)"><span class="ic">🔄</span><span class="lb">Recurring Deposit (RD)</span></a>
+<a class="ni" data-p="daily-dep" onclick="go('daily-dep',event)"><span class="ic">📅</span><span class="lb">Daily Deposit</span></a>
+<a class="ni" data-p="weekly-dep" onclick="go('weekly-dep',event)"><span class="ic">📅</span><span class="lb">Weekly Deposit</span></a>
+<a class="ni" data-p="monthly-dep" onclick="go('monthly-dep',event)"><span class="ic">📅</span><span class="lb">Monthly Deposit</span></a>
+<a class="ni" data-p="interest-pay" onclick="go('interest-pay',event)"><span class="ic">💵</span><span class="lb">Interest Pay</span></a>
+<a class="ni" data-p="account-closing" onclick="go('account-closing',event)"><span class="ic">🔒</span><span class="lb">Account Closing</span></a>
 <div class="ns">TRANSACTIONS</div>
-<a class="ni" data-p="cash-deposit" onclick="go('cash-deposit')"><span class="ic">⬇️</span><span class="lb">Cash Deposit</span></a>
-<a class="ni" data-p="cash-withdrawal" onclick="go('cash-withdrawal')"><span class="ic">⬆️</span><span class="lb">Cash Withdrawal</span></a>
-<a class="ni" data-p="fund-transfer" onclick="go('fund-transfer')"><span class="ic">↔️</span><span class="lb">Fund Transfer</span></a>
-<a class="ni" data-p="account-statement" onclick="go('account-statement')"><span class="ic">📄</span><span class="lb">Account Statement</span></a>
-<a class="ni" data-p="interest-posting" onclick="go('interest-posting')"><span class="ic">📈</span><span class="lb">Interest Posting</span></a>
-<a class="ni" data-p="charges-coll" onclick="go('charges-coll')"><span class="ic">🧾</span><span class="lb">Charges Collection</span></a>
-<a class="ni" data-p="day-end" onclick="go('day-end')"><span class="ic">🌙</span><span class="lb">Day End Transaction</span></a>
+<a class="ni" data-p="cash-deposit" onclick="go('cash-deposit',event)"><span class="ic">⬇️</span><span class="lb">Cash Deposit</span></a>
+<a class="ni" data-p="cash-withdrawal" onclick="go('cash-withdrawal',event)"><span class="ic">⬆️</span><span class="lb">Cash Withdrawal</span></a>
+<a class="ni" data-p="fund-transfer" onclick="go('fund-transfer',event)"><span class="ic">↔️</span><span class="lb">Fund Transfer</span></a>
+<a class="ni" data-p="account-statement" onclick="go('account-statement',event)"><span class="ic">📄</span><span class="lb">Account Statement</span></a>
+<a class="ni" data-p="interest-posting" onclick="go('interest-posting',event)"><span class="ic">📈</span><span class="lb">Interest Posting</span></a>
+<a class="ni" data-p="charges-coll" onclick="go('charges-coll',event)"><span class="ic">🧾</span><span class="lb">Charges Collection</span></a>
+<a class="ni" data-p="day-end" onclick="go('day-end',event)"><span class="ic">🌙</span><span class="lb">Day End Transaction</span></a>
 <div class="ns">LOAN MANAGEMENT</div>
-<a class="ni" data-p="loan-dashboard" onclick="go('loan-dashboard')"><span class="ic">📊</span><span class="lb">Loan Dashboard</span></a>
-<a class="ni" data-p="loan-registration" onclick="go('loan-registration')"><span class="ic">📝</span><span class="lb">Loan Registration</span></a>
-<a class="ni" data-p="loan-approval" onclick="go('loan-approval')"><span class="ic">✔️</span><span class="lb">Loan Approval</span></a>
-<a class="ni" data-p="loan-disbursement" onclick="go('loan-disbursement')"><span class="ic">💸</span><span class="lb">Loan Disbursement</span></a>
-<a class="ni" data-p="emi-collection" onclick="go('emi-collection')"><span class="ic">📅</span><span class="lb">Loan EMI Collection</span></a>
-<a class="ni" data-p="penalty" onclick="go('penalty')"><span class="ic">⚠️</span><span class="lb">Penalty Collection</span></a>
-<a class="ni" data-p="loan-closure" onclick="go('loan-closure')"><span class="ic">🔐</span><span class="lb">Loan Closure</span></a>
-<a class="ni" data-p="loan-calculator" onclick="go('loan-calculator')"><span class="ic">🧮</span><span class="lb">Loan Calculator</span></a>
-<a class="ni" data-p="loan-statement" onclick="go('loan-statement')"><span class="ic">📄</span><span class="lb">Loan Statement</span></a>
-<a class="ni" data-p="cibil" onclick="go('cibil')"><span class="ic">📊</span><span class="lb">CIBIL Report</span></a>
-<a class="ni" data-p="loan-products" onclick="go('loan-products')"><span class="ic">📦</span><span class="lb">Loan Products</span></a>
+<a class="ni" data-p="loan-dashboard" onclick="go('loan-dashboard',event)"><span class="ic">📊</span><span class="lb">Loan Dashboard</span></a>
+<a class="ni" data-p="loan-registration" onclick="go('loan-registration',event)"><span class="ic">📝</span><span class="lb">Loan Registration</span></a>
+<a class="ni" data-p="loan-approval" onclick="go('loan-approval',event)"><span class="ic">✔️</span><span class="lb">Loan Approval</span></a>
+<a class="ni" data-p="loan-disbursement" onclick="go('loan-disbursement',event)"><span class="ic">💸</span><span class="lb">Loan Disbursement</span></a>
+<a class="ni" data-p="emi-collection" onclick="go('emi-collection',event)"><span class="ic">📅</span><span class="lb">Loan EMI Collection</span></a>
+<a class="ni" data-p="penalty" onclick="go('penalty',event)"><span class="ic">⚠️</span><span class="lb">Penalty Collection</span></a>
+<a class="ni" data-p="loan-closure" onclick="go('loan-closure',event)"><span class="ic">🔐</span><span class="lb">Loan Closure</span></a>
+<a class="ni" data-p="loan-calculator" onclick="go('loan-calculator',event)"><span class="ic">🧮</span><span class="lb">Loan Calculator</span></a>
+<a class="ni" data-p="loan-statement" onclick="go('loan-statement',event)"><span class="ic">📄</span><span class="lb">Loan Statement</span></a>
+<a class="ni" data-p="cibil" onclick="go('cibil',event)"><span class="ic">📊</span><span class="lb">CIBIL Report</span></a>
+<a class="ni" data-p="loan-products" onclick="go('loan-products',event)"><span class="ic">📦</span><span class="lb">Loan Products</span></a>
 <div class="ns">ACCOUNTING</div>
-<a class="ni" data-p="cash-book" onclick="go('cash-book')"><span class="ic">📒</span><span class="lb">Cash Book</span></a>
-<a class="ni" data-p="day-book" onclick="go('day-book')"><span class="ic">📘</span><span class="lb">Day Book</span></a>
-<a class="ni" data-p="gl" onclick="go('gl')"><span class="ic">📗</span><span class="lb">General Ledger (GL)</span></a>
-<a class="ni" data-p="journal" onclick="go('journal')"><span class="ic">✍️</span><span class="lb">Journal Entry</span></a>
-<a class="ni" data-p="journal-report" onclick="go('journal-report')"><span class="ic">📑</span><span class="lb">Journal Entry Report</span></a>
-<a class="ni" data-p="society-control" onclick="go('society-control')"><span class="ic">🏛️</span><span class="lb">Expenses (Society Control)</span></a>
-<a class="ni" data-p="trial-balance" onclick="go('trial-balance')"><span class="ic">⚖️</span><span class="lb">Trial Balance</span></a>
-<a class="ni" data-p="pl" onclick="go('pl')"><span class="ic">📈</span><span class="lb">Profit & Loss</span></a>
-<a class="ni" data-p="balance-sheet" onclick="go('balance-sheet')"><span class="ic">📋</span><span class="lb">Balance Sheet</span></a>
+<a class="ni" data-p="cash-book" onclick="go('cash-book',event)"><span class="ic">📒</span><span class="lb">Cash Book</span></a>
+<a class="ni" data-p="day-book" onclick="go('day-book',event)"><span class="ic">📘</span><span class="lb">Day Book</span></a>
+<a class="ni" data-p="gl" onclick="go('gl',event)"><span class="ic">📗</span><span class="lb">General Ledger (GL)</span></a>
+<a class="ni" data-p="journal" onclick="go('journal',event)"><span class="ic">✍️</span><span class="lb">Journal Entry</span></a>
+<a class="ni" data-p="journal-report" onclick="go('journal-report',event)"><span class="ic">📑</span><span class="lb">Journal Entry Report</span></a>
+<a class="ni" data-p="society-control" onclick="go('society-control',event)"><span class="ic">🏛️</span><span class="lb">Expenses (Society Control)</span></a>
+<a class="ni" data-p="trial-balance" onclick="go('trial-balance',event)"><span class="ic">⚖️</span><span class="lb">Trial Balance</span></a>
+<a class="ni" data-p="pl" onclick="go('pl',event)"><span class="ic">📈</span><span class="lb">Profit & Loss</span></a>
+<a class="ni" data-p="balance-sheet" onclick="go('balance-sheet',event)"><span class="ic">📋</span><span class="lb">Balance Sheet</span></a>
 <div class="ns">COLLECTION</div>
-<a class="ni" data-p="agent-collection" onclick="go('agent-collection')"><span class="ic">🛵</span><span class="lb">Agent Collection</span></a>
-<a class="ni" data-p="daily-collection" onclick="go('daily-collection')"><span class="ic">💵</span><span class="lb">Daily Collection</span></a>
-<a class="ni" data-p="weekly-collection" onclick="go('weekly-collection')"><span class="ic">💵</span><span class="lb">Weekly Collection</span></a>
-<a class="ni" data-p="monthly-collection" onclick="go('monthly-collection')"><span class="ic">💵</span><span class="lb">Monthly Collection</span></a>
-<a class="ni" data-p="coll-report" onclick="go('coll-report')"><span class="ic">📋</span><span class="lb">Collection Report</span></a>
-<a class="ni" data-p="coll-summary" onclick="go('coll-summary')"><span class="ic">📊</span><span class="lb">Collection Summary</span></a>
+<a class="ni" data-p="agent-collection" onclick="go('agent-collection',event)"><span class="ic">🛵</span><span class="lb">Agent Collection</span></a>
+<a class="ni" data-p="daily-collection" onclick="go('daily-collection',event)"><span class="ic">💵</span><span class="lb">Daily Collection</span></a>
+<a class="ni" data-p="weekly-collection" onclick="go('weekly-collection',event)"><span class="ic">💵</span><span class="lb">Weekly Collection</span></a>
+<a class="ni" data-p="monthly-collection" onclick="go('monthly-collection',event)"><span class="ic">💵</span><span class="lb">Monthly Collection</span></a>
+<a class="ni" data-p="coll-report" onclick="go('coll-report',event)"><span class="ic">📋</span><span class="lb">Collection Report</span></a>
+<a class="ni" data-p="coll-summary" onclick="go('coll-summary',event)"><span class="ic">📊</span><span class="lb">Collection Summary</span></a>
 <div class="ns">STAFF & AGENT</div>
-<a class="ni" data-p="staff-master" onclick="go('staff-master')"><span class="ic">👨‍💼</span><span class="lb">Staff Master</span></a>
-<a class="ni" data-p="agent-master" onclick="go('agent-master')"><span class="ic">🤝</span><span class="lb">Agent Master</span></a>
-<a class="ni" data-p="attendance" onclick="go('attendance')"><span class="ic">📅</span><span class="lb">Attendance</span></a>
-<a class="ni" data-p="salary" onclick="go('salary')"><span class="ic">💰</span><span class="lb">Salary</span></a>
-<a class="ni" data-p="commission" onclick="go('commission')"><span class="ic">💵</span><span class="lb">Commission</span></a>
-<a class="ni" data-p="user-login-mgmt" onclick="go('user-login-mgmt')"><span class="ic">🔑</span><span class="lb">User Login</span></a>
+<a class="ni" data-p="staff-master" onclick="go('staff-master',event)"><span class="ic">👨‍💼</span><span class="lb">Staff Master</span></a>
+<a class="ni" data-p="agent-master" onclick="go('agent-master',event)"><span class="ic">🤝</span><span class="lb">Agent Master</span></a>
+<a class="ni" data-p="attendance" onclick="go('attendance',event)"><span class="ic">📅</span><span class="lb">Attendance</span></a>
+<a class="ni" data-p="salary" onclick="go('salary',event)"><span class="ic">💰</span><span class="lb">Salary</span></a>
+<a class="ni" data-p="commission" onclick="go('commission',event)"><span class="ic">💵</span><span class="lb">Commission</span></a>
+<a class="ni" data-p="user-login-mgmt" onclick="go('user-login-mgmt',event)"><span class="ic">🔑</span><span class="lb">User Login</span></a>
 <!-- Individual document type tabs removed — use Customer Documents (unified upload + view with images) -->
 <div class="ns">GUARANTOR</div>
-<a class="ni" data-p="guarantor" onclick="go('guarantor')"><span class="ic">🛡️</span><span class="lb">New Guarantor</span></a>
-<a class="ni" data-p="search-guarantor" onclick="go('search-guarantor')"><span class="ic">🔍</span><span class="lb">Search Guarantor</span></a>
-<a class="ni" data-p="linked-loans" onclick="go('linked-loans')"><span class="ic">🔗</span><span class="lb">Linked Loans</span></a>
-<a class="ni" data-p="guar-docs" onclick="go('guar-docs')"><span class="ic">📂</span><span class="lb">Documents</span></a>
+<a class="ni" data-p="guarantor" onclick="go('guarantor',event)"><span class="ic">🛡️</span><span class="lb">New Guarantor</span></a>
+<a class="ni" data-p="search-guarantor" onclick="go('search-guarantor',event)"><span class="ic">🔍</span><span class="lb">Search Guarantor</span></a>
+<a class="ni" data-p="linked-loans" onclick="go('linked-loans',event)"><span class="ic">🔗</span><span class="lb">Linked Loans</span></a>
+<a class="ni" data-p="guar-docs" onclick="go('guar-docs',event)"><span class="ic">📂</span><span class="lb">Documents</span></a>
 <div class="ns">REPORTS</div>
-<a class="ni" data-p="rpt-customer" onclick="go('rpt-customer')"><span class="ic">👥</span><span class="lb">Customer Report</span></a>
-<a class="ni" data-p="rpt-account" onclick="go('rpt-account')"><span class="ic">🏦</span><span class="lb">Account Report</span></a>
-<a class="ni" data-p="rpt-loan" onclick="go('rpt-loan')"><span class="ic">💳</span><span class="lb">Loan Report</span></a>
-<a class="ni" data-p="rpt-emi" onclick="go('rpt-emi')"><span class="ic">📅</span><span class="lb">EMI Report</span></a>
-<a class="ni" data-p="rpt-collection" onclick="go('rpt-collection')"><span class="ic">💵</span><span class="lb">Collection Report</span></a>
-<a class="ni" data-p="rpt-cash" onclick="go('rpt-cash')"><span class="ic">💰</span><span class="lb">Cash Report</span></a>
-<a class="ni" data-p="rpt-gl" onclick="go('rpt-gl')"><span class="ic">📒</span><span class="lb">GL Report</span></a>
-<a class="ni" data-p="journal-report" onclick="go('journal-report')"><span class="ic">📑</span><span class="lb">Journal Report</span></a>
-<a class="ni" data-p="rpt-interest" onclick="go('rpt-interest')"><span class="ic">📈</span><span class="lb">Interest Report</span></a>
-<a class="ni" data-p="rpt-agent" onclick="go('rpt-agent')"><span class="ic">🤝</span><span class="lb">Agent Report</span></a>
-<a class="ni" data-p="rpt-audit" onclick="go('rpt-audit')"><span class="ic">🔍</span><span class="lb">Audit Report</span></a>
+<a class="ni" data-p="rpt-customer" onclick="go('rpt-customer',event)"><span class="ic">👥</span><span class="lb">Customer Report</span></a>
+<a class="ni" data-p="rpt-account" onclick="go('rpt-account',event)"><span class="ic">🏦</span><span class="lb">Account Report</span></a>
+<a class="ni" data-p="rpt-loan" onclick="go('rpt-loan',event)"><span class="ic">💳</span><span class="lb">Loan Report</span></a>
+<a class="ni" data-p="rpt-emi" onclick="go('rpt-emi',event)"><span class="ic">📅</span><span class="lb">EMI Report</span></a>
+<a class="ni" data-p="rpt-collection" onclick="go('rpt-collection',event)"><span class="ic">💵</span><span class="lb">Collection Report</span></a>
+<a class="ni" data-p="rpt-cash" onclick="go('rpt-cash',event)"><span class="ic">💰</span><span class="lb">Cash Report</span></a>
+<a class="ni" data-p="rpt-gl" onclick="go('rpt-gl',event)"><span class="ic">📒</span><span class="lb">GL Report</span></a>
+<a class="ni" data-p="journal-report" onclick="go('journal-report',event)"><span class="ic">📑</span><span class="lb">Journal Report</span></a>
+<a class="ni" data-p="rpt-interest" onclick="go('rpt-interest',event)"><span class="ic">📈</span><span class="lb">Interest Report</span></a>
+<a class="ni" data-p="rpt-agent" onclick="go('rpt-agent',event)"><span class="ic">🤝</span><span class="lb">Agent Report</span></a>
+<a class="ni" data-p="rpt-audit" onclick="go('rpt-audit',event)"><span class="ic">🔍</span><span class="lb">Audit Report</span></a>
 <div class="ns">ANALYTICS</div>
-<a class="ni" data-p="an-charts" onclick="go('an-charts')"><span class="ic">📊</span><span class="lb">Dashboard Charts</span></a>
-<a class="ni" data-p="an-loan" onclick="go('an-loan')"><span class="ic">📈</span><span class="lb">Loan Statistics</span></a>
-<a class="ni" data-p="an-deposit" onclick="go('an-deposit')"><span class="ic">💰</span><span class="lb">Deposit Statistics</span></a>
-<a class="ni" data-p="an-recovery" onclick="go('an-recovery')"><span class="ic">📉</span><span class="lb">Recovery Analysis</span></a>
-<a class="ni" data-p="an-financial" onclick="go('an-financial')"><span class="ic">💹</span><span class="lb">Financial Summary</span></a>
+<a class="ni" data-p="an-charts" onclick="go('an-charts',event)"><span class="ic">📊</span><span class="lb">Dashboard Charts</span></a>
+<a class="ni" data-p="an-loan" onclick="go('an-loan',event)"><span class="ic">📈</span><span class="lb">Loan Statistics</span></a>
+<a class="ni" data-p="an-deposit" onclick="go('an-deposit',event)"><span class="ic">💰</span><span class="lb">Deposit Statistics</span></a>
+<a class="ni" data-p="an-recovery" onclick="go('an-recovery',event)"><span class="ic">📉</span><span class="lb">Recovery Analysis</span></a>
+<a class="ni" data-p="an-financial" onclick="go('an-financial',event)"><span class="ic">💹</span><span class="lb">Financial Summary</span></a>
 <div class="ns">NOTICES</div>
-<a class="ni" data-p="notice-sms" onclick="go('notice-sms')"><span class="ic">📱</span><span class="lb">SMS</span></a>
-<a class="ni" data-p="notice-wa" onclick="go('notice-wa')"><span class="ic">💬</span><span class="lb">WhatsApp</span></a>
-<a class="ni" data-p="notice-email" onclick="go('notice-email')"><span class="ic">📧</span><span class="lb">Email</span></a>
-<a class="ni" data-p="notice-announce" onclick="go('notice-announce')"><span class="ic">📢</span><span class="lb">Announcements</span></a>
+<a class="ni" data-p="notice-register" onclick="go('notice-register',event)"><span class="ic">📋</span><span class="lb">Notice Register</span></a>
+<a class="ni" data-p="notice-sms" onclick="go('notice-register',event)"><span class="ic">📱</span><span class="lb">SMS</span></a>
+<a class="ni" data-p="notice-wa" onclick="go('notice-register',event)"><span class="ic">💬</span><span class="lb">WhatsApp</span></a>
+<a class="ni" data-p="notice-email" onclick="go('notice-register',event)"><span class="ic">📧</span><span class="lb">Email</span></a>
+<a class="ni" data-p="notice-announce" onclick="go('notice-register',event)"><span class="ic">📢</span><span class="lb">Announcements</span></a>
 <div class="ns">UTILITIES</div>
-<a class="ni" data-p="util-calendar" onclick="go('util-calendar')"><span class="ic">📅</span><span class="lb">Calendar</span></a>
-<a class="ni" data-p="util-holiday" onclick="go('util-holiday')"><span class="ic">🏖️</span><span class="lb">Holiday List</span></a>
-<a class="ni" data-p="util-emi-sched" onclick="go('util-emi-sched')"><span class="ic">📅</span><span class="lb">EMI Scheduler</span></a>
-<a class="ni" data-p="util-int-calc" onclick="go('util-int-calc')"><span class="ic">🧮</span><span class="lb">Interest Calculator</span></a>
-<a class="ni" data-p="util-fd-calc" onclick="go('util-fd-calc')"><span class="ic">🧮</span><span class="lb">FD Calculator</span></a>
-<a class="ni" data-p="util-rd-calc" onclick="go('util-rd-calc')"><span class="ic">🧮</span><span class="lb">RD Calculator</span></a>
-<a class="ni" data-p="util-backup" onclick="go('util-backup')"><span class="ic">💾</span><span class="lb">Backup & Restore</span></a>
+<a class="ni" data-p="util-calendar" onclick="go('util-calendar',event)"><span class="ic">📅</span><span class="lb">Calendar</span></a>
+<a class="ni" data-p="util-holiday" onclick="go('util-holiday',event)"><span class="ic">🏖️</span><span class="lb">Holiday List</span></a>
+<a class="ni" data-p="util-emi-sched" onclick="go('util-emi-sched',event)"><span class="ic">📅</span><span class="lb">EMI Scheduler</span></a>
+<a class="ni" data-p="util-int-calc" onclick="go('util-int-calc',event)"><span class="ic">🧮</span><span class="lb">Interest Calculator</span></a>
+<a class="ni" data-p="util-fd-calc" onclick="go('util-fd-calc',event)"><span class="ic">🧮</span><span class="lb">FD Calculator</span></a>
+<a class="ni" data-p="util-rd-calc" onclick="go('util-rd-calc',event)"><span class="ic">🧮</span><span class="lb">RD Calculator</span></a>
+<a class="ni" data-p="util-backup" onclick="go('util-backup',event)"><span class="ic">💾</span><span class="lb">Backup & Restore</span></a>
 <div class="ns">ADMINISTRATION</div>
-<a class="ni" data-p="branch" onclick="go('branch')"><span class="ic">🏢</span><span class="lb">Branch Master</span></a>
-<a class="ni" data-p="product-master" onclick="go('product-master')"><span class="ic">📦</span><span class="lb">Product Master</span></a>
-<a class="ni" data-p="interest-rate-master" onclick="go('interest-rate-master')"><span class="ic">💹</span><span class="lb">Interest Rate Master</span></a>
-<a class="ni" data-p="charges-master" onclick="go('charges-master')"><span class="ic">🧾</span><span class="lb">Charges Master</span></a>
-<a class="ni" data-p="user-roles" onclick="go('user-roles')"><span class="ic">👥</span><span class="lb">User Roles</span></a>
-<a class="ni" data-p="permissions" onclick="go('permissions')"><span class="ic">🔐</span><span class="lb">Permissions</span></a>
-<a class="ni" data-p="settings" onclick="go('settings')"><span class="ic">⚙️</span><span class="lb">Settings</span></a>
-<a class="ni" data-p="audit-logs" onclick="go('audit-logs')"><span class="ic">📜</span><span class="lb">Audit Logs</span></a>
-<a class="ni" data-p="db-backup" onclick="go('db-backup')"><span class="ic">💾</span><span class="lb">Database Backup</span></a>
-<a class="ni" data-p="profile" onclick="go('profile')"><span class="ic">👤</span><span class="lb">Profile</span></a>
-<a class="ni" data-p="help" onclick="go('help')"><span class="ic">❓</span><span class="lb">Help & Support</span></a>
+<a class="ni" data-p="branch" onclick="go('branch',event)"><span class="ic">🏢</span><span class="lb">Branch Master</span></a>
+<a class="ni" data-p="product-master" onclick="go('product-master',event)"><span class="ic">📦</span><span class="lb">Product Master</span></a>
+<a class="ni" data-p="interest-rate-master" onclick="go('interest-rate-master',event)"><span class="ic">💹</span><span class="lb">Interest Rate Master</span></a>
+<a class="ni" data-p="charges-master" onclick="go('charges-master',event)"><span class="ic">🧾</span><span class="lb">Charges Master</span></a>
+<a class="ni" data-p="user-roles" onclick="go('user-roles',event)"><span class="ic">👥</span><span class="lb">User Roles</span></a>
+<a class="ni" data-p="permissions" onclick="go('permissions',event)"><span class="ic">🔐</span><span class="lb">Permissions</span></a>
+<a class="ni" data-p="settings" onclick="go('settings',event)"><span class="ic">⚙️</span><span class="lb">Settings</span></a>
+<a class="ni" data-p="audit-logs" onclick="go('audit-logs',event)"><span class="ic">📜</span><span class="lb">Audit Logs</span></a>
+<a class="ni" data-p="db-backup" onclick="go('db-backup',event)"><span class="ic">💾</span><span class="lb">Database Backup</span></a>
+<a class="ni" data-p="profile" onclick="go('profile',event)"><span class="ic">👤</span><span class="lb">Profile</span></a>
+<a class="ni" data-p="help" onclick="go('help',event)"><span class="ic">❓</span><span class="lb">Help & Support</span></a>
 <a class="ni" onclick="doLogout()"><span class="ic">🚪</span><span class="lb">Logout</span></a>
 
 </nav>
@@ -647,6 +683,10 @@ table.tn td{padding:6px 10px;font-size:11px;border-bottom:1px solid #F0F0F0}
 <div class="uc"><div class="ua" id="userAvatar">SR</div><div class="ui"><div class="uid" id="userId">—</div><div class="rl" id="userRole">—</div></div></div>
 </div>
 </header>
+<div class="ws-tabs" id="wsTabs" title="Multiple forms open — click tab to switch">
+  <button type="button" class="ws-tab on" data-page="dashboard" onclick="wsSwitch('dashboard')"><span>🏠 Dashboard</span></button>
+  <span class="ws-hint">Ctrl+Click menu = new tab • multiple forms</span>
+</div>
 <div class="content" id="content">
 
 <div class="pv active" id="p-dashboard">
@@ -672,13 +712,13 @@ table.tn td{padding:6px 10px;font-size:11px;border-bottom:1px solid #F0F0F0}
 <div style="padding:10px 12px;font-size:12px;color:var(--tm)">Loading…</div>
 </div></div>
 <div class="qa">
-<a class="qab" onclick="go('account-opening')"><div class="qai">👤+</div><div class="qal">New Account</div></a>
-<a class="qab" onclick="go('cash-deposit')"><div class="qai">⬇️</div><div class="qal">Cash Deposit</div></a>
-<a class="qab" onclick="go('cash-withdrawal')"><div class="qai">⬆️</div><div class="qal">Cash Withdrawal</div></a>
-<a class="qab" onclick="go('loan-registration')"><div class="qai">📝</div><div class="qal">Loan Registration</div></a>
-<a class="qab" onclick="go('emi-collection')"><div class="qai">📅</div><div class="qal">EMI Collection</div></a>
-<a class="qab" onclick="go('rpt-loan')"><div class="qai">📊</div><div class="qal">Reports</div></a>
-<a class="qab" onclick="go('settings')"><div class="qai">⚙️</div><div class="qal">Settings</div></a>
+<a class="qab" onclick="go('account-opening',event)"><div class="qai">👤+</div><div class="qal">New Account</div></a>
+<a class="qab" onclick="go('cash-deposit',event)"><div class="qai">⬇️</div><div class="qal">Cash Deposit</div></a>
+<a class="qab" onclick="go('cash-withdrawal',event)"><div class="qai">⬆️</div><div class="qal">Cash Withdrawal</div></a>
+<a class="qab" onclick="go('loan-registration',event)"><div class="qai">📝</div><div class="qal">Loan Registration</div></a>
+<a class="qab" onclick="go('emi-collection',event)"><div class="qai">📅</div><div class="qal">EMI Collection</div></a>
+<a class="qab" onclick="go('rpt-loan',event)"><div class="qai">📊</div><div class="qal">Reports</div></a>
+<a class="qab" onclick="go('settings',event)"><div class="qai">⚙️</div><div class="qal">Settings</div></a>
 </div>
 </div>
 </div>
@@ -763,6 +803,100 @@ table.tn td{padding:6px 10px;font-size:11px;border-bottom:1px solid #F0F0F0}
 <button type="button" class="btn btn-o" onclick="window.print()">Print</button>
 <button type="reset" class="btn btn-o">Reset</button>
 <button type="submit" class="btn btn-p">Save</button>
+</div></form></div>
+
+<div class="pv" id="p-customer-update">
+<div class="ptb"><h2>Customer Profile Update</h2><span class="bc">Customer › Profile Update</span></div>
+<div id="al-customer-update" class="alert"></div>
+<div class="fc"><h3>Load Customer</h3>
+<div class="fr">
+<div class="fg"><label>Search by Account No / Customer ID / Mobile <span class="rq">*</span></label>
+  <input type="text" id="cup_SEARCH" placeholder="SRC1253 or CU14525 or mobile" onkeydown="if(event.key==='Enter'){event.preventDefault();loadCustomerProfile();}">
+</div>
+<div class="fg" style="justify-content:flex-end"><label>&nbsp;</label>
+  <button type="button" class="btn btn-p" onclick="loadCustomerProfile()" style="height:28px">🔍 Load Profile</button>
+</div>
+</div>
+<div class="verify-box" id="cup-load-box"></div>
+</div>
+<form id="form-customer-update" onsubmit="return saveCustomerProfile(event)" style="display:none">
+<div class="fc"><h3>IDs (locked — Account No cannot change)</h3>
+<div class="fr">
+<div class="fg"><label>Customer ID</label><input type="text" name="CUSTOMER_ID" id="cup_CUSTOMER_ID" readonly></div>
+<div class="fg"><label>Member ID</label><input type="text" name="MEMBER_ID" id="cup_MEMBER_ID" readonly></div>
+<div class="fg"><label>Account No <span class="rq">*</span></label><input type="text" name="ACCOUNT_NO" id="cup_ACCOUNT_NO" readonly title="Account number cannot be changed"></div>
+<div class="fg"><label>Customer Type</label><select name="CUSTOMER_TYPE" id="cup_CUSTOMER_TYPE"><option>INDIVIDUAL</option><option>JOINT</option><option>BUSINESS</option></select></div>
+<div class="fg"><label>Prefix</label><select name="PREFIX" id="cup_PREFIX"><option>Mr</option><option>Mrs</option><option>Ms</option><option>Dr</option></select></div>
+</div></div>
+<div class="fc"><h3>Personal Details</h3>
+<div class="fr">
+<div class="fg"><label>First Name <span class="rq">*</span></label><input type="text" name="FIRST_NAME" id="cup_FIRST_NAME" required></div>
+<div class="fg"><label>Middle Name</label><input type="text" name="MIDDLE_NAME" id="cup_MIDDLE_NAME"></div>
+<div class="fg"><label>Last Name <span class="rq">*</span></label><input type="text" name="LAST_NAME" id="cup_LAST_NAME" required></div>
+<div class="fg"><label>Father Name <span class="rq">*</span></label><input type="text" name="FATHER_NAME" id="cup_FATHER_NAME" required></div>
+<div class="fg"><label>Mother Name</label><input type="text" name="MOTHER_NAME" id="cup_MOTHER_NAME"></div>
+<div class="fg"><label>Spouse Name</label><input type="text" name="SPOUSE_NAME" id="cup_SPOUSE_NAME"></div>
+<div class="fg"><label>Gender</label><select name="GENDER" id="cup_GENDER"><option>Male</option><option>Female</option><option>Other</option></select></div>
+<div class="fg"><label>DOB <span class="rq">*</span></label><input type="date" name="DOB" id="cup_DOB" required></div>
+<div class="fg"><label>Age</label><input type="number" name="AGE" id="cup_AGE"></div>
+<div class="fg"><label>Marital Status</label><select name="MARITAL_STATUS" id="cup_MARITAL_STATUS"><option>Single</option><option>Married</option><option>Widowed</option><option>Divorced</option></select></div>
+<div class="fg"><label>Mobile <span class="rq">*</span></label><input type="text" name="MOBILE" id="cup_MOBILE" required></div>
+<div class="fg"><label>Alt Mobile</label><input type="text" name="ALT_MOBILE" id="cup_ALT_MOBILE"></div>
+<div class="fg"><label>Email</label><input type="email" name="EMAIL" id="cup_EMAIL"></div>
+</div></div>
+<div class="fc"><h3>KYC / Identity</h3>
+<div class="fr">
+<div class="fg"><label>Aadhaar <span class="rq">*</span></label><input type="text" name="AADHAR_NO" id="cup_AADHAR_NO" required></div>
+<div class="fg"><label>PAN <span class="rq">*</span></label><input type="text" name="PAN_NO" id="cup_PAN_NO" required></div>
+<div class="fg"><label>Voter ID</label><input type="text" name="VOTER_ID" id="cup_VOTER_ID"></div>
+<div class="fg"><label>Driving License</label><input type="text" name="DRIVING_LICENSE" id="cup_DRIVING_LICENSE"></div>
+<div class="fg"><label>Passport No</label><input type="text" name="PASSPORT_NO" id="cup_PASSPORT_NO"></div>
+<div class="fg"><label>Ration Card</label><input type="text" name="RATION_CARD" id="cup_RATION_CARD"></div>
+<div class="fg"><label>Occupation</label><input type="text" name="OCCUPATION" id="cup_OCCUPATION"></div>
+<div class="fg"><label>Monthly Income</label><input type="number" name="MONTHLY_INCOME" id="cup_MONTHLY_INCOME"></div>
+<div class="fg"><label>Annual Income</label><input type="number" name="ANNUAL_INCOME" id="cup_ANNUAL_INCOME"></div>
+<div class="fg"><label>Caste</label><input type="text" name="CASTE" id="cup_CASTE"></div>
+<div class="fg"><label>Religion</label><input type="text" name="RELIGION" id="cup_RELIGION"></div>
+<div class="fg"><label>Nationality</label><input type="text" name="NATIONALITY" id="cup_NATIONALITY"></div>
+</div></div>
+<div class="fc"><h3>Address</h3>
+<div class="fr">
+<div class="fg"><label>Address Line 1 <span class="rq">*</span></label><input type="text" name="ADDRESS1" id="cup_ADDRESS1" required></div>
+<div class="fg"><label>Address Line 2</label><input type="text" name="ADDRESS2" id="cup_ADDRESS2"></div>
+<div class="fg"><label>City <span class="rq">*</span></label><input type="text" name="CITY" id="cup_CITY" required></div>
+<div class="fg"><label>District</label><input type="text" name="DISTRICT" id="cup_DISTRICT"></div>
+<div class="fg"><label>State <span class="rq">*</span></label><input type="text" name="STATE" id="cup_STATE" required></div>
+<div class="fg"><label>Pincode <span class="rq">*</span></label><input type="text" name="PINCODE" id="cup_PINCODE" required></div>
+<div class="fg"><label>Permanent Address 1</label><input type="text" name="PERMANENT_ADDRESS1" id="cup_PERMANENT_ADDRESS1"></div>
+<div class="fg"><label>Permanent Address 2</label><input type="text" name="PERMANENT_ADDRESS2" id="cup_PERMANENT_ADDRESS2"></div>
+<div class="fg"><label>Permanent City</label><input type="text" name="PERMANENT_CITY" id="cup_PERMANENT_CITY"></div>
+<div class="fg"><label>Permanent District</label><input type="text" name="PERMANENT_DISTRICT" id="cup_PERMANENT_DISTRICT"></div>
+<div class="fg"><label>Permanent State</label><input type="text" name="PERMANENT_STATE" id="cup_PERMANENT_STATE"></div>
+<div class="fg"><label>Permanent Pincode</label><input type="text" name="PERMANENT_PINCODE" id="cup_PERMANENT_PINCODE"></div>
+</div></div>
+<div class="fc"><h3>Nominee</h3>
+<div class="fr">
+<div class="fg"><label>Nominee Name</label><input type="text" name="NOMINEE_NAME" id="cup_NOMINEE_NAME"></div>
+<div class="fg"><label>Nominee Relation</label><input type="text" name="NOMINEE_RELATION" id="cup_NOMINEE_RELATION"></div>
+<div class="fg"><label>Nominee Mobile</label><input type="text" name="NOMINEE_MOBILE" id="cup_NOMINEE_MOBILE"></div>
+<div class="fg"><label>Nominee Address</label><input type="text" name="NOMINEE_ADDRESS" id="cup_NOMINEE_ADDRESS"></div>
+</div></div>
+<div class="fc"><h3>Photo / Signature / Documents (re-upload to replace)</h3>
+<div class="fr">
+<div class="fg"><label>Photo</label><input type="file" accept="image/*" onchange="fileToField(this,'cup_PHOTO')"><input type="hidden" name="PHOTO" id="cup_PHOTO"><small class="file-hint" id="hint-cup_PHOTO"></small></div>
+<div class="fg"><label>Signature</label><input type="file" accept="image/*" onchange="fileToField(this,'cup_SIGNATURE')"><input type="hidden" name="SIGNATURE" id="cup_SIGNATURE"><small class="file-hint" id="hint-cup_SIGNATURE"></small></div>
+<div class="fg"><label>Aadhaar Front</label><input type="file" accept="image/*,.pdf" onchange="fileToField(this,'cup_AADHAR_FRONT')"><input type="hidden" name="AADHAR_FRONT" id="cup_AADHAR_FRONT"><small class="file-hint" id="hint-cup_AADHAR_FRONT"></small></div>
+<div class="fg"><label>Aadhaar Back</label><input type="file" accept="image/*,.pdf" onchange="fileToField(this,'cup_AADHAR_BACK')"><input type="hidden" name="AADHAR_BACK" id="cup_AADHAR_BACK"><small class="file-hint" id="hint-cup_AADHAR_BACK"></small></div>
+<div class="fg"><label>PAN Card</label><input type="file" accept="image/*,.pdf" onchange="fileToField(this,'cup_PAN_CARD')"><input type="hidden" name="PAN_CARD" id="cup_PAN_CARD"><small class="file-hint" id="hint-cup_PAN_CARD"></small></div>
+<div class="fg"><label>KYC Status</label><select name="KYC_STATUS" id="cup_KYC_STATUS"><option>PENDING</option><option>VERIFIED</option><option>REJECTED</option></select></div>
+<div class="fg"><label>Member Status</label><select name="MEMBER_STATUS" id="cup_MEMBER_STATUS"><option>ACTIVE</option><option>INACTIVE</option></select></div>
+<div class="fg"><label>Updated By</label><input type="text" name="UPDATED_BY" id="cup_UPDATED_BY" class="staff-field" readonly></div>
+</div>
+<div id="cup-preview" style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px"></div>
+</div>
+<div class="ba">
+<button type="button" class="btn btn-o" onclick="resetCustomerProfile()">Clear</button>
+<button type="submit" class="btn btn-p">💾 Update Profile</button>
 </div></form></div>
 
 <div class="pv" id="p-customer-login">
@@ -918,14 +1052,20 @@ table.tn td{padding:6px 10px;font-size:11px;border-bottom:1px solid #F0F0F0}
 <div class="pv" id="p-loan-dashboard">
 <div class="ptb"><h2>Loan Dashboard</h2><span class="bc">Welcome back — Loan Management Overview</span>
 <span style="margin-left:auto;font-size:11px;color:var(--tm)" id="ldClock"></span>
-<button class="btn btn-p" style="margin-left:8px" onclick="go('loan-registration')">+ Add New Loan</button>
+<button class="btn btn-o" style="margin-left:8px" onclick="showDueEmiPopup(true)">⚠ Due EMI Alert</button>
+<button class="btn btn-p" style="margin-left:8px" onclick="go('loan-registration',event)">+ Add New Loan</button>
 </div>
-<div class="stats" style="grid-template-columns:repeat(5,1fr)">
+<div class="stats" style="grid-template-columns:repeat(4,1fr)">
 <div class="sc"><div class="si" style="background:#FCE4EC">💼</div><div><div class="sl">Total Active Loans</div><div class="sv" id="ld-active">—</div><a href="#" style="font-size:10px;color:var(--p)" onclick="go('loan-approval');return false">View Details →</a></div></div>
 <div class="sc"><div class="si" style="background:#F3E5F5">🏦</div><div><div class="sl">Total Loan Disbursed</div><div class="sv" id="ld-disbursed">—</div><a href="#" style="font-size:10px;color:var(--p)" onclick="go('loan-disbursement');return false">View Details →</a></div></div>
 <div class="sc"><div class="si" style="background:#E8F5E9">₹</div><div><div class="sl">Total Amount Collected</div><div class="sv" id="ld-collected">—</div><a href="#" style="font-size:10px;color:var(--p)" onclick="go('emi-collection');return false">View Details →</a></div></div>
 <div class="sc"><div class="si" style="background:#FFF3E0">₹</div><div><div class="sl">Total Outstanding</div><div class="sv" id="ld-outstanding">—</div><a href="#" style="font-size:10px;color:var(--p)" onclick="go('rpt-loan');return false">View Details →</a></div></div>
-<div class="sc"><div class="si" style="background:#FFEBEE">⏱</div><div><div class="sl">Overdue Accounts</div><div class="sv" id="ld-overdue" style="color:var(--er)">—</div><a href="#" style="font-size:10px;color:var(--p)" onclick="go('penalty');return false">View Details →</a></div></div>
+</div>
+<div class="stats" style="grid-template-columns:repeat(4,1fr)">
+<div class="sc"><div class="si" style="background:#FFEBEE">⏱</div><div><div class="sl">Overdue / Due EMIs</div><div class="sv" id="ld-overdue" style="color:var(--er)">—</div><a href="#" style="font-size:10px;color:var(--p)" onclick="showDueEmiPopup(true);return false">View Alert →</a></div></div>
+<div class="sc"><div class="si" style="background:#E3F2FD">📅</div><div><div class="sl">EMI Amount Due (Total)</div><div class="sv ld-emi-amt" id="ld-emi-due">—</div></div></div>
+<div class="sc"><div class="si" style="background:#FCE4EC">⚠</div><div><div class="sl">Auto Penalty (Total)</div><div class="sv ld-penalty" id="ld-penalty-total">—</div></div></div>
+<div class="sc"><div class="si" style="background:#FFF3E0">💳</div><div><div class="sl">Total Payable (EMI+Penalty)</div><div class="sv" id="ld-total-payable" style="color:#8B1538">—</div></div></div>
 </div>
 <div class="two" style="grid-template-columns:1fr 1.2fr 1fr">
 <div class="card"><div class="ch"><h3>Loan Summary</h3><span style="font-size:10px;color:var(--tm)">All Branches</span></div>
@@ -956,18 +1096,42 @@ table.tn td{padding:6px 10px;font-size:11px;border-bottom:1px solid #F0F0F0}
 <div class="card"><div class="ch"><h3>Recent Loan Applications</h3><a href="#" onclick="go('loan-registration');return false">View All</a></div>
 <table class="tn"><thead><tr><th>Loan ID</th><th>Applicant</th><th>Amount</th><th>Purpose</th><th>Status</th><th>Date</th></tr></thead>
 <tbody id="ld-recent"><tr><td colspan="6" style="text-align:center;color:var(--tm)">Loading…</td></tr></tbody></table></div>
-<div class="card"><div class="ch"><h3>Overdue Loan Accounts</h3><a href="#" onclick="go('penalty');return false">View All</a></div>
-<table class="tn"><thead><tr><th>Loan ID</th><th>Customer</th><th>Overdue (Days)</th><th>Amount</th></tr></thead>
-<tbody id="ld-overdue-tbl"><tr><td colspan="4" style="text-align:center;color:var(--tm)">Loading…</td></tr></tbody></table></div>
+<div class="card"><div class="ch"><h3>Due / Overdue EMIs <span style="font-size:10px;color:var(--er)">(blinking = action needed)</span></h3><a href="#" onclick="showDueEmiPopup(true);return false">Open Alert</a></div>
+<table class="tn"><thead><tr><th>Loan A/c</th><th>Customer Name</th><th>EMI ₹</th><th>Due Date</th><th>Kitne Din Se Due</th><th>Penalty ₹</th><th>Total Due</th><th></th></tr></thead>
+<tbody id="ld-overdue-tbl"><tr><td colspan="8" style="text-align:center;color:var(--tm)">Loading…</td></tr></tbody></table></div>
 </div>
 <div class="qa" style="margin-top:10px">
-<a class="qab" onclick="go('loan-registration')"><div class="qai">📝</div><div class="qal">Loan Registration</div></a>
-<a class="qab" onclick="go('loan-approval')"><div class="qai">✔️</div><div class="qal">Loan Approval</div></a>
-<a class="qab" onclick="go('emi-collection')"><div class="qai">📅</div><div class="qal">EMI Collection</div></a>
+<a class="qab" onclick="go('loan-registration',event)"><div class="qai">📝</div><div class="qal">Loan Registration</div></a>
+<a class="qab" onclick="go('loan-approval',event)"><div class="qai">✔️</div><div class="qal">Loan Approval</div></a>
+<a class="qab" onclick="go('emi-collection',event)"><div class="qai">📅</div><div class="qal">EMI Collection</div></a>
 <a class="qab" onclick="go('loan-repayment')||go('emi-collection')"><div class="qai">💸</div><div class="qal">Loan Repayment</div></a>
-<a class="qab" onclick="go('rpt-loan')"><div class="qai">📊</div><div class="qal">Reports</div></a>
-<a class="qab" onclick="go('cibil')"><div class="qai">📄</div><div class="qal">CIBIL Report</div></a>
+<a class="qab" onclick="go('rpt-loan',event)"><div class="qai">📊</div><div class="qal">Reports</div></a>
+<a class="qab" onclick="go('cibil',event)"><div class="qai">📄</div><div class="qal">CIBIL Report</div></a>
 </div>
+</div>
+
+<!-- Due EMI Login Popup -->
+<div class="due-popup-ov" id="dueEmiPopup">
+  <div class="due-popup">
+    <div class="dp-h">
+      <h3>⚠ EMI Due / Overdue Alert</h3>
+      <span style="cursor:pointer;font-size:18px;opacity:.9" onclick="closeDueEmiPopup()">×</span>
+    </div>
+    <div class="dp-b">
+      <p style="font-size:12px;color:#555;margin-bottom:8px" id="duePopupSummary">Loading due EMIs…</p>
+      <div style="overflow-x:auto">
+        <table>
+          <thead><tr><th>Loan A/c</th><th>Customer Name</th><th>EMI ₹</th><th>Due Date</th><th>Kitne Din Se Due</th><th>Penalty</th><th>Total</th><th></th></tr></thead>
+          <tbody id="duePopupBody"><tr><td colspan="8" style="text-align:center">Loading…</td></tr></tbody>
+        </table>
+      </div>
+      <p style="font-size:10.5px;color:#666;margin-top:8px">Penalty rule: 3 din late → ₹510 (one-time); 7 din ke baad daily loan amount ka 0.5%. Red rows = overdue.</p>
+    </div>
+    <div class="dp-f">
+      <button type="button" class="btn btn-o" onclick="closeDueEmiPopup()">Dismiss</button>
+      <button type="button" class="btn btn-p" onclick="closeDueEmiPopup();go('emi-collection',event)">Go to EMI Collection</button>
+    </div>
+  </div>
 </div>
 
 <div class="pv" id="p-loan-registration">
@@ -1004,18 +1168,22 @@ table.tn td{padding:6px 10px;font-size:11px;border-bottom:1px solid #F0F0F0}
 <div class="fg"><label>Loan Purpose <span class="rq">*</span></label><input type="text" name="LOAN_PURPOSE" required></div>
 <div class="fg"><label>Loan Amount ₹ <span class="rq">*</span></label><input type="number" name="LOAN_AMOUNT" id="lr_LOAN_AMOUNT" required min="1" oninput="calcLoanFields();checkEligibilityLive()"></div>
 <div class="fg"><label>Max Eligible ₹</label><input type="text" id="lr_MAX_ELIGIBLE" readonly style="background:#F3F4F6"></div>
-<div class="fg"><label>Interest Type</label><select name="INTEREST_TYPE" onchange="calcLoanFields()"><option>REDUCING</option><option>FLAT</option></select></div>
-<div class="fg"><label>Interest Rate %</label><input type="number" name="INTEREST_RATE" value="12" step="0.1" oninput="calcLoanFields()"></div>
-<div class="fg"><label>Tenure</label><input type="number" name="TENURE" value="12" oninput="calcLoanFields()"></div>
-<div class="fg"><label>Tenure Type</label><select name="TENURE_TYPE"><option>MONTHS</option><option>DAYS</option><option>WEEKS</option><option>YEARS</option></select></div>
+<div class="fg"><label>Interest Type</label><select name="INTEREST_TYPE" id="lr_INTEREST_TYPE" onchange="calcLoanFields()"><option value="REDUCING">REDUCING</option><option value="FLAT">FLAT</option></select></div>
+<div class="fg"><label>Interest Rate % p.a.</label><input type="number" name="INTEREST_RATE" id="lr_INTEREST_RATE" value="12" step="0.01" min="0" oninput="calcLoanFields()"></div>
+<div class="fg"><label>Tenure</label><input type="number" name="TENURE" id="lr_TENURE" value="12" min="1" oninput="calcLoanFields()"></div>
+<div class="fg"><label>Tenure Type</label><select name="TENURE_TYPE" id="lr_TENURE_TYPE" onchange="calcLoanFields()"><option value="MONTHS">MONTHS</option><option value="DAYS">DAYS</option><option value="WEEKS">WEEKS</option><option value="YEARS">YEARS</option></select></div>
 <div class="fg"><label>Repayment Mode</label><select name="REPAYMENT_MODE"><option>EMI</option><option>BULLET</option><option>INTEREST_ONLY</option></select></div>
-<div class="fg"><label>Repayment Frequency</label><select name="REPAYMENT_FREQUENCY" onchange="calcLoanFields()"><option value="MONTHLY">Monthly</option><option value="DAILY">Daily</option><option value="WEEKLY">Weekly</option><option value="YEARLY">Yearly</option></select></div>
-<div class="fg"><label>EMI Amount</label><input type="text" name="EMI_AMOUNT" readonly></div>
-<div class="fg"><label>Processing Fee</label><input type="text" name="PROCESSING_FEE" readonly></div>
-<div class="fg"><label>File Charges</label><input type="number" name="FILE_CHARGES" value="0"></div>
+<div class="fg"><label>Repayment Frequency</label><select name="REPAYMENT_FREQUENCY" id="lr_REPAYMENT_FREQUENCY" onchange="calcLoanFields()"><option value="MONTHLY">Monthly</option><option value="DAILY">Daily</option><option value="WEEKLY">Weekly</option><option value="YEARLY">Yearly</option></select></div>
+<div class="fg"><label>No. of Installments</label><input type="text" name="NO_OF_INSTALLMENTS" id="lr_NO_OF_INSTALLMENTS" readonly style="background:#F3F4F6"></div>
+<div class="fg"><label>EMI Amount ₹</label><input type="text" name="EMI_AMOUNT" id="lr_EMI_AMOUNT" readonly style="background:#ECFDF5;font-weight:700;color:#065F46"></div>
+<div class="fg"><label>Total Interest ₹</label><input type="text" name="TOTAL_INTEREST" id="lr_TOTAL_INTEREST" readonly style="background:#FFF8F9;font-weight:700;color:#8B1538"></div>
+<div class="fg"><label>Total Payable ₹</label><input type="text" name="TOTAL_PAYABLE" id="lr_TOTAL_PAYABLE" readonly style="background:#F5E6EA;font-weight:700"></div>
+<div class="fg"><label>Processing Fee</label><input type="text" name="PROCESSING_FEE" id="lr_PROCESSING_FEE" readonly></div>
+<div class="fg"><label>File Charges (3%)</label><input type="text" name="FILE_CHARGES" id="lr_FILE_CHARGES" readonly style="background:#FFF8F9;font-weight:600" title="Auto = 3% of Loan Amount"></div>
 <div class="fg"><label>Insurance Charges</label><input type="number" name="INSURANCE_CHARGES" value="0"></div>
-<div class="fg"><label>Other Charges</label><input type="text" name="OTHER_CHARGES" value="180"></div>
-<div class="fg"><label>Total Disbursement</label><input type="text" name="TOTAL_DISBURSEMENT" readonly></div>
+<div class="fg"><label>Other Charges</label><input type="text" name="OTHER_CHARGES" id="lr_OTHER_CHARGES" value="180"></div>
+<div class="fg"><label>Total Disbursement</label><input type="text" name="TOTAL_DISBURSEMENT" id="lr_TOTAL_DISBURSEMENT" readonly></div>
+<p style="grid-column:1/-1;font-size:10.5px;color:#6B7280;margin:0">💡 <b>FLAT</b> = interest on full principal for full tenure · <b>REDUCING</b> = EMI on outstanding balance (standard bank formula). Tenure Type + Frequency se installments auto convert hote hain.</p>
 <div class="fg"><label>Security Type</label><select name="SECURITY_TYPE"><option>NONE</option><option>GUARANTOR</option><option>PROPERTY</option><option>GOLD</option><option>FD_LIEN</option></select></div>
 <div class="fg"><label>Security Value</label><input type="number" name="SECURITY_VALUE" value="0"></div>
 <div class="fg"><label>CIBIL Score</label><input type="number" name="CIBIL_SCORE" id="lr_CIBIL" placeholder="600+" oninput="checkEligibilityLive()"></div>
@@ -1798,7 +1966,7 @@ table.tn td{padding:6px 10px;font-size:11px;border-bottom:1px solid #F0F0F0}
 
 <div class="fc" style="margin-top:10px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
   <div style="font-size:12px;color:var(--tm)">Posted vouchers alag <b>Journal Entry Report</b> tab me dikhte hain (Particulars + Remarks ke saath).</div>
-  <button type="button" class="btn btn-o" onclick="go('journal-report')">📑 Open Journal Entry Report</button>
+  <button type="button" class="btn btn-o" onclick="go('journal-report',event)">📑 Open Journal Entry Report</button>
 </div>
 </div>
 
@@ -2510,37 +2678,167 @@ table.tn td{padding:6px 10px;font-size:11px;border-bottom:1px solid #F0F0F0}
 <button class="btn btn-o" style="margin-left:6px" onclick="window.print()">Print</button></p>
 </div></div>
 
-<div class="pv" id="p-notice-sms">
-<div class="ptb"><h2>SMS Notices</h2><span class="bc">SMS Notices</span></div>
-<div class="ph"><div class="pi">📋</div><h3>SMS Notices</h3>
-<p>Module ready for Google Sheets connection. Staff ID auto from login. Use structure in Google_Sheets_Structure_All_Masters.xlsx</p>
-<p style="margin-top:8px"><button class="btn btn-p" onclick="toast('SMS Notices – connect sheet for live data')">Open Module</button>
-<button class="btn btn-o" style="margin-left:6px" onclick="window.print()">Print</button></p>
-</div></div>
+<div class="pv" id="p-notice-register">
+<div class="ptb"><h2>Notice Register</h2><span class="bc">Notices › Full Tracking (kis ko · kab · kyu · kahan · amount · reply · process)</span></div>
+<div id="al-notice" class="alert"></div>
 
-<div class="pv" id="p-notice-wa">
-<div class="ptb"><h2>WhatsApp Notices</h2><span class="bc">WhatsApp Notices</span></div>
-<div class="ph"><div class="pi">📋</div><h3>WhatsApp Notices</h3>
-<p>Module ready for Google Sheets connection. Staff ID auto from login. Use structure in Google_Sheets_Structure_All_Masters.xlsx</p>
-<p style="margin-top:8px"><button class="btn btn-p" onclick="toast('WhatsApp Notices – connect sheet for live data')">Open Module</button>
-<button class="btn btn-o" style="margin-left:6px" onclick="window.print()">Print</button></p>
-</div></div>
+<div class="stats" style="grid-template-columns:repeat(5,1fr)">
+<div class="sc"><div class="si">📋</div><div><div class="sl">Total Notices</div><div class="sv" id="nt-total">0</div></div></div>
+<div class="sc"><div class="si" style="background:#FFF3E0">📤</div><div><div class="sl">Sent</div><div class="sv" id="nt-sent">0</div></div></div>
+<div class="sc"><div class="si" style="background:#E8F5E9">💬</div><div><div class="sl">Reply Aaya</div><div class="sv" id="nt-reply" style="color:#059669">0</div></div></div>
+<div class="sc"><div class="si" style="background:#FFEBEE">⏳</div><div><div class="sl">Reply Pending</div><div class="sv" id="nt-pending" style="color:#DC2626">0</div></div></div>
+<div class="sc"><div class="si" style="background:#E3F2FD">₹</div><div><div class="sl">Total Amount Linked</div><div class="sv" id="nt-amount">₹0</div></div></div>
+</div>
 
-<div class="pv" id="p-notice-email">
-<div class="ptb"><h2>Email Notices</h2><span class="bc">Email Notices</span></div>
-<div class="ph"><div class="pi">📋</div><h3>Email Notices</h3>
-<p>Module ready for Google Sheets connection. Staff ID auto from login. Use structure in Google_Sheets_Structure_All_Masters.xlsx</p>
-<p style="margin-top:8px"><button class="btn btn-p" onclick="toast('Email Notices – connect sheet for live data')">Open Module</button>
-<button class="btn btn-o" style="margin-left:6px" onclick="window.print()">Print</button></p>
-</div></div>
+<div class="fc"><h3>1. Recipient / Account Verify</h3>
+<div class="fr">
+<div class="fg"><label>Account No / Loan A/c / Customer ID</label>
+  <input type="text" id="nt_SEARCH" placeholder="SRC1253 or LA14525 or CU14525" onkeydown="if(event.key==='Enter'){event.preventDefault();ntVerify();}">
+  <button type="button" class="btn btn-o" style="margin-top:4px;height:26px;padding:2px 10px" onclick="ntVerify()">Verify</button>
+</div>
+<div class="fg"><label>Customer Name</label><input type="text" id="nt_RECIPIENT_NAME" placeholder="Auto / manual"></div>
+<div class="fg"><label>Customer ID</label><input type="text" id="nt_CUSTOMER_ID"></div>
+<div class="fg"><label>Account No</label><input type="text" id="nt_ACCOUNT_NO"></div>
+<div class="fg"><label>Loan A/c (if any)</label><input type="text" id="nt_LOAN_ACCOUNT_NO"></div>
+<div class="fg"><label>Mobile</label><input type="text" id="nt_RECIPIENT_MOBILE"></div>
+<div class="fg"><label>Email</label><input type="email" id="nt_RECIPIENT_EMAIL"></div>
+</div>
+<div class="verify-box" id="nt-verify"></div>
+</div>
 
-<div class="pv" id="p-notice-announce">
-<div class="ptb"><h2>Announcements</h2><span class="bc">Announcements</span></div>
-<div class="ph"><div class="pi">📋</div><h3>Announcements</h3>
-<p>Module ready for Google Sheets connection. Staff ID auto from login. Use structure in Google_Sheets_Structure_All_Masters.xlsx</p>
-<p style="margin-top:8px"><button class="btn btn-p" onclick="toast('Announcements – connect sheet for live data')">Open Module</button>
-<button class="btn btn-o" style="margin-left:6px" onclick="window.print()">Print</button></p>
-</div></div>
+<form id="form-notice" onsubmit="return saveNotice(event)">
+<div class="fc"><h3>2. Notice Details</h3>
+<div class="fr">
+<div class="fg"><label>Notice No</label><input type="text" id="nt_NOTICE_NO" name="NOTICE_NO" readonly placeholder="Auto"></div>
+<div class="fg"><label>Notice ID</label><input type="text" id="nt_NOTICE_ID" name="NOTICE_ID" readonly></div>
+<div class="fg"><label>Channel / Type <span class="rq">*</span></label>
+  <select id="nt_CHANNEL" name="CHANNEL" required>
+    <option value="SMS">SMS</option>
+    <option value="WHATSAPP">WhatsApp</option>
+    <option value="EMAIL">Email</option>
+    <option value="LETTER">Letter / Post</option>
+    <option value="HAND">Hand Delivery</option>
+    <option value="LEGAL">Legal / Advocate</option>
+    <option value="ANNOUNCEMENT">Announcement</option>
+  </select>
+</div>
+<div class="fg"><label>Notice Type</label>
+  <select id="nt_NOTICE_TYPE" name="NOTICE_TYPE">
+    <option>Demand Notice</option>
+    <option>EMI Overdue</option>
+    <option>Loan Recovery</option>
+    <option>KYC Pending</option>
+    <option>Account Alert</option>
+    <option>Meeting / AGM</option>
+    <option>Legal Notice</option>
+    <option>General</option>
+  </select>
+</div>
+<div class="fg"><label>Title / Subject <span class="rq">*</span></label><input type="text" id="nt_TITLE" name="TITLE" required placeholder="e.g. EMI Overdue Notice"></div>
+<div class="fg"><label>Amount ₹ (if any)</label><input type="number" id="nt_AMOUNT" name="AMOUNT" min="0" step="0.01" placeholder="0"></div>
+<div class="fg"><label>Priority</label>
+  <select id="nt_PRIORITY" name="PRIORITY"><option>NORMAL</option><option>HIGH</option><option>URGENT</option></select>
+</div>
+<div class="fg"><label>Sent Date</label><input type="date" id="nt_SENT_DATE" name="SENT_DATE"></div>
+<div class="fg"><label>Sent Time</label><input type="text" id="nt_SENT_TIME" name="SENT_TIME" readonly></div>
+</div>
+<div class="fr" style="margin-top:6px">
+<div class="fg" style="grid-column:1/-1"><label>Kyun bheja / Reason <span class="rq">*</span></label>
+  <textarea id="nt_REASON" name="REASON" required placeholder="e.g. EMI 15 din se overdue — recovery notice"></textarea>
+</div>
+<div class="fg" style="grid-column:1/-1"><label>Notice Body / Description</label>
+  <textarea id="nt_DESCRIPTION" name="DESCRIPTION" placeholder="Full notice text…"></textarea>
+</div>
+</div>
+</div>
+
+<div class="fc"><h3>3. Delivery — Kahan / Kaise</h3>
+<div class="fr">
+<div class="fg"><label>Delivery Place / Address</label><input type="text" id="nt_DELIVERY_PLACE" name="DELIVERY_PLACE" placeholder="Home / Branch / Post / Village…"></div>
+<div class="fg"><label>Delivery Address (detail)</label><input type="text" id="nt_DELIVERY_ADDRESS" name="DELIVERY_ADDRESS"></div>
+<div class="fg"><label>Delivery Status</label>
+  <select id="nt_DELIVERY_STATUS" name="DELIVERY_STATUS">
+    <option>SENT</option><option>DELIVERED</option><option>FAILED</option><option>RETURNED</option><option>PENDING</option>
+  </select>
+</div>
+<div class="fg"><label>Created By</label><input type="text" id="nt_CREATED_BY" name="CREATED_BY" class="staff-field" readonly></div>
+</div>
+</div>
+
+<div class="fc"><h3>4. Reply & Process</h3>
+<div class="fr">
+<div class="fg"><label>Reply Aaya?</label>
+  <select id="nt_REPLY_RECEIVED" name="REPLY_RECEIVED" onchange="ntToggleReply()">
+    <option value="NO">Nahi</option><option value="YES">Haan</option>
+  </select>
+</div>
+<div class="fg"><label>Reply Date</label><input type="date" id="nt_REPLY_DATE" name="REPLY_DATE"></div>
+<div class="fg"><label>Process Status</label>
+  <select id="nt_PROCESS_STATUS" name="PROCESS_STATUS">
+    <option>OPEN</option><option>IN_PROGRESS</option><option>REPLIED</option><option>CLOSED</option><option>ESCALATED</option><option>LEGAL</option>
+  </select>
+</div>
+<div class="fg" style="grid-column:1/-1"><label>Reply Text</label>
+  <textarea id="nt_REPLY_TEXT" name="REPLY_TEXT" placeholder="Customer / party ka reply…"></textarea>
+</div>
+<div class="fg" style="grid-column:1/-1"><label>Process Notes / Kya process hui</label>
+  <textarea id="nt_PROCESS_NOTES" name="PROCESS_NOTES" placeholder="e.g. Branch visit, part payment ₹5000, next hearing…"></textarea>
+</div>
+</div>
+</div>
+
+<div class="fc"><h3>5. Notice Image / Scan Upload</h3>
+<div class="fr">
+<div class="fg"><label>Upload Notice Document (Image / PDF / DOC / Excel)</label>
+  <input type="file" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt,.rtf" onchange="fileToField(this,'nt_NOTICE_IMAGE')">
+  <input type="hidden" name="NOTICE_IMAGE" id="nt_NOTICE_IMAGE">
+  <small class="file-hint" id="hint-nt_NOTICE_IMAGE"></small>
+</div>
+<div class="fg" style="grid-column:1/-1"><label>Document Preview</label>
+  <div id="nt-img-preview" style="min-height:48px;font-size:11px;color:var(--tm);border:1px dashed #e0c4ca;border-radius:6px;padding:8px;background:#FFFBFB">No document</div>
+</div>
+</div>
+</div>
+
+<div class="ba">
+<button type="button" class="btn btn-o" onclick="ntReset()">Reset</button>
+<button type="button" class="btn btn-o" onclick="ntPrintSelected()">🖨 Print</button>
+<button type="submit" class="btn btn-p">💾 Save Notice</button>
+</div>
+</form>
+
+<div class="fc" style="margin-top:10px">
+<h3>All Notices Register</h3>
+<div class="lv-bar">
+  <input class="lv-search" id="nt-search" placeholder="Search notice no, name, mobile, amount…" oninput="filterNoticeList()">
+  <select id="nt-filter-channel" onchange="filterNoticeList()" style="height:30px;border-radius:5px;border:1px solid #D1D5DB">
+    <option value="">All Channels</option>
+    <option>SMS</option><option>WHATSAPP</option><option>EMAIL</option><option>LETTER</option><option>HAND</option><option>LEGAL</option><option>ANNOUNCEMENT</option>
+  </select>
+  <select id="nt-filter-reply" onchange="filterNoticeList()" style="height:30px;border-radius:5px;border:1px solid #D1D5DB">
+    <option value="">Reply: All</option>
+    <option value="YES">Reply Aaya</option>
+    <option value="NO">Reply Pending</option>
+  </select>
+  <span class="lv-count" id="nt-list-count">0</span>
+  <button class="btn btn-o" style="height:28px" onclick="loadNoticeList(true)">↻ Refresh</button>
+</div>
+<div class="lv-wrap" style="overflow-x:auto">
+<table class="tn" id="tbl-notice-list">
+<thead><tr>
+  <th>Notice No</th><th>Date</th><th>Channel</th><th>To (Name)</th><th>Mobile</th><th>Amount ₹</th>
+  <th>Kyun</th><th>Kahan</th><th>Reply</th><th>Process</th><th>Image</th><th>Actions</th>
+</tr></thead>
+<tbody><tr><td colspan="12" class="lv-empty">Load / Save notices</td></tr></tbody>
+</table>
+</div>
+</div>
+</div>
+
+<div class="pv" id="p-notice-sms"></div>
+<div class="pv" id="p-notice-wa"></div>
+<div class="pv" id="p-notice-email"></div>
+<div class="pv" id="p-notice-announce"></div>
 
 <div class="pv" id="p-util-calendar">
 <div class="ptb"><h2>Calendar</h2><span class="bc">Calendar</span></div>
@@ -2567,12 +2865,85 @@ table.tn td{padding:6px 10px;font-size:11px;border-bottom:1px solid #F0F0F0}
 </div></div>
 
 <div class="pv" id="p-util-int-calc">
-<div class="ptb"><h2>Interest Calculator</h2><span class="bc">Interest Calculator</span></div>
-<div class="ph"><div class="pi">📋</div><h3>Interest Calculator</h3>
-<p>Module ready for Google Sheets connection. Staff ID auto from login. Use structure in Google_Sheets_Structure_All_Masters.xlsx</p>
-<p style="margin-top:8px"><button class="btn btn-p" onclick="toast('Interest Calculator – connect sheet for live data')">Open Module</button>
-<button class="btn btn-o" style="margin-left:6px" onclick="window.print()">Print</button></p>
-</div></div>
+<div class="ptb"><h2>Interest Calculator</h2><span class="bc">Utilities › Interest Calculator</span></div>
+<div id="al-int-calc" class="alert"></div>
+
+<div class="fc"><h3>1. Account Verify</h3>
+<div class="fr">
+<div class="fg"><label>Account No <span class="rq">*</span></label>
+  <input type="text" id="ic_ACCOUNT_NO" placeholder="SRC1253" onkeydown="if(event.key==='Enter'){event.preventDefault();icVerifyAccount();}">
+  <button type="button" class="btn btn-o" style="margin-top:4px;height:26px;padding:2px 10px" onclick="icVerifyAccount()">Verify A/c</button>
+</div>
+<div class="fg"><label>Customer / Name</label><input type="text" id="ic_NAME" readonly></div>
+<div class="fg"><label>Account Type</label><input type="text" id="ic_TYPE" readonly></div>
+<div class="fg"><label>Current Balance ₹</label><input type="text" id="ic_BALANCE" readonly></div>
+<div class="fg"><label>Interest Rate % (from A/c)</label><input type="text" id="ic_ACC_RATE" readonly></div>
+</div>
+<div class="verify-box" id="ic-verify"></div>
+</div>
+
+<div class="fc"><h3>2. Deposit / Interest Inputs</h3>
+<div class="fr">
+<div class="fg"><label>Calculation Mode</label>
+  <select id="ic_MODE" onchange="icOnModeChange()">
+    <option value="DAILY">Daily Deposit (e.g. ₹100 every day)</option>
+    <option value="WEEKLY">Weekly Deposit</option>
+    <option value="MONTHLY">Monthly Deposit</option>
+    <option value="LUMPSUM">Lumpsum (one-time principal)</option>
+    <option value="BALANCE">On Current Balance only</option>
+  </select>
+</div>
+<div class="fg"><label>Installment / Amount ₹ <span class="rq">*</span></label>
+  <input type="number" id="ic_AMOUNT" min="1" step="0.01" value="100" placeholder="100">
+</div>
+<div class="fg"><label>Number of Days / Period <span class="rq">*</span></label>
+  <input type="number" id="ic_DAYS" min="1" value="365" placeholder="365">
+  <small style="font-size:10px;color:var(--tm)">Daily mode = no. of days · Weekly = weeks · Monthly = months · Lumpsum = days</small>
+</div>
+<div class="fg"><label>Interest Rate % p.a. <span class="rq">*</span></label>
+  <input type="number" id="ic_RATE" min="0" step="0.01" value="6" placeholder="6">
+</div>
+<div class="fg"><label>Interest Method</label>
+  <select id="ic_METHOD">
+    <option value="BOTH">Both — Fixed + Reducing</option>
+    <option value="FIXED">Fixed (Simple / on total deposit)</option>
+    <option value="REDUCING">Reducing Balance (day-wise accrual)</option>
+  </select>
+</div>
+<div class="fg"><label>Compounding (Fixed only)</label>
+  <select id="ic_COMPOUND">
+    <option value="NONE">None (Simple Interest)</option>
+    <option value="YEARLY">Yearly</option>
+    <option value="HALF">Half-yearly</option>
+    <option value="QUARTER">Quarterly</option>
+    <option value="MONTHLY">Monthly</option>
+  </select>
+</div>
+</div>
+<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+  <button type="button" class="btn btn-p" onclick="icCalculate()">🧮 Calculate Interest</button>
+  <button type="button" class="btn btn-o" onclick="icPresetDaily100()">Example: ₹100 × 365 days</button>
+  <button type="button" class="btn btn-o" onclick="icUseAccountBalance()">Use A/c Balance</button>
+  <button type="button" class="btn btn-o" onclick="icReset()">Reset</button>
+  <button type="button" class="btn btn-o" onclick="icPrint()">🖨 Print</button>
+</div>
+</div>
+
+<div class="stats" id="ic-result-stats" style="display:none;margin-top:4px">
+  <div class="sc"><div class="si">💰</div><div><div class="sl">Total Principal / Deposit</div><div class="sv" id="ic-r-principal">—</div></div></div>
+  <div class="sc"><div class="si">📈</div><div><div class="sl">Fixed Interest</div><div class="sv" id="ic-r-fixed" style="color:#0F6B3A">—</div></div></div>
+  <div class="sc"><div class="si">📉</div><div><div class="sl">Reducing Interest</div><div class="sv" id="ic-r-reducing" style="color:#1565C0">—</div></div></div>
+  <div class="sc"><div class="si">✅</div><div><div class="sl">Maturity (Fixed)</div><div class="sv" id="ic-r-maturity">—</div></div></div>
+</div>
+
+<div class="fc" id="ic-detail-card" style="display:none">
+  <h3>Calculation Summary</h3>
+  <div id="ic-summary" style="font-size:12px;line-height:1.6"></div>
+  <div style="overflow-x:auto;margin-top:10px">
+    <table class="tn" id="ic-schedule"><thead></thead><tbody></tbody></table>
+  </div>
+</div>
+</div>
 
 <div class="pv" id="p-util-fd-calc">
 <div class="ptb"><h2>FD Calculator</h2><span class="bc">FD Calculator</span></div>
@@ -2688,9 +3059,97 @@ table.tn td{padding:6px 10px;font-size:11px;border-bottom:1px solid #F0F0F0}
 <p style="margin-top:14px;text-align:right"><button class="btn btn-o" onclick="printModalRecord()">🖨 Print</button> <button class="btn btn-p" onclick="closeModal()">Close</button></p>
 </div></div>
 <script>
-const GS_URL="https://script.google.com/macros/s/AKfycbxfaH6J7uwJKK3FV3r2T01ia_OR7YASKK59jfOIyuuGIQi3wUJaXtSfB2yEeRIMQRU8AQ/exec";
+const GS_URL="https://script.google.com/macros/s/AKfycbwRQyRenzL_VfnHLBwpS4UeqKbQjOL1US0m_Sf3u35gwnFAu_IHZ_RHy0BjrQbPJf71_g/exec";
 let session={employeeCode:"",role:"",name:"",agentId:"",mobile:"",branchId:""};
 let c={cu:14525,mb:14525,src:1253,emp:10001,app:14525,la:14525,gu:14526,txn:14525,rcp:14525,emi:14525,fd:14525,rd:14525,col:14525,agt:10001,lp:1001,br:1};
+
+/* ===== SOCIETY IDENTITY (logo + name on EVERY print) ===== */
+var SOCIETY = {
+  name: "SHREE RADHA CREDIT CO-OPERATIVE SOCIETY LTD.",
+  short: "SHREE RADHA",
+  tag: "Credit Co-operative Society Limited",
+  reg: "DR/DHR/151716",
+  place: "DHAR (MP)",
+  motto: "विश्वास • सहयोग • समृद्धि",
+  // Same logo used in sidebar / login (small version for receipts)
+  logoSmall: null // filled from DOM on first use
+};
+function getSocietyLogoSrc(){
+  if(SOCIETY.logoSmall) return SOCIETY.logoSmall;
+  try{
+    var img = document.querySelector(".sb-logo .li img") || document.querySelector(".login-box .logo .li img");
+    if(img && img.src){ SOCIETY.logoSmall = img.src; return img.src; }
+  }catch(e){}
+  return "";
+}
+/** Unified letterhead for receipts / day-sheets / modal prints */
+function printLetterhead(opts){
+  opts = opts || {};
+  var logo = getSocietyLogoSrc();
+  var title = opts.title || "Receipt";
+  var sub = opts.sub || "";
+  var css = opts.extraCss || "";
+  return "<!DOCTYPE html><html><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width'>"
+    +"<title>"+title+"</title><style>"
+    +"body{font-family:'Segoe UI',system-ui,sans-serif;padding:16px;color:#1a1a1a;max-width:720px;margin:0 auto}"
+    +".lh{display:flex;gap:12px;align-items:center;border-bottom:2px solid #8B1538;padding-bottom:10px;margin-bottom:12px}"
+    +".lh img{width:48px;height:48px;object-fit:contain}"
+    +".lh h1{margin:0;font-size:14px;color:#8B1538;font-weight:800;line-height:1.2}"
+    +".lh .tag{font-size:10px;color:#6B0F2A;font-weight:600}"
+    +".lh .motto{font-size:9.5px;color:#888;margin-top:2px}"
+    +".lh-meta{margin-left:auto;text-align:right;font-size:10.5px;color:#333;line-height:1.5}"
+    +".lh-meta b{color:#8B1538}"
+    +".doc-title{text-align:center;font-size:15px;font-weight:800;color:#1a1a1a;margin:8px 0 4px}"
+    +".doc-sub{text-align:center;font-size:11px;color:#555;margin-bottom:10px}"
+    +"table{width:100%;border-collapse:collapse;font-size:12px}"
+    +"th,td{border:1px solid #e8d0d5;padding:5px 8px}"
+    +"th{background:#8B1538;color:#fff;font-weight:700}"
+    +"td:last-child{font-weight:600}"
+    +".tot{font-weight:800;background:#F5E6EA}"
+    +".foot{text-align:center;font-size:10px;color:#888;margin-top:16px;border-top:1px solid #e8d0d5;padding-top:8px}"
+    +".sign{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:24px;font-size:10.5px;text-align:center}"
+    +".sign .who{font-weight:700;color:#8B1538;margin-top:28px}"
+    +"@media print{body{padding:8px}}"
+    +css+"</style></head><body>"
+    +"<div class='lh'>"
+    +(logo?"<img src='"+logo+"' alt='Logo'>":"")
+    +"<div><h1>"+SOCIETY.name+"</h1><div class='tag'>"+SOCIETY.tag+"</div><div class='motto'>"+SOCIETY.motto+"</div></div>"
+    +"<div class='lh-meta'>Reg. No. : <b>"+SOCIETY.reg+"</b><br>Place : <b>"+SOCIETY.place+"</b><br>Date : <b>"+(opts.date||(typeof todayISO==="function"?todayISO():""))+"</b></div>"
+    +"</div>"
+    +"<div class='doc-title'>"+title+"</div>"
+    +(sub?"<div class='doc-sub'>"+sub+"</div>":"");
+}
+function printLetterFooter(){
+  return "<div class='foot'>"+SOCIETY.motto+"<br>"+SOCIETY.name+" • "+SOCIETY.reg+"</div>"
+    +"<div class='sign'>"
+    +"<div><div class='who'>Shyam Prajapat</div><div>(Pradhan / Chairman)</div></div>"
+    +"<div><div class='who'>Dharmendra Prajapat</div><div>(Director)</div></div>"
+    +"<div><div class='who'>&nbsp;</div><div>(Prepared By)</div></div>"
+    +"</div></body></html>";
+}
+
+/* ===== LOOKUP CACHE (accounts / agents — no repeated network) ===== */
+var LOOKUP_CACHE = { accounts: {}, agents: {}, ttl: 10 * 60 * 1000 }; // 10 min
+function lookupCacheGet(kind, key){
+  key = String(key||"").toUpperCase().trim();
+  if(!key) return null;
+  var bucket = LOOKUP_CACHE[kind];
+  if(!bucket) return null;
+  var e = bucket[key];
+  if(!e) return null;
+  if(Date.now() - e.at > LOOKUP_CACHE.ttl){ delete bucket[key]; return null; }
+  return e.data;
+}
+function lookupCacheSet(kind, key, data){
+  key = String(key||"").toUpperCase().trim();
+  if(!key || !data) return;
+  if(!LOOKUP_CACHE[kind]) LOOKUP_CACHE[kind] = {};
+  LOOKUP_CACHE[kind][key] = { data: data, at: Date.now() };
+}
+function lookupCacheInvalidate(kind){
+  if(kind) LOOKUP_CACHE[kind] = {};
+  else { LOOKUP_CACHE.accounts = {}; LOOKUP_CACHE.agents = {}; }
+}
 function pad(n,d){return String(n).padStart(d,"0")}
 function nid(p,k,d){return p+pad(c[k]++,d)}
 function today(){
@@ -2769,6 +3228,8 @@ function doLogin(){
     preloadAllData();
     startLiveFetch();
     APP_LIVE.activePage = "dashboard";
+    // Auto popup for due / overdue EMIs after login
+    setTimeout(function(){ try{ checkDueEmiOnLogin(); }catch(e){} }, 900);
   }
   function loginError(msg){
     if(btn){btn.disabled=false;btn.textContent="Login"}
@@ -2795,7 +3256,7 @@ function doLogin(){
     loginError("Could not reach the server. Check GS_URL / deployment. ("+String(err)+")");
   });
 }
-function doLogout(){if(confirm("Logout?")){if(APP_LIVE.timer)clearInterval(APP_LIVE.timer);cacheInvalidate();session.employeeCode="";session.agentId="";document.getElementById("appScreen").classList.add("hidden");var aa=document.getElementById("agentApp");if(aa)aa.classList.remove("show");document.getElementById("loginScreen").classList.remove("hidden")}}
+function doLogout(){if(confirm("Logout?")){if(APP_LIVE.timer)clearInterval(APP_LIVE.timer);cacheInvalidate();session.employeeCode="";session.agentId="";window._dueEmiPopupShown=false;window._dueEmiList=[];document.getElementById("appScreen").classList.add("hidden");var aa=document.getElementById("agentApp");if(aa)aa.classList.remove("show");document.getElementById("loginScreen").classList.remove("hidden");closeDueEmiPopup()}}
 function fillStaff(){document.querySelectorAll(".staff-field").forEach(e=>e.value=session.employeeCode)}
 function applyIds(ids){
   const s=(id,v)=>{const e=document.getElementById(id);if(e&&v)e.value=v};
@@ -2864,48 +3325,137 @@ function initIds(){
     applyIds(localFallbackIds());fillStaff();calcLoanFields();
   }
 }
-function go(page){
+/* ===== Multi-tab workspace: keep multiple forms open ===== */
+var WS = { tabs: ["dashboard"], active: "dashboard", labels: {}, inited: {} };
+var WS_LABELS = {
+  dashboard:"🏠 Dashboard", "new-customer":"👤 New Customer", "customer-update":"✏️ Profile Update", "customer-login":"🔑 Cust Login",
+  "customer-search":"🔍 Cust Search", "customer-list":"📋 Cust List", kyc:"✅ KYC",
+  "sig-verify":"✍️ Signature", "cust-docs":"📂 Documents", "account-opening":"🏦 A/c Opening",
+  savings:"💰 Savings", current:"💼 Current", fd:"📦 FD", rd:"🔄 RD",
+  "cash-deposit":"⬇️ Cash Deposit", "cash-withdrawal":"⬆️ Cash Withdrawal",
+  "fund-transfer":"↔️ Transfer", "account-statement":"📄 Statement",
+  "loan-dashboard":"📊 Loans", "loan-registration":"📝 Loan Reg", "loan-approval":"✔️ Approval",
+  "loan-disbursement":"💸 Disburse", "emi-collection":"📅 EMI", "loan-calculator":"🧮 Loan Calc",
+  "agent-collection":"🛵 Agent Coll", "daily-collection":"💵 Daily Coll",
+  "weekly-collection":"💵 Weekly", "monthly-collection":"💵 Monthly",
+  journal:"✍️ Journal", "society-control":"🏛️ Expenses", "journal-report":"📑 JV Report",
+  "cash-book":"📒 Cash Book", "day-book":"📘 Day Book", gl:"📗 GL",
+  "trial-balance":"⚖️ Trial Bal", pl:"📈 P&L", "balance-sheet":"📋 Bal Sheet",
+  "coll-report":"📋 Coll Report", "staff-master":"👨‍💼 Staff", "agent-master":"🤝 Agents",
+  "notice-register":"📋 Notice Register", "util-int-calc":"🧮 Interest Calc", "util-fd-calc":"🧮 FD Calc", "util-rd-calc":"🧮 RD Calc", settings:"⚙️ Settings", profile:"👤 Profile", help:"❓ Help"
+};
+function wsLabel(page){ return WS_LABELS[page] || page.replace(/-/g," "); }
+function wsRenderTabs(){
+  var bar = document.getElementById("wsTabs");
+  if(!bar) return;
+  var html = "";
+  WS.tabs.forEach(function(p){
+    var on = p === WS.active ? " on" : "";
+    var canClose = p !== "dashboard";
+    html += '<button type="button" class="ws-tab'+on+'" data-page="'+p+'" onclick="wsSwitch(\''+p+'\')">'
+      +'<span>'+wsLabel(p)+'</span>'
+      +(canClose?'<span class="x" onclick="event.stopPropagation();wsClose(\''+p+'\')" title="Close">×</span>':'')
+      +'</button>';
+  });
+  html += '<button type="button" class="ws-tab-new" onclick="toast(\'Sidebar se page kholo — Ctrl+Click se new tab\')" title="Open more from sidebar">+</button>';
+  html += '<span class="ws-hint">Ctrl+Click menu = new tab</span>';
+  bar.innerHTML = html;
+}
+function wsOpen(page, asNew){
+  if(!page) return;
+  if(asNew || WS.tabs.indexOf(page) < 0){
+    if(WS.tabs.indexOf(page) < 0) WS.tabs.push(page);
+  }
+  WS.active = page;
+  wsRenderTabs();
+  goPage(page);
+}
+function wsSwitch(page){
+  if(WS.tabs.indexOf(page) < 0) WS.tabs.push(page);
+  WS.active = page;
+  wsRenderTabs();
+  goPage(page);
+}
+function wsClose(page){
+  if(page === "dashboard") return;
+  var i = WS.tabs.indexOf(page);
+  if(i < 0) return;
+  WS.tabs.splice(i, 1);
+  delete WS.inited[page]; // next open gets fresh initIds
+  if(WS.active === page){
+    WS.active = WS.tabs[Math.max(0, i-1)] || "dashboard";
+  }
+  wsRenderTabs();
+  goPage(WS.active);
+}
+/** Public navigate — Ctrl/Cmd+Click or middle-click opens as extra tab without closing current work */
+function go(page, evt){
+  var e = evt || window.event;
+  var asNew = false;
+  if(e && (e.ctrlKey || e.metaKey || e.button === 1 || e.shiftKey)){
+    asNew = true;
+    if(e.preventDefault) e.preventDefault();
+  }
+  // If currently on a form (not dashboard) and opening a different page → keep both open (new tab)
+  if(!asNew && WS.active && WS.active !== "dashboard" && page !== WS.active && page !== "dashboard"){
+    asNew = true;
+  }
+  wsOpen(page, asNew);
+}
+/** Actual page show + init (no tab logic) */
+function goPage(page){
   if(page==='sig-verify'){ setTimeout(function(){ loadSigHistory(); var de=document.getElementById('sv_DATE'); if(de&&!de.value) de.value=(typeof todayISO==='function'?todayISO():''); var by=document.getElementById('sv_BY'); if(by&&session) by.value=(session.employeeCode||session.username||'')+(session.role?' / '+session.role:''); }, 50); }
 
-  document.querySelectorAll(".ni").forEach(n=>n.classList.remove("active"));
-  const link=document.querySelector(`.ni[data-p="${page}"]`);
+  document.querySelectorAll(".ni").forEach(function(n){ n.classList.remove("active"); });
+  const link=document.querySelector('.ni[data-p="'+page+'"]');
   if(link)link.classList.add("active");
-  document.querySelectorAll(".pv").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".pv").forEach(function(p){ p.classList.remove("active"); });
   const el=document.getElementById("p-"+page);
   if(el)el.classList.add("active");
   else toast("Page: "+page);
   fillStaff();
-  if(page==="dashboard")loadDashboard();
-  if(page==="loan-dashboard"){loadLoanDashboard();return}
-  if(page==="loan-registration"||page==="customer-login"||page==="loan-products"||page==="cust-docs"){initIds();fillStaff()}
-  if(page==="customer-list"){renderCustomer360();return}
-  if(page==="account-statement"){return}
-  if(page==="agent-collection"){ initAgentCollection(); }
-  if(page==="cash-deposit"||page==="cash-withdrawal"||page==="fund-transfer"||page==="emi-collection"||page==="journal"||page==="society-control"||page==="weekly-collection"||page==="monthly-collection"||page==="daily-collection"){
-    initIds();
-    fillStaff();
-  }
-  if(page==="society-control"){ initSocietyControl(); }
-  if(page==="journal"){ initJournalVoucher(); }
-  if(page==="journal-report"){ setDefaultYearFilters("jr"); loadJournalReport(false); return; }
-  if(page==="weekly-collection")loadCollectionAlerts("weekly");
-  if(page==="monthly-collection")loadCollectionAlerts("monthly");
-  if(page==="fund-transfer"){
-    var ftFrom=document.getElementById("ft_ACCOUNT_NO"),ftTo=document.getElementById("ft_TO_ACCOUNT");
-    if(ftFrom)ftFrom.addEventListener("blur",updateFtParticulars);
-    if(ftTo)ftTo.addEventListener("blur",updateFtParticulars);
-  }
+  var firstOpen = !WS.inited[page];
+  WS.inited[page] = true;
   APP_LIVE.activePage = page;
-  if(page==="cash-book"){setDefaultYearFilters("cb");loadCashBookAdvanced(false);return}
-  if(page==="day-book"){setDefaultYearFilters("db");loadDayBookAdvanced(false);return}
-  if(page==="gl"){setDefaultYearFilters("gl");loadGLAdvanced(false);return}
-  if(page==="day-end"){setTodayDayEnd();loadDayEnd();return}
-  if(page==="trial-balance"){setDefaultYearFilters("tb");loadTrialBalance(false);return}
-  if(page==="pl"){setDefaultYearFilters("pl");loadProfitLoss(false);return}
-  if(page==="balance-sheet"){setDefaultYearFilters("bs");loadBalanceSheet(false);return}
-  if(page==="coll-report"){loadCollectionReport(false);return}
-  if(page==="coll-summary"){loadCollectionSummary(false);return}
-  if(LIST_VIEW_MAP[page]&&LIST_VIEW_MAP[page].special!=="customer360")renderListView(page,LIST_VIEW_MAP[page].sheet,LIST_VIEW_MAP[page].title,LIST_VIEW_MAP[page].actions);
+
+  // Reports / lists — safe to refresh from cache (no form wipe)
+  if(page==="dashboard"){ loadDashboard(); return; }
+  if(page==="loan-dashboard"){ loadLoanDashboard(); return; }
+  if(page==="customer-list"){ renderCustomer360(false); return; }
+  if(page==="notice-register"||page==="notice-sms"||page==="notice-wa"||page==="notice-email"||page==="notice-announce"){ initNoticeRegister(); return; }
+  if(page==="account-statement"){ return; }
+  if(page==="journal-report"){ if(firstOpen) setDefaultYearFilters("jr"); loadJournalReport(false); return; }
+  if(page==="cash-book"){ if(firstOpen) setDefaultYearFilters("cb"); loadCashBookAdvanced(false); return; }
+  if(page==="day-book"){ if(firstOpen) setDefaultYearFilters("db"); loadDayBookAdvanced(false); return; }
+  if(page==="gl"){ if(firstOpen) setDefaultYearFilters("gl"); loadGLAdvanced(false); return; }
+  if(page==="day-end"){ if(firstOpen) setTodayDayEnd(); loadDayEnd(); return; }
+  if(page==="trial-balance"){ if(firstOpen) setDefaultYearFilters("tb"); loadTrialBalance(false); return; }
+  if(page==="pl"){ if(firstOpen) setDefaultYearFilters("pl"); loadProfitLoss(false); return; }
+  if(page==="balance-sheet"){ if(firstOpen) setDefaultYearFilters("bs"); loadBalanceSheet(false); return; }
+  if(page==="coll-report"){ loadCollectionReport(false); return; }
+  if(page==="coll-summary"){ loadCollectionSummary(false); return; }
+
+  // Forms — only init IDs / defaults on FIRST open so typed data is preserved when switching tabs
+  if(firstOpen){
+    if(page==="loan-registration"||page==="customer-login"||page==="loan-products"||page==="cust-docs"){ initIds(); fillStaff(); }
+    if(page==="agent-collection"){ initAgentCollection(); }
+    if(page==="cash-deposit"||page==="cash-withdrawal"||page==="fund-transfer"||page==="emi-collection"||page==="journal"||page==="society-control"||page==="weekly-collection"||page==="monthly-collection"||page==="daily-collection"){
+      initIds(); fillStaff();
+    }
+    if(page==="society-control"){ initSocietyControl(); }
+    if(page==="journal"){ initJournalVoucher(); }
+    if(page==="weekly-collection") loadCollectionAlerts("weekly");
+    if(page==="monthly-collection") loadCollectionAlerts("monthly");
+    if(page==="fund-transfer"){
+      var ftFrom=document.getElementById("ft_ACCOUNT_NO"),ftTo=document.getElementById("ft_TO_ACCOUNT");
+      if(ftFrom)ftFrom.addEventListener("blur",updateFtParticulars);
+      if(ftTo)ftTo.addEventListener("blur",updateFtParticulars);
+    }
+  }
+  if(LIST_VIEW_MAP[page]&&LIST_VIEW_MAP[page].special!=="customer360"){
+    // list views: only full fetch on first open
+    if(firstOpen) renderListView(page,LIST_VIEW_MAP[page].sheet,LIST_VIEW_MAP[page].title,LIST_VIEW_MAP[page].actions);
+  }
 }
 
 /* ================= GENERIC LIST / SEARCH / VIEW / PRINT ENGINE =================
@@ -3267,14 +3817,21 @@ function fetchDueEmi(){
       s("EMI_ID",r.EMI_ID);s("EMI_NO",r.EMI_NO);s("DUE_DATE",r.DUE_DATE);
       s("EMI_AMOUNT",r.EMI_AMOUNT);s("PRINCIPAL",r.PRINCIPAL);s("INTEREST",r.INTEREST);
       s("emi_CUSTOMER_ID",r.CUSTOMER_ID);s("emi_ACCOUNT_NO",r.ACCOUNT_NO);
-      s("PENALTY",r.SUGGESTED_PENALTY||0);
-      s("TOTAL_RECEIVED",r.TOTAL_DUE||((parseFloat(r.EMI_AMOUNT)||0)+(parseFloat(r.SUGGESTED_PENALTY)||0)));
+      var daysLate = parseInt(r.DAYS_LATE,10)||0;
+      var loanAmt = parseFloat(r.LOAN_AMOUNT||r.OUTSTANDING_PRINCIPAL||r.SANCTIONED_AMOUNT||0)||0;
+      var emiAmt = parseFloat(r.EMI_AMOUNT)||0;
+      // Always apply official client penalty rule (3d→₹510; 7d+ daily 0.5%)
+      var autoPen = (typeof calcAutoPenalty==="function") ? calcAutoPenalty(daysLate, loanAmt, emiAmt) : (parseFloat(r.SUGGESTED_PENALTY)||0);
+      r.SUGGESTED_PENALTY = autoPen;
+      r.TOTAL_DUE = emiAmt + autoPen;
+      s("PENALTY", autoPen);
+      s("TOTAL_RECEIVED", r.TOTAL_DUE);
       s("PAID_DATE",today());
       var ok=true;
       var msg=r.MESSAGE||"";
       var outLine=(r.OUTSTANDING_PRINCIPAL!=null)?("<br><b>Outstanding Principal:</b> ₹ "+Number(r.OUTSTANDING_PRINCIPAL).toLocaleString("en-IN")+" ("+(r.INTEREST_TYPE||"")+")"):"";
       if(r.DAYS_LATE>0){
-        if(box){box.className="verify-box err show";box.innerHTML="<b>⚠ OVERDUE EMI</b><br>EMI #"+r.EMI_NO+" due "+r.DUE_DATE+" — <b>"+r.DAYS_LATE+" days late</b><br>Principal ₹"+r.PRINCIPAL+" + Interest ₹"+r.INTEREST+" + <b>Penalty ₹"+r.SUGGESTED_PENALTY+"</b><br>Total due ₹"+r.TOTAL_DUE+outLine+"<br><span style=\"color:var(--tm)\">"+msg+"</span><br><span style=\"font-size:10px;color:var(--tm)\">Rule: day≥2 → ₹450; day≥5 → +0.5% of loan/day</span>"}
+        if(box){box.className="verify-box err show";box.innerHTML="<b>⚠ OVERDUE EMI</b><br>EMI #"+r.EMI_NO+" due "+r.DUE_DATE+" — <b>"+r.DAYS_LATE+" days late</b><br>Principal ₹"+r.PRINCIPAL+" + Interest ₹"+r.INTEREST+" + <b>Penalty ₹"+r.SUGGESTED_PENALTY+"</b><br>Total due ₹"+r.TOTAL_DUE+outLine+"<br><span style=\"color:var(--tm)\">"+msg+"</span><br><span style=\"font-size:10px;color:var(--tm)\">Rule: 3 din late → ₹510 (one-time); 7 din se daily loan ka 0.5%</span>"}
         toast("Overdue "+r.DAYS_LATE+"d — penalty ₹"+r.SUGGESTED_PENALTY);
       } else {
         if(box){box.className="verify-box ok show";box.innerHTML="<b>✓ EMI ready to collect"+(r.DAYS_EARLY>0?" (EARLY PAY OK)":"")+"</b><br>EMI #"+r.EMI_NO+" due "+r.DUE_DATE+(r.DAYS_EARLY>0?" — due in "+r.DAYS_EARLY+" day(s)":" — due today")+"<br>Principal ₹"+r.PRINCIPAL+" + Interest ₹"+r.INTEREST+" + Penalty ₹0<br>Total ₹"+r.EMI_AMOUNT+outLine+"<br><span style=\"color:var(--tm)\">"+msg+"</span><br><span style=\"font-size:10px;color:var(--tm)\">Extra payment above EMI reduces outstanding principal. Flat interest schedule stays fixed.</span>"}
@@ -3316,26 +3873,106 @@ function loadCollectionAlerts(kind){
   }).catch(function(){box.innerHTML="Alert load failed"});
 }
 
-function calcLoanFields(){
-  const amt=parseFloat(document.querySelector('[name="LOAN_AMOUNT"]')?.value)||0;
-  const rate=parseFloat(document.querySelector('[name="INTEREST_RATE"]')?.value)||12;
-  const n=parseInt(document.querySelector('[name="TENURE"]')?.value)||12;
-  const type=document.querySelector('[name="INTEREST_TYPE"]')?.value||"REDUCING";
-  const freq=document.querySelector('[name="REPAYMENT_FREQUENCY"]')?.value||"MONTHLY";
-  const ppy={DAILY:365,WEEKLY:52,MONTHLY:12,YEARLY:1}[freq]||12;
-  let proc=0;if(amt>=10000&&amt<=15000)proc=250;else if(amt>15000)proc=510;
-  const pf=document.querySelector('[name="PROCESSING_FEE"]');if(pf)pf.value=proc;
-  const oc=document.querySelector('[name="OTHER_CHARGES"]');if(oc)oc.value=180;
-  const net=document.querySelector('[name="TOTAL_DISBURSEMENT"]');if(net)net.value=Math.max(0,amt-proc-180).toFixed(2);
-  let emi=0;
-  if(amt>0&&n>0){
-    if(type==="FLAT")emi=(amt+amt*rate*(n/ppy)/100)/n;
-    else{const r=rate/ppy/100;emi=r===0?amt/n:amt*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1)}
+/**
+ * Loan EMI helpers — Flat vs Reducing (correct Indian co-op formulas)
+ * TENURE_TYPE (DAYS/WEEKS/MONTHS/YEARS) + REPAYMENT_FREQUENCY → installment count
+ */
+function loanPeriodsPerYear(freq){
+  return ({DAILY:365, WEEKLY:52, MONTHLY:12, YEARLY:1}[String(freq||"MONTHLY").toUpperCase()]||12);
+}
+function loanTenureToYears(tenure, tenureType){
+  tenure = parseFloat(tenure)||0;
+  if(tenure<=0) return 0;
+  var t = String(tenureType||"MONTHS").toUpperCase();
+  if(t==="YEARS") return tenure;
+  if(t==="MONTHS") return tenure/12;
+  if(t==="WEEKS") return tenure/52;
+  if(t==="DAYS") return tenure/365;
+  return tenure/12;
+}
+function loanInstallmentCount(tenure, tenureType, freq){
+  var years = loanTenureToYears(tenure, tenureType);
+  if(years<=0) return 0;
+  var ppy = loanPeriodsPerYear(freq);
+  return Math.max(1, Math.round(years * ppy));
+}
+/** Flat: Total Interest = P × R% × Years; EMI = (P + I) / n */
+function calcFlatEmi(principal, annualRate, nInstallments, years){
+  if(principal<=0 || nInstallments<=0) return {emi:0, totalInterest:0, totalPayable:0};
+  var totalInterest = principal * (annualRate/100) * years;
+  var totalPayable = principal + totalInterest;
+  var emi = totalPayable / nInstallments;
+  return {emi:emi, totalInterest:totalInterest, totalPayable:totalPayable};
+}
+/** Reducing (amortizing): EMI = P × r × (1+r)^n / ((1+r)^n − 1) where r = period rate */
+function calcReducingEmi(principal, annualRate, nInstallments, ppy){
+  if(principal<=0 || nInstallments<=0) return {emi:0, totalInterest:0, totalPayable:0};
+  if(annualRate===0){
+    var emi0 = principal / nInstallments;
+    return {emi:emi0, totalInterest:0, totalPayable:principal};
   }
-  const ef=document.querySelector('[name="EMI_AMOUNT"]');if(ef)ef.value=emi>0?emi.toFixed(2):"";
+  var r = (annualRate/100) / ppy;
+  var pow = Math.pow(1+r, nInstallments);
+  var emi = principal * r * pow / (pow - 1);
+  var totalPayable = emi * nInstallments;
+  var totalInterest = totalPayable - principal;
+  return {emi:emi, totalInterest:totalInterest, totalPayable:totalPayable};
+}
+function calcLoanFields(){
+  // Scope to loan registration page only — avoid picking fields from other forms
+  var root = document.getElementById("p-loan-registration") || document;
+  var q = function(sel){ return root.querySelector(sel); };
+  var amt = parseFloat((q('#lr_LOAN_AMOUNT')||q('[name="LOAN_AMOUNT"]')||{}).value)||0;
+  var rate = parseFloat((q('#lr_INTEREST_RATE')||q('[name="INTEREST_RATE"]')||{}).value);
+  if(isNaN(rate)) rate = 12;
+  var tenure = parseFloat((q('#lr_TENURE')||q('[name="TENURE"]')||{}).value)||0;
+  var tenureType = ((q('#lr_TENURE_TYPE')||q('[name="TENURE_TYPE"]')||{}).value||"MONTHS");
+  var type = String(((q('#lr_INTEREST_TYPE')||q('[name="INTEREST_TYPE"]')||{}).value||"REDUCING")).toUpperCase();
+  var freq = String(((q('#lr_REPAYMENT_FREQUENCY')||q('[name="REPAYMENT_FREQUENCY"]')||{}).value||"MONTHLY")).toUpperCase();
+  var ppy = loanPeriodsPerYear(freq);
+  var years = loanTenureToYears(tenure, tenureType);
+  var n = loanInstallmentCount(tenure, tenureType, freq);
+
+  // Processing fee rule
+  var proc = 0;
+  if(amt>=10000 && amt<=15000) proc = 250;
+  else if(amt>15000) proc = 510;
+  // File Charges = 3% of loan amount
+  var fileChg = amt > 0 ? Math.round(amt * 0.03 * 100) / 100 : 0;
+  var otherEl = q('#lr_OTHER_CHARGES')||q('[name="OTHER_CHARGES"]');
+  var other = 180;
+  if(otherEl){
+    if(otherEl.value==="" || otherEl.value==null) otherEl.value = 180;
+    other = parseFloat(otherEl.value);
+    if(isNaN(other)) other = 180;
+  }
+
+  var pf = q('#lr_PROCESSING_FEE')||q('[name="PROCESSING_FEE"]');
+  if(pf) pf.value = proc;
+  var fc = q('#lr_FILE_CHARGES')||q('[name="FILE_CHARGES"]');
+  if(fc) fc.value = fileChg > 0 ? fileChg.toFixed(2) : "0";
+  var net = q('#lr_TOTAL_DISBURSEMENT')||q('[name="TOTAL_DISBURSEMENT"]');
+  // Net disbursement = Loan − Processing − File(3%) − Other
+  if(net) net.value = Math.max(0, amt - proc - fileChg - other).toFixed(2);
+
+  var nInstEl = q('#lr_NO_OF_INSTALLMENTS')||q('[name="NO_OF_INSTALLMENTS"]');
+  if(nInstEl) nInstEl.value = n>0 ? String(n) : "";
+
+  var result = {emi:0, totalInterest:0, totalPayable:0};
+  if(amt>0 && n>0 && years>0){
+    if(type==="FLAT") result = calcFlatEmi(amt, rate, n, years);
+    else result = calcReducingEmi(amt, rate, n, ppy);
+  }
+
+  var ef = q('#lr_EMI_AMOUNT')||q('[name="EMI_AMOUNT"]');
+  if(ef) ef.value = result.emi>0 ? result.emi.toFixed(2) : "";
+  var ti = q('#lr_TOTAL_INTEREST')||q('[name="TOTAL_INTEREST"]');
+  if(ti) ti.value = result.emi>0 ? result.totalInterest.toFixed(2) : "";
+  var tp = q('#lr_TOTAL_PAYABLE')||q('[name="TOTAL_PAYABLE"]');
+  if(tp) tp.value = result.emi>0 ? result.totalPayable.toFixed(2) : "";
 }
 document.addEventListener("input",e=>{
-  if(["LOAN_AMOUNT","INTEREST_RATE","TENURE","INTEREST_TYPE","REPAYMENT_FREQUENCY"].includes(e.target.name))calcLoanFields();
+  if(["LOAN_AMOUNT","INTEREST_RATE","TENURE","TENURE_TYPE","INTEREST_TYPE","REPAYMENT_FREQUENCY","OTHER_CHARGES"].includes(e.target.name))calcLoanFields();
   // FD maturity auto-calc
   if(e.target.closest&&e.target.closest("#p-fd")){
     var amt=parseFloat(document.querySelector('#p-fd [name="FD_AMOUNT"]')?.value)||0;
@@ -3354,20 +3991,23 @@ document.addEventListener("input",e=>{
   }
 });
 function doCalc(){
-  const amt=parseFloat(document.getElementById("calc_amt")?.value)||0;
-  const rate=parseFloat(document.getElementById("calc_rate")?.value)||0;
-  const n=parseInt(document.getElementById("calc_ten")?.value)||0;
-  const type=document.getElementById("calc_type")?.value||"REDUCING";
-  const freq=document.getElementById("calc_freq")?.value||"MONTHLY";
-  const ppy={DAILY:365,WEEKLY:52,MONTHLY:12,YEARLY:1}[freq]||12;
-  let emi=0;
+  var amt=parseFloat(document.getElementById("calc_amt")?.value)||0;
+  var rate=parseFloat(document.getElementById("calc_rate")?.value)||0;
+  var tenure=parseInt(document.getElementById("calc_ten")?.value)||0;
+  var type=String(document.getElementById("calc_type")?.value||"REDUCING").toUpperCase();
+  var freq=String(document.getElementById("calc_freq")?.value||"MONTHLY").toUpperCase();
+  // Calculator tenure is number of installments matching frequency (label says Tenure)
+  var ppy=loanPeriodsPerYear(freq);
+  var n=tenure;
+  var years=n/ppy;
+  var result={emi:0,totalInterest:0,totalPayable:0};
   if(amt>0&&n>0){
-    if(type==="FLAT")emi=(amt+amt*rate*(n/ppy)/100)/n;
-    else{const r=rate/ppy/100;emi=r===0?amt/n:amt*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1)}
+    if(type==="FLAT") result=calcFlatEmi(amt,rate,n,years);
+    else result=calcReducingEmi(amt,rate,n,ppy);
   }
-  document.getElementById("calc_emi").value=emi>0?"₹ "+emi.toFixed(2):"";
-  document.getElementById("calc_int").value=emi>0?"₹ "+(emi*n-amt).toFixed(2):"";
-  document.getElementById("calc_tot").value=emi>0?"₹ "+(emi*n).toFixed(2):"";
+  var e1=document.getElementById("calc_emi"); if(e1) e1.value=result.emi>0?"₹ "+result.emi.toFixed(2):"";
+  var e2=document.getElementById("calc_int"); if(e2) e2.value=result.emi>0?"₹ "+result.totalInterest.toFixed(2):"";
+  var e3=document.getElementById("calc_tot"); if(e3) e3.value=result.emi>0?"₹ "+result.totalPayable.toFixed(2):"";
 }
 function fmtINR(n){
   n=Number(n)||0;
@@ -3375,15 +4015,273 @@ function fmtINR(n){
   if(n>=100000)return "₹ "+(n/100000).toFixed(2)+" L";
   return "₹ "+n.toLocaleString("en-IN");
 }
+/* ===== Due EMI + Auto Penalty helpers ===== */
+window._dueEmiList = [];
+window._dueEmiPopupShown = false;
+
+/**
+ * Penalty Rule (official):
+ *  - 3 days late → ₹510 one-time
+ *  - From 7th day onwards → additional 0.5% of loan amount PER DAY
+ *  - Before 3 days → ₹0
+ */
+function calcAutoPenalty(daysLate, loanAmount, emiAmount){
+  daysLate = parseInt(daysLate,10)||0;
+  loanAmount = parseFloat(loanAmount)||0;
+  emiAmount = parseFloat(emiAmount)||0;
+  if(daysLate < 3) return 0;
+  var pen = 510; // one-time from day 3
+  if(daysLate >= 7){
+    // day 7 → 1 day charge, day 8 → 2 days, …
+    var dailyDays = daysLate - 6;
+    pen += loanAmount * 0.005 * dailyDays;
+  }
+  return Math.round(pen * 100) / 100;
+}
+function penaltyRuleText(){
+  return "Rule: 3 din late → ₹510 (one-time); 7 din se daily loan amount ka 0.5%";
+}
+function daysBetweenISO(dueISO, todayISO){
+  try{
+    var a = String(dueISO||"").substring(0,10);
+    var b = String(todayISO||"").substring(0,10);
+    if(!a || a.length<10) return 0;
+    var d1 = new Date(a+"T00:00:00");
+    var d2 = new Date(b+"T00:00:00");
+    return Math.floor((d2 - d1) / 86400000);
+  }catch(e){ return 0; }
+}
+function formatDaysDue(days){
+  days = parseInt(days,10)||0;
+  if(days > 0) return days + " din se due";
+  if(days === 0) return "Aaj due";
+  return Math.abs(days) + " din baad";
+}
+function pickCustomerName(o){
+  if(!o) return "—";
+  var name = o.CUSTOMER_NAME || o.APPLICANT || o.APPLICANT_NAME || o.ACCOUNT_NAME || o.MEMBER_NAME || o.NAME || "";
+  name = String(name||"").trim();
+  if(name && name !== "—" && !/^(CU|SRC|LA)\d+$/i.test(name)) return name;
+  // build from parts
+  var parts = [o.PREFIX, o.FIRST_NAME, o.MIDDLE_NAME, o.LAST_NAME].filter(Boolean).join(" ").replace(/\s+/g," ").trim();
+  if(parts) return parts;
+  if(name) return name;
+  if(o.CUSTOMER_ID) return String(o.CUSTOMER_ID);
+  return "—";
+}
+function normalizeDueRow(o){
+  var emi = parseFloat(o.EMI_AMOUNT||o.AMOUNT||o.INSTALLMENT||0)||0;
+  var loanAmt = parseFloat(o.LOAN_AMOUNT||o.SANCTIONED_AMOUNT||o.OUTSTANDING_PRINCIPAL||0)||0;
+  var due = o.DUE_DATE || o.NEXT_DUE_DATE || o.EMI_DUE_DATE || o.NEXT_EMI_DATE || "";
+  var days = o.OVERDUE_DAYS!=null ? parseInt(o.OVERDUE_DAYS,10) : (o.DAYS_LATE!=null ? parseInt(o.DAYS_LATE,10) : daysBetweenISO(due, typeof todayISO==="function"?todayISO():""));
+  if(isNaN(days)) days = 0;
+  // Always use official rule (ignore stale backend penalty if days known)
+  var pen = calcAutoPenalty(days, loanAmt, emi);
+  if(isNaN(pen)) pen = 0;
+  return {
+    LOAN_ID: o.LOAN_ID || o.LOAN_ACCOUNT_NO || o.APPLICATION_ID || "—",
+    LOAN_ACCOUNT_NO: o.LOAN_ACCOUNT_NO || o.LOAN_ID || "",
+    CUSTOMER_NAME: pickCustomerName(o),
+    CUSTOMER_ID: o.CUSTOMER_ID || "",
+    ACCOUNT_NO: o.ACCOUNT_NO || "",
+    EMI_AMOUNT: emi,
+    DUE_DATE: due,
+    OVERDUE_DAYS: days,
+    DAYS_LABEL: formatDaysDue(days),
+    PENALTY: pen,
+    TOTAL_DUE: emi + pen,
+    LOAN_AMOUNT: loanAmt,
+    STATUS: days>0 ? "OVERDUE" : (days===0 ? "DUE_TODAY" : "UPCOMING")
+  };
+}
+function paintDueEmiTable(rows){
+  var ot = document.getElementById("ld-overdue-tbl");
+  if(!ot) return;
+  if(!rows || !rows.length){
+    ot.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--tm)">No due / overdue EMIs 🎉</td></tr>';
+    return;
+  }
+  ot.innerHTML = rows.map(function(o){
+    var cls = o.OVERDUE_DAYS>0 ? "emi-overdue-blink" : (o.OVERDUE_DAYS===0 ? "emi-due-today-blink" : "");
+    var loanRef = (o.LOAN_ACCOUNT_NO||o.LOAN_ID||"").replace(/'/g,"");
+    var name = o.CUSTOMER_NAME || "—";
+    var daysLbl = o.DAYS_LABEL || formatDaysDue(o.OVERDUE_DAYS);
+    return "<tr class='"+cls+"'>"
+      +"<td>"+(o.LOAN_ACCOUNT_NO||o.LOAN_ID||"—")+"</td>"
+      +"<td style='font-weight:700;color:#1a1a1a;min-width:120px'>"+name+(o.CUSTOMER_ID?" <span style=\"font-size:10px;color:#6B7280;font-weight:500\">("+o.CUSTOMER_ID+")</span>":"")+"</td>"
+      +"<td class='ld-emi-amt'>"+fmtINR(o.EMI_AMOUNT)+"</td>"
+      +"<td>"+(o.DUE_DATE||"—")+"</td>"
+      +"<td style='font-weight:800;color:"+(o.OVERDUE_DAYS>0?"#DC2626":"#B45309")+";white-space:nowrap'>"+daysLbl+"</td>"
+      +"<td class='ld-penalty'>"+fmtINR(o.PENALTY)+"</td>"
+      +"<td style='font-weight:700'>"+fmtINR(o.TOTAL_DUE)+"</td>"
+      +"<td class='lv-actions'><button onclick=\"goCollectEmi('"+loanRef+"')\">Collect</button></td>"
+      +"</tr>";
+  }).join("");
+}
+function goCollectEmi(loanNo){
+  closeDueEmiPopup();
+  go("emi-collection");
+  setTimeout(function(){
+    var el = document.getElementById("LOAN_ACCOUNT_NO");
+    if(el){ el.value = loanNo; }
+    if(typeof fetchDueEmi==="function") fetchDueEmi();
+  }, 300);
+}
+function updateDueEmiStats(rows){
+  rows = rows || window._dueEmiList || [];
+  var emiSum=0, penSum=0;
+  rows.forEach(function(r){ emiSum+=parseFloat(r.EMI_AMOUNT)||0; penSum+=parseFloat(r.PENALTY)||0; });
+  var s=function(id,v){var e=document.getElementById(id);if(e)e.textContent=v};
+  s("ld-overdue", String(rows.length));
+  s("ld-emi-due", typeof fmtINR==="function"?fmtINR(emiSum):("₹ "+emiSum));
+  s("ld-penalty-total", typeof fmtINR==="function"?fmtINR(penSum):("₹ "+penSum));
+  s("ld-total-payable", typeof fmtINR==="function"?fmtINR(emiSum+penSum):("₹ "+(emiSum+penSum)));
+}
+function buildDueListFromLoans(loanRows){
+  var today = typeof todayISO==="function" ? todayISO() : "";
+  var out = [];
+  (loanRows||[]).forEach(function(L){
+    var st = String(L.LOAN_STATUS||L.STATUS||"").toUpperCase();
+    if(st==="CLOSED"||st==="REJECTED"||st==="CANCELLED") return;
+    var due = L.NEXT_DUE_DATE || L.DUE_DATE || L.EMI_DUE_DATE || L.NEXT_EMI_DATE || "";
+    var emi = parseFloat(L.EMI_AMOUNT||0)||0;
+    if(!due && !emi) return;
+    var days = daysBetweenISO(due, today);
+    if(days < 0) return; // future — skip
+    var row = normalizeDueRow(Object.assign({}, L, {
+      LOAN_ACCOUNT_NO: L.LOAN_ACCOUNT_NO || L.APPLICATION_ID,
+      LOAN_ID: L.APPLICATION_ID || L.LOAN_ACCOUNT_NO,
+      CUSTOMER_NAME: pickCustomerName(L),
+      CUSTOMER_ID: L.CUSTOMER_ID || "",
+      ACCOUNT_NO: L.ACCOUNT_NO,
+      EMI_AMOUNT: emi,
+      DUE_DATE: due,
+      OVERDUE_DAYS: days,
+      LOAN_AMOUNT: L.LOAN_AMOUNT || L.SANCTIONED_AMOUNT || L.OUTSTANDING_PRINCIPAL
+    }));
+    out.push(row);
+  });
+  out.sort(function(a,b){ return (b.OVERDUE_DAYS||0)-(a.OVERDUE_DAYS||0); });
+  return out;
+}
+function enrichDueWithLoanMaster(list, loanRows){
+  var map = {};
+  (loanRows||[]).forEach(function(L){
+    var k1 = String(L.LOAN_ACCOUNT_NO||"").toUpperCase();
+    var k2 = String(L.APPLICATION_ID||"").toUpperCase();
+    if(k1) map[k1] = L;
+    if(k2) map[k2] = L;
+  });
+  return (list||[]).map(function(r){
+    var L = map[String(r.LOAN_ACCOUNT_NO||"").toUpperCase()] || map[String(r.LOAN_ID||"").toUpperCase()];
+    if(!L) return r;
+    var name = pickCustomerName(r);
+    if(!name || name==="—" || name===r.CUSTOMER_ID) name = pickCustomerName(L);
+    var emi = r.EMI_AMOUNT || parseFloat(L.EMI_AMOUNT)||0;
+    var due = r.DUE_DATE || L.NEXT_DUE_DATE || L.DUE_DATE || "";
+    var days = r.OVERDUE_DAYS;
+    if(due && (days==null || isNaN(days))) days = daysBetweenISO(due, typeof todayISO==="function"?todayISO():"");
+    var loanAmt = r.LOAN_AMOUNT || L.LOAN_AMOUNT || L.SANCTIONED_AMOUNT || 0;
+    return normalizeDueRow(Object.assign({}, L, r, {
+      CUSTOMER_NAME: name,
+      CUSTOMER_ID: r.CUSTOMER_ID || L.CUSTOMER_ID || "",
+      EMI_AMOUNT: emi,
+      DUE_DATE: due,
+      OVERDUE_DAYS: days,
+      LOAN_AMOUNT: loanAmt
+    }));
+  });
+}
+function loadDueEmisAndPaint(dashboardOverdue){
+  var fromDash = (dashboardOverdue||[]).map(normalizeDueRow).filter(function(r){
+    return (r.OVERDUE_DAYS>=0) && (r.EMI_AMOUNT>0 || r.TOTAL_DUE>0 || r.DUE_DATE);
+  });
+  function finish(list){
+    list = (list||[]).slice().sort(function(a,b){ return (b.OVERDUE_DAYS||0)-(a.OVERDUE_DAYS||0); });
+    window._dueEmiList = list;
+    updateDueEmiStats(list);
+    paintDueEmiTable(list);
+  }
+  // Always load loan master to fill Customer Name + days
+  return postGAS({action:"get_list", sheet:"LOAN_REGISTRATION_MASTER", limit:1000}).then(function(r){
+    var loans = (r&&r.rows)||[];
+    var list;
+    if(fromDash.length){
+      list = enrichDueWithLoanMaster(fromDash, loans);
+      // also merge any due from master not in dashboard
+      var fromMaster = buildDueListFromLoans(loans);
+      var keys = {};
+      list.forEach(function(x){ keys[String(x.LOAN_ACCOUNT_NO||x.LOAN_ID).toUpperCase()]=1; });
+      fromMaster.forEach(function(x){
+        var k = String(x.LOAN_ACCOUNT_NO||x.LOAN_ID).toUpperCase();
+        if(!keys[k]) list.push(x);
+      });
+    } else {
+      list = buildDueListFromLoans(loans);
+    }
+    finish(list);
+    return list;
+  }).catch(function(){
+    finish(fromDash);
+    return fromDash;
+  });
+}
+function showDueEmiPopup(force){
+  var ov = document.getElementById("dueEmiPopup");
+  if(!ov) return;
+  function render(list){
+    list = list || window._dueEmiList || [];
+    var body = document.getElementById("duePopupBody");
+    var sum = document.getElementById("duePopupSummary");
+    var emiSum=0, penSum=0;
+    list.forEach(function(r){ emiSum+=r.EMI_AMOUNT||0; penSum+=r.PENALTY||0; });
+    if(sum){
+      if(!list.length) sum.innerHTML = "✅ Koi EMI due / overdue nahi hai.";
+      else sum.innerHTML = "<b style='color:#DC2626'>"+list.length+"</b> EMI(s) need attention · EMI total <b>"+fmtINR(emiSum)+"</b> · Penalty <b class='ld-penalty'>"+fmtINR(penSum)+"</b> · Payable <b>"+fmtINR(emiSum+penSum)+"</b>";
+    }
+    if(body){
+      if(!list.length) body.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#059669">All clear</td></tr>';
+      else body.innerHTML = list.map(function(o){
+        var cls = o.OVERDUE_DAYS>0 ? "emi-overdue-blink" : "emi-due-today-blink";
+        var loanRef = (o.LOAN_ACCOUNT_NO||o.LOAN_ID||"").replace(/'/g,"");
+        var daysLbl = o.DAYS_LABEL || formatDaysDue(o.OVERDUE_DAYS);
+        var name = o.CUSTOMER_NAME || "—";
+        return "<tr class='"+cls+"'><td>"+(o.LOAN_ACCOUNT_NO||o.LOAN_ID)+"</td>"
+          +"<td style='font-weight:700'>"+name+"</td>"
+          +"<td class='ld-emi-amt'>"+fmtINR(o.EMI_AMOUNT)+"</td><td>"+(o.DUE_DATE||"—")+"</td>"
+          +"<td style='color:#DC2626;font-weight:800;white-space:nowrap'>"+daysLbl+"</td>"
+          +"<td class='ld-penalty'>"+fmtINR(o.PENALTY)+"</td><td><b>"+fmtINR(o.TOTAL_DUE)+"</b></td>"
+          +"<td><button class='btn btn-p' style='height:24px;padding:2px 8px;font-size:10px' onclick=\"goCollectEmi('"+loanRef+"')\">Collect</button></td></tr>";
+      }).join("");
+    }
+    if(force || list.length){ ov.classList.add("show"); }
+  }
+  if(window._dueEmiList && window._dueEmiList.length){ render(window._dueEmiList); return; }
+  loadDueEmisAndPaint([]).then(render);
+}
+function closeDueEmiPopup(){
+  var ov = document.getElementById("dueEmiPopup");
+  if(ov) ov.classList.remove("show");
+}
+function checkDueEmiOnLogin(){
+  // After staff login — auto popup if any due/overdue
+  if(window._dueEmiPopupShown) return;
+  loadDueEmisAndPaint([]).then(function(list){
+    if(list && list.length){
+      window._dueEmiPopupShown = true;
+      setTimeout(function(){ showDueEmiPopup(true); }, 600);
+    }
+  });
+}
+
 function loadLoanDashboard(){
   var s=function(id,v){var e=document.getElementById(id);if(e)e.textContent=v};
   postGAS({action:"get_loan_dashboard"}).then(function(r){
-    if(!r||r.status!=="success"){toast((r&&r.message)||"Loan dashboard load failed");return}
+    if(!r||r.status!=="success"){toast((r&&r.message)||"Loan dashboard load failed"); loadDueEmisAndPaint([]); return}
     s("ld-active",(r.TOTAL_ACTIVE_LOANS||0).toLocaleString("en-IN"));
     s("ld-disbursed",fmtINR(r.TOTAL_LOAN_DISBURSED));
     s("ld-collected",fmtINR(r.TOTAL_AMOUNT_COLLECTED));
     s("ld-outstanding",fmtINR(r.TOTAL_OUTSTANDING));
-    s("ld-overdue",(r.OVERDUE_ACCOUNTS||0).toLocaleString("en-IN"));
     var sm=r.LOAN_SUMMARY||{};
     var tot=sm.total||((sm.active||0)+(sm.overdue||0)+(sm.closed||0))||1;
     s("ld-s-active",sm.active||0);s("ld-s-overdue",sm.overdue||0);s("ld-s-closed",sm.closed||0);s("ld-s-total",sm.total||tot);
@@ -3418,15 +4316,13 @@ function loadLoanDashboard(){
           +"<td><span class='tb "+badge+"'>"+(a.STATUS||"—")+"</span></td><td>"+(a.DATE||"—")+"</td></tr>";
       }).join("");
     }
-    var ot=document.getElementById("ld-overdue-tbl");
-    if(ot){
-      var ol=r.OVERDUE_LIST||[];
-      if(!ol.length)ot.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--tm)">No overdue accounts</td></tr>';
-      else ot.innerHTML=ol.map(function(o){
-        return "<tr><td>"+(o.LOAN_ID||"—")+"</td><td>"+(o.CUSTOMER_NAME||"—")+"</td><td>"+(o.OVERDUE_DAYS||0)+"</td><td>"+fmtINR(o.AMOUNT)+"</td></tr>";
-      }).join("");
-    }
-  }).catch(function(){toast("Network error loading loan dashboard")});
+    // EMI amount + auto penalty + blinking due rows
+    var ol = r.OVERDUE_LIST || r.DUE_EMI_LIST || [];
+    loadDueEmisAndPaint(ol);
+  }).catch(function(){
+    toast("Network error loading loan dashboard");
+    loadDueEmisAndPaint([]);
+  });
 }
 function loadDashboard(){
   if(!(GS_URL&&GS_URL.indexOf("YOUR_")<0))return;
@@ -3608,14 +4504,16 @@ function verifyAccount(key){
   if(!accEl||!box)return;
   const accNo=accEl.value.trim();
   if(!accNo){box.className="verify-box err show";box.innerHTML="<b>Enter account number</b>";return}
-  box.className="verify-box show";box.innerHTML="Verifying…";
-  postGAS({action:"lookup_account",account_no:accNo}).then(function(r){
+  function applyVerify(r){
     if(!r||r.status!=="success"){
       box.className="verify-box err show";
       box.innerHTML="⚠️ "+((r&&r.message)||"Account not found");
       if(cfg.cust){const c=document.getElementById(cfg.cust);if(c)c.value=""}
+      if(key==="ac") window._acAccount=null;
       return;
     }
+    lookupCacheSet("accounts", accNo, r);
+    if(key==="ac") window._acAccount=r;
     if(cfg.cust){const c=document.getElementById(cfg.cust);if(c)c.value=r.CUSTOMER_ID||""}
     var st=(r.ACCOUNT_STATUS||"ACTIVE").toUpperCase();
     var stOk=(st!=="CLOSED"&&st!=="BLOCKED"&&st!=="NO ACCOUNT");
@@ -3642,26 +4540,47 @@ function verifyAccount(key){
       +'</div>'+photoHtml
       +(stOk?"":'<p style="color:var(--er);margin-top:6px;font-weight:600">Account is '+st+' — transaction may be blocked</p>');
     toast("Account verified: "+(r.ACCOUNT_NAME||r.ACCOUNT_NO));
-  }).catch(function(){
+  }
+  var cached = lookupCacheGet("accounts", accNo);
+  if(cached){ applyVerify(cached); return; }
+  box.className="verify-box show";box.innerHTML="Verifying…";
+  postGAS({action:"lookup_account",account_no:accNo}).then(applyVerify).catch(function(){
     box.className="verify-box err show";box.innerHTML="⚠️ Network error";
   });
 }
 
 /* ===== CUSTOMER 360 LIST ===== */
-function renderCustomer360(){
+function renderCustomer360(force){
   const host=document.getElementById("p-customer-list");
   if(!host)return;
   let box=document.getElementById("lv-customer-list");
   if(!box){
     box=document.createElement("div");
     box.id="lv-customer-list";
-    box.innerHTML='<div class="lv-bar"><input class="lv-search" placeholder="Search A/c, Name, Mobile…" oninput="filterCustomer360()" id="srch-customer-list"><span class="lv-count" id="cnt-customer-list"></span><button class="btn btn-o" style="height:28px" onclick="renderCustomer360()">↻ Refresh</button></div><div class="lv-wrap"><table class="tn" id="tbl-customer-list"><thead></thead><tbody></tbody></table></div>';
+    box.innerHTML='<div class="lv-bar"><input class="lv-search" placeholder="Search A/c, Name, Mobile…" oninput="filterCustomer360()" id="srch-customer-list"><span class="lv-count" id="cnt-customer-list"></span><button class="btn btn-o" style="height:28px" onclick="renderCustomer360(true)">↻ Refresh</button></div><div class="lv-wrap"><table class="tn" id="tbl-customer-list"><thead></thead><tbody></tbody></table></div>';
     host.appendChild(box);
   }
   const tbody=document.querySelector("#tbl-customer-list tbody");
+  // Use cache — do NOT reload every time (e.g. after Signature Verification click-back)
+  if(!force){
+    var cached = cacheGet("cust360", {});
+    if(cached && cached.rows){
+      box.dataset.rows=JSON.stringify(cached.rows);
+      paintCustomer360(cached.rows);
+      return;
+    }
+    // also check in-memory sticky cache
+    if(window._cust360Rows && window._cust360Rows.length){
+      box.dataset.rows=JSON.stringify(window._cust360Rows);
+      paintCustomer360(window._cust360Rows);
+      return;
+    }
+  }
   tbody.innerHTML='<tr><td colspan="8" class="lv-empty">Loading combined masters…</td></tr>';
   postGAS({action:"get_customer_360",limit:400}).then(function(r){
     const rows=(r&&r.rows)||[];
+    window._cust360Rows = rows;
+    cacheSet("cust360", {}, {rows:rows});
     box.dataset.rows=JSON.stringify(rows);
     paintCustomer360(rows);
   }).catch(function(){tbody.innerHTML='<tr><td class="lv-empty">Network error</td></tr>'});
@@ -3838,11 +4757,20 @@ function checkEligibilityLive(){
   var cibil = parseFloat((document.getElementById("lr_CIBIL")||{}).value)||0;
   var box = document.getElementById("lr-eligibility");
   if(!accNo&&!cid)return;
+  // Rule: Max Eligible = Deposit Base + ₹200 only (not multiplier)
+  function applyMaxEligible(r){
+    var deposit = parseFloat(r && r.DEPOSIT_BASE)!=null ? (parseFloat(r.DEPOSIT_BASE)||0) : 0;
+    // Prefer explicit deposit; fallback if server sent MAX as 2.2x — still force +200 rule
+    var maxElig = deposit + 200;
+    if(r) r.MAX_ELIGIBLE = maxElig;
+    var maxEl = document.getElementById("lr_MAX_ELIGIBLE");
+    if(maxEl) maxEl.value = "₹ "+Number(maxElig).toLocaleString("en-IN");
+    return maxElig;
+  }
   // 3-month account age rule REMOVED — normal registration allowed for any age account
   postGAS({action:"loan_eligibility",ACCOUNT_NO:accNo,CUSTOMER_ID:cid,LOAN_AMOUNT:amt,CIBIL_SCORE:cibil,SKIP_MIN_AGE:true,MIN_ACCOUNT_AGE_DAYS:0}).then(function(r){
     window._lastEligibility = r;
-    var maxEl = document.getElementById("lr_MAX_ELIGIBLE");
-    if(maxEl && r && r.MAX_ELIGIBLE!=null) maxEl.value = "₹ "+Number(r.MAX_ELIGIBLE).toLocaleString("en-IN");
+    var maxElig = applyMaxEligible(r||{});
     if(!box)return;
     var msg = String((r&&r.message)||"").toLowerCase();
     var ageOnlyFail = r && r.status!=="success" && (
@@ -3853,22 +4781,20 @@ function checkEligibilityLive(){
     if(r&&r.status==="success"){
       box.className="verify-box ok show";
       box.innerHTML="<b>Eligible</b> · Age "+(r.ACCOUNT_AGE_DAYS!=null?r.ACCOUNT_AGE_DAYS:"?")+" days · Deposits ₹ "+Number(r.DEPOSIT_BASE||0).toLocaleString("en-IN")
-        +" · Max loan (2.2×) ₹ "+Number(r.MAX_ELIGIBLE||0).toLocaleString("en-IN")
+        +" · Max loan (Deposit + ₹200) ₹ "+Number(maxElig).toLocaleString("en-IN")
         +(cibil?(" · CIBIL "+cibil):"")
         +" <span style=\"font-size:10px;color:var(--tm)\">(no min account age)</span>";
     } else if(ageOnlyFail){
-      // Soft-pass: 3-month rule removed — treat as eligible for registration
       box.className="verify-box ok show";
       var ageInfo = (r.ACCOUNT_AGE_DAYS!=null) ? ("Age "+r.ACCOUNT_AGE_DAYS+" days · ") : "";
       box.innerHTML="<b>Eligible</b> (3-month rule removed) · "+ageInfo+"Deposits ₹ "+Number(r.DEPOSIT_BASE||0).toLocaleString("en-IN")
-        +" · Max loan ₹ "+Number(r.MAX_ELIGIBLE||0).toLocaleString("en-IN")
+        +" · Max loan (Deposit + ₹200) ₹ "+Number(maxElig).toLocaleString("en-IN")
         +(cibil?(" · CIBIL "+cibil):"");
-      if(r.MAX_ELIGIBLE!=null && maxEl) maxEl.value = "₹ "+Number(r.MAX_ELIGIBLE).toLocaleString("en-IN");
-      window._lastEligibility = Object.assign({}, r, {status:"success", _age_waived:true});
+      window._lastEligibility = Object.assign({}, r, {status:"success", MAX_ELIGIBLE:maxElig, _age_waived:true});
     } else {
       box.className="verify-box err show";
-      box.innerHTML="⚠️ "+((r&&r.message)||"Not eligible");
-      if(r&&r.MAX_ELIGIBLE!=null && maxEl) maxEl.value = "₹ "+Number(r.MAX_ELIGIBLE).toLocaleString("en-IN");
+      box.innerHTML="⚠️ "+((r&&r.message)||"Not eligible")
+        +(r&&r.DEPOSIT_BASE!=null?(" · Max (Deposit+200) ₹ "+Number(maxElig).toLocaleString("en-IN")):"");
     }
   }).catch(function(){});
 }
@@ -4060,9 +4986,10 @@ var APP_CACHE = {
   collSum: null,
   trial: null,
   notifications: null,
+  cust360: null,
   loadedAt: {}
 };
-var APP_LIVE = { timer: null, activePage: "dashboard", TTL: 3 * 60 * 1000 }; // 3 min
+var APP_LIVE = { timer: null, activePage: "dashboard", TTL: 8 * 60 * 1000 }; // 8 min — avoid baar-baar reload
 
 function cacheKey(kind, filt){
   filt = filt || {};
@@ -4082,10 +5009,11 @@ function cacheSet(kind, filt, data){
   APP_CACHE.loadedAt[k] = Date.now();
 }
 function cacheInvalidate(kind){
-  if(kind){ APP_CACHE[kind]=null; }
+  if(kind){ APP_CACHE[kind]=null; if(kind==="cust360") window._cust360Rows=null; }
   else {
-    ["dashboard","cash","daybook","gl","pl","bs","coll","collSum","trial","notifications"].forEach(function(x){ APP_CACHE[x]=null; });
+    ["dashboard","cash","daybook","gl","pl","bs","coll","collSum","trial","notifications","cust360"].forEach(function(x){ APP_CACHE[x]=null; });
     APP_CACHE.loadedAt = {};
+    window._cust360Rows=null;
   }
 }
 
@@ -5928,9 +6856,7 @@ function aaVerifyAccount(){
     box.innerHTML="Enter account number";
     return;
   }
-  box.className="aa-verify show";
-  box.innerHTML="Verifying…";
-  postGAS({action:"lookup_account", account_no:acc}).then(function(r){
+  function applyAA(r){
     if(!r || r.status!=="success"){
       box.className="aa-verify err show";
       box.innerHTML="⚠️ "+((r&&r.message)||"Account not found");
@@ -5938,6 +6864,7 @@ function aaVerifyAccount(){
       aaAutoParticulars();
       return;
     }
+    lookupCacheSet("accounts", acc, r);
     var st=String(r.ACCOUNT_STATUS||"ACTIVE").toUpperCase();
     if(st==="CLOSED"||st==="BLOCKED"){
       box.className="aa-verify err show";
@@ -5958,7 +6885,12 @@ function aaVerifyAccount(){
     aaToast("Account OK: "+(r.ACCOUNT_NAME||r.ACCOUNT_NO));
     if(window._aaType==="EMI") aaLoadLoanEMI();
     else aaAutoParticulars();
-  }).catch(function(){
+  }
+  var cached = lookupCacheGet("accounts", acc);
+  if(cached){ applyAA(cached); return; }
+  box.className="aa-verify show";
+  box.innerHTML="Verifying…";
+  postGAS({action:"lookup_account", account_no:acc}).then(applyAA).catch(function(){
     box.className="aa-verify err show";
     box.innerHTML="Network error";
   });
@@ -6063,6 +6995,7 @@ function aaSave(){
 
   function doneOk(r){
     if(btn){ btn.disabled=false; btn.textContent="Save Collection"; }
+    try{ cacheInvalidate("coll"); APP_CACHE.collSum=null; lookupCacheInvalidate("accounts"); }catch(e){}
     aaToast("Saved Rs "+Number(amt).toLocaleString("en-IN"));
     if(r){
       if(r.RECEIPT_NO) row.RECEIPT_NO = r.RECEIPT_NO;
@@ -6194,12 +7127,11 @@ function aaPrintDaySheet(){
   var body = rows.map(function(x,i){
     return "<tr><td>"+(i+1)+"</td><td>"+(x.ACCOUNT_NO||"")+"</td><td>"+(x.COLLECTION_TYPE||"")+"</td><td>"+(x.PAYMENT_MODE||"")+"</td><td style='text-align:right'>"+Number(x.AMOUNT||0).toLocaleString("en-IN")+"</td></tr>";
   }).join("");
-  w.document.write("<html><head><meta name='viewport' content='width=device-width'><title>Day Sheet</title><style>body{font-family:sans-serif;padding:12px}h1{color:#8B1538;font-size:14px}table{width:100%;border-collapse:collapse;font-size:12px}th,td{border:1px solid #ddd;padding:6px}th{background:#8B1538;color:#fff}</style></head><body>");
-  w.document.write("<h1>SHREE RADHA — Agent Day Sheet</h1>");
-  w.document.write("<p>Agent: <b>"+agent+"</b> | Date: <b>"+date+"</b> | Total: <b>₹ "+Number(total).toLocaleString("en-IN")+"</b></p>");
-  w.document.write("<table><thead><tr><th>#</th><th>A/c</th><th>Type</th><th>Mode</th><th>Amt</th></tr></thead><tbody>"+body);
-  w.document.write("<tr style='font-weight:700'><td colspan='4'>TOTAL</td><td style='text-align:right'>"+Number(total).toLocaleString("en-IN")+"</td></tr></tbody></table>");
-  w.document.write("<script>window.print()<\/script></body></html>");
+  w.document.write(printLetterhead({title:"AGENT DAY COLLECTION SHEET", sub:"Agent: <b>"+agent+"</b> &nbsp;|&nbsp; Date: <b>"+date+"</b> &nbsp;|&nbsp; Receipts: <b>"+rows.length+"</b>", date:date}));
+  w.document.write("<table><thead><tr><th>#</th><th>A/c No</th><th>Type</th><th>Mode</th><th>Amount ₹</th></tr></thead><tbody>"+body);
+  w.document.write("<tr class='tot'><td colspan='4'>TOTAL</td><td style='text-align:right'>₹ "+Number(total).toLocaleString("en-IN")+"</td></tr></tbody></table>");
+  w.document.write(printLetterFooter());
+  w.document.write("<script>window.print()<\/script>");
   w.document.close();
 }
 
@@ -6342,6 +7274,7 @@ function saveAgentCollection(e){
       al.className="alert show alert-ok";
       al.textContent="✓ Collection saved — Receipt "+(row.RECEIPT_NO||row.COLLECTION_ID||"")+" • ₹ "+Number(amt).toLocaleString("en-IN");
     }
+    try{ cacheInvalidate("coll"); APP_CACHE.collSum=null; }catch(e){}
     toast("Collection saved");
     // reset amount/ref for next entry, keep agent+account
     document.getElementById("ac_AMOUNT").value = "";
@@ -6491,31 +7424,25 @@ function printACRow(i){
 function printLastACReceipt(){
   var r = window._acLastReceipt;
   if(!r){ toast("No receipt to print — save a collection first"); return; }
-  var w = window.open("", "_blank", "width=420,height=600");
+  var w = window.open("", "_blank", "width=480,height=640");
   if(!w){ toast("Allow popups"); return; }
-  var css = "body{font-family:Segoe UI,system-ui,sans-serif;padding:16px;color:#1a1a1a;max-width:360px;margin:0 auto}"
-    +"h1{color:#8B1538;font-size:14px;margin:0;text-align:center}"
-    +".sub{text-align:center;font-size:11px;color:#666;margin-bottom:10px}"
-    +"table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}"
-    +"td{padding:4px 0;border-bottom:1px dotted #ddd}"
-    +"td:last-child{text-align:right;font-weight:600}"
-    +".tot{font-size:15px;font-weight:800;color:#8B1538;border-top:2px solid #8B1538;padding-top:8px}"
-    +".foot{text-align:center;font-size:10px;color:#888;margin-top:14px}";
-  w.document.write("<html><head><title>Receipt "+(r.RECEIPT_NO||"")+"</title><style>"+css+"</style></head><body>");
-  w.document.write("<h1>SHREE RADHA CREDIT CO-OPERATIVE</h1>");
-  w.document.write("<div class='sub'>Agent Collection Receipt</div>");
+  w.document.write(printLetterhead({
+    title: "AGENT COLLECTION RECEIPT",
+    sub: "Receipt No: <b>"+(r.RECEIPT_NO||r.COLLECTION_ID||"—")+"</b>",
+    date: r.DATE||"",
+    extraCss: "body{max-width:400px} table td{border:none;border-bottom:1px dotted #ddd;padding:5px 0} table td:last-child{text-align:right} .amt-row td{font-size:15px;font-weight:800;color:#8B1538;border-top:2px solid #8B1538;padding-top:8px}"
+  }));
   w.document.write("<table>");
-  w.document.write("<tr><td>Receipt No</td><td>"+(r.RECEIPT_NO||r.COLLECTION_ID||"—")+"</td></tr>");
   w.document.write("<tr><td>Date</td><td>"+(r.DATE||"—")+"</td></tr>");
   w.document.write("<tr><td>Account No</td><td>"+(r.ACCOUNT_NO||"—")+"</td></tr>");
   w.document.write("<tr><td>Customer</td><td>"+(r.ACCOUNT_NAME||r.CUSTOMER_ID||"—")+"</td></tr>");
   w.document.write("<tr><td>Type</td><td>"+(r.COLLECTION_TYPE||"—")+"</td></tr>");
   w.document.write("<tr><td>Mode</td><td>"+(r.PAYMENT_MODE||"—")+"</td></tr>");
   w.document.write("<tr><td>Agent</td><td>"+(r.AGENT_NAME||r.AGENT_ID||"—")+"</td></tr>");
-  w.document.write("<tr class='tot'><td>Amount</td><td>₹ "+Number(r.AMOUNT||0).toLocaleString("en-IN")+"</td></tr>");
+  w.document.write("<tr class='amt-row'><td>Amount</td><td>₹ "+Number(r.AMOUNT||0).toLocaleString("en-IN")+"</td></tr>");
   w.document.write("</table>");
-  w.document.write("<div class='foot'>Thank you • विश्वास • सहयोग • समृद्धि</div>");
-  w.document.write("<script>window.print()<\/script></body></html>");
+  w.document.write(printLetterFooter());
+  w.document.write("<script>window.print()<\/script>");
   w.document.close();
 }
 
@@ -6530,32 +7457,1085 @@ function printAgentDaySheet(){
   var body = rows.map(function(x,i){
     return "<tr><td>"+(i+1)+"</td><td>"+(x.RECEIPT_NO||x.COLLECTION_ID||"")+"</td><td>"+(x.ACCOUNT_NO||"")+"</td><td>"+(x.COLLECTION_TYPE||"")+"</td><td>"+(x.PAYMENT_MODE||"")+"</td><td style='text-align:right'>"+Number(x.AMOUNT||0).toLocaleString("en-IN")+"</td></tr>";
   }).join("");
-  w.document.write("<html><head><title>Agent Day Sheet</title><style>body{font-family:Segoe UI,sans-serif;padding:16px}h1{color:#8B1538;font-size:15px}table{width:100%;border-collapse:collapse;font-size:12px}th,td{border:1px solid #e8d0d5;padding:5px 8px}th{background:#8B1538;color:#fff}</style></head><body>");
-  w.document.write("<h1>SHREE RADHA — Agent Day Collection Sheet</h1>");
-  w.document.write("<p><b>Agent:</b> "+agent+" &nbsp;|&nbsp; <b>Date:</b> "+date+" &nbsp;|&nbsp; <b>Total:</b> ₹ "+Number(total).toLocaleString("en-IN")+" &nbsp;|&nbsp; <b>Count:</b> "+rows.length+"</p>");
+  w.document.write(printLetterhead({
+    title: "AGENT DAY COLLECTION SHEET",
+    sub: "Agent: <b>"+agent+"</b> &nbsp;|&nbsp; Date: <b>"+date+"</b> &nbsp;|&nbsp; Count: <b>"+rows.length+"</b> &nbsp;|&nbsp; Total: <b>₹ "+Number(total).toLocaleString("en-IN")+"</b>",
+    date: date
+  }));
   w.document.write("<table><thead><tr><th>#</th><th>Receipt</th><th>A/c No</th><th>Type</th><th>Mode</th><th>Amount ₹</th></tr></thead><tbody>"+body);
-  w.document.write("<tr style='font-weight:700;background:#F5E6EA'><td colspan='5'>TOTAL</td><td style='text-align:right'>"+Number(total).toLocaleString("en-IN")+"</td></tr></tbody></table>");
-  w.document.write("<script>window.print()<\/script></body></html>");
+  w.document.write("<tr class='tot'><td colspan='5'>TOTAL</td><td style='text-align:right'>₹ "+Number(total).toLocaleString("en-IN")+"</td></tr></tbody></table>");
+  w.document.write(printLetterFooter());
+  w.document.write("<script>window.print()<\/script>");
   w.document.close();
 }
 
-// Patch verifyAccount to also store _acAccount for agent collection
-(function(){
-  var _orig = window.verifyAccount;
-  if(typeof _orig !== "function") return;
-  window.verifyAccount = function(key){
-    _orig(key);
-    if(key!=="ac") return;
-    // after verify, capture account object by re-reading from box success path via postGAS already done inside _orig
-    // hook: listen when ac-verify becomes ok
-    var accNo = (document.getElementById("ac_ACCOUNT_NO")||{}).value;
-    if(!accNo) return;
-    postGAS({action:"lookup_account", account_no:accNo}).then(function(r){
-      if(r && r.status==="success") window._acAccount = r;
-    });
-  };
-})();
 
+
+
+
+/* ===== Notice Register (full tracking) ===== */
+window._ntList = [];
+window._ntSelected = null;
+
+function initNoticeRegister(){
+  fillStaff();
+  var de = document.getElementById("nt_SENT_DATE");
+  if(de && !de.value) de.value = (typeof todayISO==="function"?todayISO():"");
+  var te = document.getElementById("nt_SENT_TIME");
+  if(te){ try{ te.value = (typeof nowT==="function"?nowT():""); }catch(e){} }
+  var by = document.getElementById("nt_CREATED_BY");
+  if(by && session) by.value = session.employeeCode || session.username || "";
+  // next ids
+  postGAS({action:"get_next_ids"}).then(function(r){
+    if(!r||!r.ids) return;
+    var id = document.getElementById("nt_NOTICE_ID");
+    var no = document.getElementById("nt_NOTICE_NO");
+    if(id && !id.value) id.value = r.ids.NOTICE_ID || r.ids.NOTICE_NO || "";
+    if(no && !no.value) no.value = r.ids.NOTICE_NO || r.ids.NOTICE_ID || "";
+  }).catch(function(){});
+  loadNoticeList(false);
+  // image preview bind
+  var hid = document.getElementById("nt_NOTICE_IMAGE");
+  if(hid){
+    var _lastPrev = "";
+    var obs = function(){
+      var v = hid.value||"";
+      if(v === _lastPrev) return;
+      _lastPrev = v;
+      var prev = document.getElementById("nt-img-preview");
+      if(!prev) return;
+      if(v && String(v).indexOf("data:")===0) updateDocPreviewEl("nt-img-preview", v, {maxH:160, downloadName:"notice-doc"});
+      else if(v) prev.innerHTML = "✓ File attached";
+      else prev.innerHTML = "No document";
+    };
+    setInterval(obs, 800);
+  }
+}
+function ntToggleReply(){
+  var v = (document.getElementById("nt_REPLY_RECEIVED")||{}).value;
+  if(v==="YES"){
+    var d = document.getElementById("nt_REPLY_DATE");
+    if(d && !d.value) d.value = (typeof todayISO==="function"?todayISO():"");
+    var ps = document.getElementById("nt_PROCESS_STATUS");
+    if(ps && ps.value==="OPEN") ps.value = "REPLIED";
+  }
+}
+function ntVerify(){
+  var q = ((document.getElementById("nt_SEARCH")||{}).value||"").trim();
+  var box = document.getElementById("nt-verify");
+  if(!q){ if(box){ box.className="verify-box err show"; box.innerHTML="Enter A/c / Loan / Customer ID"; } return; }
+  function fill(name, cid, acc, loan, mobile, email){
+    var set=function(id,v){ var e=document.getElementById(id); if(e && (v||v==="")) e.value=v||""; };
+    if(name) set("nt_RECIPIENT_NAME", name);
+    if(cid) set("nt_CUSTOMER_ID", cid);
+    if(acc) set("nt_ACCOUNT_NO", acc);
+    if(loan) set("nt_LOAN_ACCOUNT_NO", loan);
+    if(mobile) set("nt_RECIPIENT_MOBILE", mobile);
+    if(email) set("nt_RECIPIENT_EMAIL", email);
+  }
+  function applyAcc(r){
+    if(r && r.status==="success"){
+      lookupCacheSet("accounts", q, r);
+      fill(r.ACCOUNT_NAME, r.CUSTOMER_ID, r.ACCOUNT_NO, "", r.MOBILE, r.EMAIL);
+      if(box){ box.className="verify-box ok show"; box.innerHTML="✓ "+(r.ACCOUNT_NAME||r.ACCOUNT_NO)+" · Bal ₹ "+Number(r.CURRENT_BALANCE||0).toLocaleString("en-IN"); }
+      toast("Account OK");
+      return true;
+    }
+    return false;
+  }
+  var cached = lookupCacheGet("accounts", q);
+  if(cached && applyAcc(cached)) return;
+  if(box){ box.className="verify-box show"; box.innerHTML="Verifying…"; }
+  postGAS({action:"lookup_account", account_no:q}).then(function(r){
+    if(applyAcc(r)) return;
+    // try loan list
+    return postGAS({action:"get_list", sheet:"LOAN_REGISTRATION_MASTER", limit:500}).then(function(lr){
+      var rows=(lr&&lr.rows)||[];
+      var qu=q.toUpperCase();
+      for(var i=0;i<rows.length;i++){
+        var L=rows[i];
+        if(String(L.LOAN_ACCOUNT_NO||"").toUpperCase()===qu || String(L.APPLICATION_ID||"").toUpperCase()===qu || String(L.ACCOUNT_NO||"").toUpperCase()===qu || String(L.CUSTOMER_ID||"").toUpperCase()===qu){
+          fill(L.ACCOUNT_NAME||L.CUSTOMER_NAME||L.APPLICANT_NAME||L.CUSTOMER_ID, L.CUSTOMER_ID, L.ACCOUNT_NO, L.LOAN_ACCOUNT_NO||L.APPLICATION_ID, L.MOBILE||"", L.CU_EMAIL||"");
+          if(box){ box.className="verify-box ok show"; box.innerHTML="✓ Loan "+(L.LOAN_ACCOUNT_NO||L.APPLICATION_ID)+" · "+(L.CUSTOMER_ID||""); }
+          toast("Loan linked");
+          return;
+        }
+      }
+      // customer master
+      return postGAS({action:"get_list", sheet:"CUSTOMER_MASTER", limit:500}).then(function(cr){
+        var crow=(cr&&cr.rows)||[];
+        for(var j=0;j<crow.length;j++){
+          var C=crow[j];
+          if(String(C.CUSTOMER_ID||"").toUpperCase()===qu || String(C.ACCOUNT_NO||"").toUpperCase()===qu || String(C.MOBILE||"")===q){
+            var nm=[C.PREFIX,C.FIRST_NAME,C.MIDDLE_NAME,C.LAST_NAME].filter(Boolean).join(" ");
+            fill(nm||C.CUSTOMER_ID, C.CUSTOMER_ID, C.ACCOUNT_NO, "", C.MOBILE, C.EMAIL);
+            if(box){ box.className="verify-box ok show"; box.innerHTML="✓ Customer "+nm; }
+            toast("Customer linked");
+            return;
+          }
+        }
+        if(box){ box.className="verify-box err show"; box.innerHTML="⚠️ Not found — aap manually name/mobile bhar sakte ho"; }
+      });
+    });
+  }).catch(function(){ if(box){ box.className="verify-box err show"; box.innerHTML="Network error"; } });
+}
+function ntReset(){
+  window._ntSelected=null;
+  ["nt_TITLE","nt_REASON","nt_DESCRIPTION","nt_AMOUNT","nt_DELIVERY_PLACE","nt_DELIVERY_ADDRESS","nt_REPLY_TEXT","nt_PROCESS_NOTES","nt_NOTICE_IMAGE","nt_SEARCH"].forEach(function(id){
+    var e=document.getElementById(id); if(e) e.value="";
+  });
+  var prev=document.getElementById("nt-img-preview"); if(prev) prev.innerHTML="No document";
+  var hint=document.getElementById("hint-nt_NOTICE_IMAGE"); if(hint) hint.textContent="";
+  var al=document.getElementById("al-notice"); if(al){ al.className="alert"; al.textContent=""; }
+  initNoticeRegister();
+}
+function saveNotice(e){
+  e.preventDefault();
+  var al=document.getElementById("al-notice");
+  var title=((document.getElementById("nt_TITLE")||{}).value||"").trim();
+  var reason=((document.getElementById("nt_REASON")||{}).value||"").trim();
+  if(!title){ toast("Title required"); return false; }
+  if(!reason){ toast("Reason (kyun) required"); return false; }
+  var row = {
+    NOTICE_ID: (document.getElementById("nt_NOTICE_ID")||{}).value||"",
+    NOTICE_NO: (document.getElementById("nt_NOTICE_NO")||{}).value||"",
+    CHANNEL: (document.getElementById("nt_CHANNEL")||{}).value||"SMS",
+    NOTICE_TYPE: (document.getElementById("nt_NOTICE_TYPE")||{}).value||"",
+    TITLE: title,
+    DESCRIPTION: (document.getElementById("nt_DESCRIPTION")||{}).value||"",
+    REASON: reason,
+    AMOUNT: parseFloat((document.getElementById("nt_AMOUNT")||{}).value)||0,
+    PRIORITY: (document.getElementById("nt_PRIORITY")||{}).value||"NORMAL",
+    CUSTOMER_ID: (document.getElementById("nt_CUSTOMER_ID")||{}).value||"",
+    ACCOUNT_NO: (document.getElementById("nt_ACCOUNT_NO")||{}).value||"",
+    LOAN_ACCOUNT_NO: (document.getElementById("nt_LOAN_ACCOUNT_NO")||{}).value||"",
+    RECIPIENT_NAME: (document.getElementById("nt_RECIPIENT_NAME")||{}).value||"",
+    RECIPIENT_MOBILE: (document.getElementById("nt_RECIPIENT_MOBILE")||{}).value||"",
+    RECIPIENT_EMAIL: (document.getElementById("nt_RECIPIENT_EMAIL")||{}).value||"",
+    DELIVERY_PLACE: (document.getElementById("nt_DELIVERY_PLACE")||{}).value||"",
+    DELIVERY_ADDRESS: (document.getElementById("nt_DELIVERY_ADDRESS")||{}).value||"",
+    SENT_DATE: (document.getElementById("nt_SENT_DATE")||{}).value||(typeof todayISO==="function"?todayISO():""),
+    SENT_TIME: (document.getElementById("nt_SENT_TIME")||{}).value||"",
+    DELIVERY_STATUS: (document.getElementById("nt_DELIVERY_STATUS")||{}).value||"SENT",
+    REPLY_RECEIVED: (document.getElementById("nt_REPLY_RECEIVED")||{}).value||"NO",
+    REPLY_DATE: (document.getElementById("nt_REPLY_DATE")||{}).value||"",
+    REPLY_TEXT: (document.getElementById("nt_REPLY_TEXT")||{}).value||"",
+    PROCESS_STATUS: (document.getElementById("nt_PROCESS_STATUS")||{}).value||"OPEN",
+    PROCESS_NOTES: (document.getElementById("nt_PROCESS_NOTES")||{}).value||"",
+    NOTICE_IMAGE: (document.getElementById("nt_NOTICE_IMAGE")||{}).value||"",
+    CREATED_BY: (document.getElementById("nt_CREATED_BY")||{}).value||(session.employeeCode||""),
+    STATUS: "ACTIVE",
+    START_DATE: (document.getElementById("nt_SENT_DATE")||{}).value||"",
+    CREATED_DATE: new Date().toISOString()
+  };
+  var btn = (e.target.querySelector && e.target.querySelector('button[type="submit"]')) || null;
+  if(btn){ btn.disabled=true; btn.dataset.orig=btn.textContent; btn.textContent="Saving…"; }
+  if(al){ al.className="alert show"; al.textContent="Saving notice…"; }
+
+  var isUpdate = !!(window._ntSelected && window._ntSelected.NOTICE_ID && row.NOTICE_ID === window._ntSelected.NOTICE_ID);
+  var payload = isUpdate
+    ? { action:"update", sheet:"NOTICE_MASTER", key_field:"NOTICE_ID", key_value:row.NOTICE_ID, row:row }
+    : { action:"append", sheet:"NOTICE_MASTER", row:row };
+
+  function ok(r){
+    if(btn){ btn.disabled=false; btn.textContent=btn.dataset.orig||"Save Notice"; }
+    if(!r||r.status!=="success"){
+      // try update_row fallback
+      if(isUpdate){
+        return postGAS({action:"update_row", sheet:"NOTICE_MASTER", keyColumn:"NOTICE_ID", keyValue:row.NOTICE_ID, patch:row}).then(function(r2){
+          if(r2&&r2.status==="success"){
+            if(al){ al.className="alert show alert-ok"; al.textContent="✓ Notice updated "+(row.NOTICE_NO||row.NOTICE_ID); }
+            toast("Notice updated"); loadNoticeList(true); ntReset();
+          } else {
+            var msg=(r2&&r2.message)||(r&&r.message)||"Save failed";
+            if(al){ al.className="alert show alert-er"; al.textContent="⚠️ "+msg; }
+            toast(msg);
+          }
+        });
+      }
+      var msg=(r&&r.message)||"Save failed";
+      if(al){ al.className="alert show alert-er"; al.textContent="⚠️ "+msg; }
+      toast(msg);
+      return;
+    }
+    if(r.NOTICE_NO) row.NOTICE_NO=r.NOTICE_NO;
+    if(r.NOTICE_ID) row.NOTICE_ID=r.NOTICE_ID;
+    if(r.row){ if(r.row.NOTICE_NO) row.NOTICE_NO=r.row.NOTICE_NO; if(r.row.NOTICE_ID) row.NOTICE_ID=r.row.NOTICE_ID; }
+    if(al){ al.className="alert show alert-ok"; al.textContent="✓ Notice saved — "+(row.NOTICE_NO||row.NOTICE_ID)+" → "+(row.RECIPIENT_NAME||row.ACCOUNT_NO||""); }
+    toast("Notice saved");
+    window._ntSelected=null;
+    loadNoticeList(true);
+    // refresh ids for next
+    ["nt_TITLE","nt_REASON","nt_DESCRIPTION","nt_AMOUNT","nt_REPLY_TEXT","nt_PROCESS_NOTES","nt_NOTICE_IMAGE"].forEach(function(id){
+      var el=document.getElementById(id); if(el) el.value="";
+    });
+    postGAS({action:"get_next_ids"}).then(function(nr){
+      if(nr&&nr.ids){
+        var id=document.getElementById("nt_NOTICE_ID"); var no=document.getElementById("nt_NOTICE_NO");
+        if(id) id.value=nr.ids.NOTICE_ID||"";
+        if(no) no.value=nr.ids.NOTICE_NO||nr.ids.NOTICE_ID||"";
+      }
+    });
+  }
+  postGAS(payload).then(ok).catch(function(){
+    if(btn){ btn.disabled=false; btn.textContent=btn.dataset.orig||"Save Notice"; }
+    if(al){ al.className="alert show alert-er"; al.textContent="⚠️ Network error"; }
+    toast("Network error");
+  });
+  return false;
+}
+function loadNoticeList(force){
+  var tbody=document.querySelector("#tbl-notice-list tbody");
+  if(!force && window._ntList && window._ntList.length){
+    paintNoticeList(window._ntList);
+    return;
+  }
+  if(tbody) tbody.innerHTML='<tr><td colspan="12" class="lv-empty">Loading…</td></tr>';
+  postGAS({action:"get_list", sheet:"NOTICE_MASTER", limit:1000}).then(function(r){
+    var rows=((r&&r.rows)||[]).slice();
+    rows.sort(function(a,b){ return String(b.SENT_DATE||b.CREATED_DATE||"").localeCompare(String(a.SENT_DATE||a.CREATED_DATE||"")); });
+    window._ntList = rows;
+    paintNoticeList(rows);
+    // stats
+    var sent=0, reply=0, pending=0, amt=0;
+    rows.forEach(function(x){
+      sent++;
+      var rp=String(x.REPLY_RECEIVED||"NO").toUpperCase();
+      if(rp==="YES") reply++; else pending++;
+      amt += parseFloat(x.AMOUNT)||0;
+    });
+    var s=function(id,v){ var e=document.getElementById(id); if(e) e.textContent=v; };
+    s("nt-total", String(rows.length));
+    s("nt-sent", String(sent));
+    s("nt-reply", String(reply));
+    s("nt-pending", String(pending));
+    s("nt-amount", "₹ "+Number(amt).toLocaleString("en-IN"));
+  }).catch(function(){
+    if(tbody) tbody.innerHTML='<tr><td colspan="12" class="lv-empty">Network error</td></tr>';
+  });
+}
+function paintNoticeList(rows){
+  var tbody=document.querySelector("#tbl-notice-list tbody");
+  var cnt=document.getElementById("nt-list-count");
+  if(cnt) cnt.textContent = (rows||[]).length + " notice(s)";
+  if(!tbody) return;
+  if(!rows||!rows.length){
+    tbody.innerHTML='<tr><td colspan="12" class="lv-empty">No notices yet</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map(function(x,i){
+    var reply = String(x.REPLY_RECEIVED||"NO").toUpperCase()==="YES";
+    var img = x.NOTICE_IMAGE && String(x.NOTICE_IMAGE).indexOf("data:")===0;
+    var reason = (x.REASON||x.DESCRIPTION||"—");
+    if(reason.length>40) reason = reason.substring(0,40)+"…";
+    var badge = reply ? "td" : "tw";
+    return "<tr>"
+      +"<td>"+(x.NOTICE_NO||x.NOTICE_ID||"—")+"</td>"
+      +"<td>"+(x.SENT_DATE||"—")+"</td>"
+      +"<td>"+(x.CHANNEL||x.NOTICE_TYPE||"—")+"</td>"
+      +"<td style='font-weight:600'>"+(x.RECIPIENT_NAME||x.CUSTOMER_ID||"—")+"</td>"
+      +"<td>"+(x.RECIPIENT_MOBILE||"—")+"</td>"
+      +"<td style='text-align:right;font-weight:600'>"+(x.AMOUNT?("₹ "+Number(x.AMOUNT).toLocaleString("en-IN")):"—")+"</td>"
+      +"<td style='max-width:140px;font-size:10.5px'>"+reason+"</td>"
+      +"<td style='font-size:10.5px'>"+(x.DELIVERY_PLACE||x.DELIVERY_ADDRESS||"—")+"</td>"
+      +"<td><span class='tb "+badge+"'>"+(reply?"YES":"NO")+"</span></td>"
+      +"<td>"+(x.PROCESS_STATUS||"—")+"</td>"
+      +"<td>"+(function(){ if(!x.NOTICE_IMAGE||String(x.NOTICE_IMAGE).indexOf("data:")!==0) return "—"; var k=detectDocKind(x.NOTICE_IMAGE); return docKindIcon(k.kind); })()+"</td>"
+      +"<td class='lv-actions'><button onclick='ntView("+i+")'>View</button> <button onclick='ntEdit("+i+")'>Edit</button></td>"
+      +"</tr>";
+  }).join("");
+}
+function filterNoticeList(){
+  var q=((document.getElementById("nt-search")||{}).value||"").trim().toLowerCase();
+  var ch=((document.getElementById("nt-filter-channel")||{}).value||"").toUpperCase();
+  var rp=((document.getElementById("nt-filter-reply")||{}).value||"").toUpperCase();
+  var all=window._ntList||[];
+  paintNoticeList(all.filter(function(x){
+    if(ch && String(x.CHANNEL||"").toUpperCase()!==ch) return false;
+    if(rp && String(x.REPLY_RECEIVED||"NO").toUpperCase()!==rp) return false;
+    if(!q) return true;
+    return [x.NOTICE_NO,x.NOTICE_ID,x.RECIPIENT_NAME,x.RECIPIENT_MOBILE,x.TITLE,x.REASON,x.AMOUNT,x.ACCOUNT_NO,x.CUSTOMER_ID,x.PROCESS_STATUS].join(" ").toLowerCase().indexOf(q)>=0;
+  }));
+}
+function ntView(i){
+  var x=(window._ntList||[])[i];
+  if(!x) return;
+  window._ntSelected=x;
+  var imgHtml = "";
+  if(x.NOTICE_IMAGE && String(x.NOTICE_IMAGE).indexOf("data:")===0){
+    imgHtml = '<div style="margin-top:10px;grid-column:1/-1"><b style="display:block;color:var(--tm);font-size:10px;text-transform:uppercase;margin-bottom:6px">Attached Document</b>'
+      + renderDocPreview(x.NOTICE_IMAGE, {maxH:280, downloadName:(x.NOTICE_NO||x.NOTICE_ID||"notice")+"-doc"})
+      + '</div>';
+  } else if(x.NOTICE_IMAGE){
+    imgHtml = '<div style="margin-top:8px;color:#6B7280;font-size:11px">📎 Document on record (preview unavailable)</div>';
+  }
+  var html = '<div class="modal-grid">'
+    +'<div><b>Notice No</b>'+(x.NOTICE_NO||x.NOTICE_ID||"—")+'</div>'
+    +'<div><b>Date / Time</b>'+(x.SENT_DATE||"—")+' '+(x.SENT_TIME||"")+'</div>'
+    +'<div><b>Channel</b>'+(x.CHANNEL||"—")+'</div>'
+    +'<div><b>Type</b>'+(x.NOTICE_TYPE||"—")+'</div>'
+    +'<div><b>To (Name)</b>'+(x.RECIPIENT_NAME||"—")+'</div>'
+    +'<div><b>Mobile / Email</b>'+(x.RECIPIENT_MOBILE||"—")+' / '+(x.RECIPIENT_EMAIL||"—")+'</div>'
+    +'<div><b>A/c / Loan</b>'+(x.ACCOUNT_NO||"—")+' / '+(x.LOAN_ACCOUNT_NO||"—")+'</div>'
+    +'<div><b>Amount</b>₹ '+Number(x.AMOUNT||0).toLocaleString("en-IN")+'</div>'
+    +'<div><b>Kyun (Reason)</b>'+(x.REASON||"—")+'</div>'
+    +'<div><b>Kahan (Place)</b>'+(x.DELIVERY_PLACE||x.DELIVERY_ADDRESS||"—")+'</div>'
+    +'<div><b>Delivery Status</b>'+(x.DELIVERY_STATUS||"—")+'</div>'
+    +'<div><b>Reply</b>'+(x.REPLY_RECEIVED||"NO")+(x.REPLY_DATE?(" · "+x.REPLY_DATE):"")+'</div>'
+    +'<div style="grid-column:1/-1"><b>Reply Text</b>'+(x.REPLY_TEXT||"—")+'</div>'
+    +'<div><b>Process</b>'+(x.PROCESS_STATUS||"—")+'</div>'
+    +'<div style="grid-column:1/-1"><b>Process Notes</b>'+(x.PROCESS_NOTES||"—")+'</div>'
+    +'<div style="grid-column:1/-1"><b>Body</b>'+(x.DESCRIPTION||"—")+'</div>'
+    +'</div>'+imgHtml;
+  if(typeof _currentModalTitle!=="undefined") window._currentModalTitle = "Notice — "+(x.NOTICE_NO||"");
+  window._currentModalRow = x;
+  var title=document.getElementById("vmTitle");
+  var body=document.getElementById("vmBody");
+  var modal=document.getElementById("viewModal");
+  if(title) title.textContent = "Notice — "+(x.NOTICE_NO||x.NOTICE_ID||"");
+  if(body) body.innerHTML = html;
+  if(modal) modal.classList.add("show");
+}
+function ntEdit(i){
+  var x=(window._ntList||[])[i];
+  if(!x) return;
+  window._ntSelected=x;
+  var set=function(id,v){ var e=document.getElementById(id); if(e) e.value=(v!=null?v:""); };
+  set("nt_NOTICE_ID", x.NOTICE_ID);
+  set("nt_NOTICE_NO", x.NOTICE_NO||x.NOTICE_ID);
+  set("nt_CHANNEL", x.CHANNEL||"SMS");
+  set("nt_NOTICE_TYPE", x.NOTICE_TYPE||"General");
+  set("nt_TITLE", x.TITLE);
+  set("nt_AMOUNT", x.AMOUNT||"");
+  set("nt_PRIORITY", x.PRIORITY||"NORMAL");
+  set("nt_SENT_DATE", x.SENT_DATE?String(x.SENT_DATE).substring(0,10):"");
+  set("nt_SENT_TIME", x.SENT_TIME||"");
+  set("nt_REASON", x.REASON);
+  set("nt_DESCRIPTION", x.DESCRIPTION);
+  set("nt_CUSTOMER_ID", x.CUSTOMER_ID);
+  set("nt_ACCOUNT_NO", x.ACCOUNT_NO);
+  set("nt_LOAN_ACCOUNT_NO", x.LOAN_ACCOUNT_NO);
+  set("nt_RECIPIENT_NAME", x.RECIPIENT_NAME);
+  set("nt_RECIPIENT_MOBILE", x.RECIPIENT_MOBILE);
+  set("nt_RECIPIENT_EMAIL", x.RECIPIENT_EMAIL);
+  set("nt_DELIVERY_PLACE", x.DELIVERY_PLACE);
+  set("nt_DELIVERY_ADDRESS", x.DELIVERY_ADDRESS);
+  set("nt_DELIVERY_STATUS", x.DELIVERY_STATUS||"SENT");
+  set("nt_REPLY_RECEIVED", x.REPLY_RECEIVED||"NO");
+  set("nt_REPLY_DATE", x.REPLY_DATE?String(x.REPLY_DATE).substring(0,10):"");
+  set("nt_REPLY_TEXT", x.REPLY_TEXT);
+  set("nt_PROCESS_STATUS", x.PROCESS_STATUS||"OPEN");
+  set("nt_PROCESS_NOTES", x.PROCESS_NOTES);
+  set("nt_NOTICE_IMAGE", x.NOTICE_IMAGE||"");
+  var prev=document.getElementById("nt-img-preview");
+  if(prev){
+    if(x.NOTICE_IMAGE && String(x.NOTICE_IMAGE).indexOf("data:")===0)
+      updateDocPreviewEl("nt-img-preview", x.NOTICE_IMAGE, {maxH:160, downloadName:(x.NOTICE_NO||"notice")+"-doc"});
+    else prev.innerHTML = x.NOTICE_IMAGE ? "✓ File on record" : "No document";
+  }
+  toast("Notice loaded for edit — update reply/process & Save");
+  try{ document.getElementById("form-notice").scrollIntoView({behavior:"smooth"}); }catch(e){}
+}
+function ntPrintSelected(){
+  var x = window._ntSelected || (window._ntList||[])[0];
+  if(!x){ toast("Pehle View/Edit se notice select karein"); return; }
+  var w=window.open("","_blank");
+  if(!w){ toast("Allow popups"); return; }
+  w.document.write(printLetterhead({ title:"NOTICE — "+(x.NOTICE_NO||x.NOTICE_ID||""), sub:(x.NOTICE_TYPE||"")+" · "+(x.CHANNEL||""), date:x.SENT_DATE||"" }));
+  w.document.write("<table>");
+  w.document.write("<tr><td>Notice No</td><td>"+(x.NOTICE_NO||x.NOTICE_ID)+"</td></tr>");
+  w.document.write("<tr><td>To</td><td>"+(x.RECIPIENT_NAME||"—")+" · "+(x.RECIPIENT_MOBILE||"")+"</td></tr>");
+  w.document.write("<tr><td>A/c / Loan</td><td>"+(x.ACCOUNT_NO||"—")+" / "+(x.LOAN_ACCOUNT_NO||"—")+"</td></tr>");
+  w.document.write("<tr><td>Amount</td><td>₹ "+Number(x.AMOUNT||0).toLocaleString("en-IN")+"</td></tr>");
+  w.document.write("<tr><td>Kyun</td><td>"+(x.REASON||"—")+"</td></tr>");
+  w.document.write("<tr><td>Kahan</td><td>"+(x.DELIVERY_PLACE||x.DELIVERY_ADDRESS||"—")+"</td></tr>");
+  w.document.write("<tr><td>Reply</td><td>"+(x.REPLY_RECEIVED||"NO")+" "+(x.REPLY_TEXT||"")+"</td></tr>");
+  w.document.write("<tr><td>Process</td><td>"+(x.PROCESS_STATUS||"—")+" — "+(x.PROCESS_NOTES||"")+"</td></tr>");
+  w.document.write("</table>");
+  if(x.DESCRIPTION) w.document.write("<p style='margin-top:10px;font-size:12px'><b>Body:</b><br>"+x.DESCRIPTION+"</p>");
+  if(x.NOTICE_IMAGE && String(x.NOTICE_IMAGE).indexOf("data:image")===0){
+    w.document.write("<div style='margin-top:10px'><img src='"+x.NOTICE_IMAGE+"' style='max-width:100%;max-height:280px'></div>");
+  } else if(x.NOTICE_IMAGE && String(x.NOTICE_IMAGE).indexOf("data:application/pdf")===0){
+    w.document.write("<div style='margin-top:10px;padding:10px;border:1px solid #ccc'><b>Attached PDF</b> — print/open from system. <a href='"+x.NOTICE_IMAGE+"' target='_blank'>Open PDF</a></div>");
+  } else if(x.NOTICE_IMAGE && String(x.NOTICE_IMAGE).indexOf("data:")===0){
+    w.document.write("<div style='margin-top:10px;padding:10px;border:1px solid #ccc'><b>Attached Document</b> (download from system to view)</div>");
+  }
+  w.document.write(printLetterFooter());
+  w.document.write("<script>window.print()<\/script>");
+  w.document.close();
+}
+
+/* ===== Interest Calculator (Fixed + Reducing, Account Verify) ===== */
+window._icAccount = null;
+window._icLast = null;
+
+function icFmt(n){
+  return "₹ "+Number(n||0).toLocaleString("en-IN",{maximumFractionDigits:2,minimumFractionDigits:2});
+}
+function icVerifyAccount(){
+  var acc = (document.getElementById("ic_ACCOUNT_NO")||{}).value||"";
+  acc = acc.trim();
+  var box = document.getElementById("ic-verify");
+  if(!acc){
+    if(box){ box.className="verify-box err show"; box.innerHTML="<b>Enter Account No</b>"; }
+    toast("Account number required");
+    return;
+  }
+  function apply(r){
+    if(!r || r.status!=="success"){
+      window._icAccount=null;
+      if(box){ box.className="verify-box err show"; box.innerHTML="⚠️ "+((r&&r.message)||"Account not found"); }
+      ["ic_NAME","ic_TYPE","ic_BALANCE","ic_ACC_RATE"].forEach(function(id){ var e=document.getElementById(id); if(e) e.value=""; });
+      return;
+    }
+    lookupCacheSet("accounts", acc, r);
+    window._icAccount = r;
+    var set=function(id,v){ var e=document.getElementById(id); if(e) e.value=v!=null?v:""; };
+    set("ic_NAME", r.ACCOUNT_NAME||r.CUSTOMER_ID||"");
+    set("ic_TYPE", r.ACCOUNT_TYPE||"");
+    set("ic_BALANCE", Number(r.CURRENT_BALANCE||0).toLocaleString("en-IN"));
+    var rate = r.INTEREST_RATE!=null && r.INTEREST_RATE!=="" ? r.INTEREST_RATE : "";
+    set("ic_ACC_RATE", rate!=="" ? rate : "—");
+    if(rate!=="" && rate!=null){
+      var re=document.getElementById("ic_RATE"); if(re) re.value=rate;
+    }
+    var st=String(r.ACCOUNT_STATUS||"ACTIVE").toUpperCase();
+    var ok = st!=="CLOSED"&&st!=="BLOCKED";
+    if(box){
+      box.className="verify-box "+(ok?"ok":"err")+" show";
+      box.innerHTML='<div class="verify-grid">'
+        +'<div><b>A/c</b>'+(r.ACCOUNT_NO||"—")+'</div>'
+        +'<div><b>Name</b>'+(r.ACCOUNT_NAME||"—")+'</div>'
+        +'<div><b>Type</b>'+(r.ACCOUNT_TYPE||"—")+'</div>'
+        +'<div><b>Balance</b>₹ '+Number(r.CURRENT_BALANCE||0).toLocaleString("en-IN")+'</div>'
+        +'<div><b>Rate</b>'+(rate!==""?rate+"%":"—")+'</div>'
+        +'<div><b>Status</b>'+(r.ACCOUNT_STATUS||"—")+'</div>'
+        +'</div>'+(ok?"":'<p style="color:var(--er);margin-top:6px">Account is '+st+'</p>');
+    }
+    toast("Account verified: "+(r.ACCOUNT_NAME||r.ACCOUNT_NO));
+  }
+  var cached = lookupCacheGet("accounts", acc);
+  if(cached){ apply(cached); return; }
+  if(box){ box.className="verify-box show"; box.innerHTML="Verifying…"; }
+  postGAS({action:"lookup_account", account_no:acc}).then(apply).catch(function(){
+    if(box){ box.className="verify-box err show"; box.innerHTML="Network error"; }
+  });
+}
+function icOnModeChange(){
+  var m = (document.getElementById("ic_MODE")||{}).value||"DAILY";
+  var days = document.getElementById("ic_DAYS");
+  var amt = document.getElementById("ic_AMOUNT");
+  if(m==="DAILY"){ if(days) days.value=365; if(amt && !amt.value) amt.value=100; }
+  else if(m==="WEEKLY"){ if(days) days.value=52; }
+  else if(m==="MONTHLY"){ if(days) days.value=12; }
+  else if(m==="LUMPSUM"){ if(days) days.value=365; }
+  else if(m==="BALANCE"){
+    icUseAccountBalance();
+    if(days) days.value=365;
+  }
+}
+function icPresetDaily100(){
+  var m=document.getElementById("ic_MODE"); if(m) m.value="DAILY";
+  var a=document.getElementById("ic_AMOUNT"); if(a) a.value=100;
+  var d=document.getElementById("ic_DAYS"); if(d) d.value=365;
+  var meth=document.getElementById("ic_METHOD"); if(meth) meth.value="BOTH";
+  toast("Example set: ₹100 daily × 365 days");
+  icCalculate();
+}
+function icUseAccountBalance(){
+  if(!window._icAccount){ toast("Pehle Account Verify karein"); icVerifyAccount(); return; }
+  var bal = parseFloat(window._icAccount.CURRENT_BALANCE)||0;
+  var m=document.getElementById("ic_MODE"); if(m) m.value="BALANCE";
+  var a=document.getElementById("ic_AMOUNT"); if(a) a.value=bal;
+  toast("Amount = A/c balance ₹ "+bal.toLocaleString("en-IN"));
+}
+function icReset(){
+  window._icLast=null;
+  ["ic_AMOUNT","ic_DAYS","ic_RATE"].forEach(function(id){
+    var e=document.getElementById(id);
+    if(e){ if(id==="ic_AMOUNT") e.value=100; else if(id==="ic_DAYS") e.value=365; else e.value=6; }
+  });
+  var m=document.getElementById("ic_MODE"); if(m) m.value="DAILY";
+  var meth=document.getElementById("ic_METHOD"); if(meth) meth.value="BOTH";
+  var c=document.getElementById("ic_COMPOUND"); if(c) c.value="NONE";
+  var s=document.getElementById("ic-result-stats"); if(s) s.style.display="none";
+  var d=document.getElementById("ic-detail-card"); if(d) d.style.display="none";
+  var al=document.getElementById("al-int-calc"); if(al){ al.className="alert"; al.textContent=""; }
+}
+
+/**
+ * FIXED interest for recurring deposits:
+ * - Simple: interest on each installment for remaining period, OR average capital method
+ *   SI on total principal for half period is common approximation for RD:
+ *   Interest = P * n * (n+1)/2 / n * r/100 * (period_unit/365 or /12)
+ * For DAILY deposit of A for N days at R% p.a.:
+ *   Each day-i deposit earns interest for (N-i+1)/365 years → sum = A * R/100 /365 * sum(1..N)
+ *   = A * R/100 /365 * N*(N+1)/2
+ * REDUCING / day-wise accrual: same formula for daily deposits (exact).
+ * Difference appears for lumpsum / balance with reducing vs fixed compound.
+ */
+function icCalculate(){
+  var box = document.getElementById("ic-verify");
+  if(!window._icAccount || !(box && box.classList.contains("ok"))){
+    toast("Pehle Account Verify karein");
+    if(box){ box.className="verify-box err show"; box.innerHTML="⚠️ Pehle <b>Verify A/c</b> dabayein"; }
+    return;
+  }
+  var mode = (document.getElementById("ic_MODE")||{}).value||"DAILY";
+  var amount = parseFloat((document.getElementById("ic_AMOUNT")||{}).value)||0;
+  var period = parseInt((document.getElementById("ic_DAYS")||{}).value,10)||0;
+  var rate = parseFloat((document.getElementById("ic_RATE")||{}).value)||0;
+  var method = (document.getElementById("ic_METHOD")||{}).value||"BOTH";
+  var compound = (document.getElementById("ic_COMPOUND")||{}).value||"NONE";
+  if(amount<=0){ toast("Valid amount enter karein"); return; }
+  if(period<=0){ toast("Valid period enter karein"); return; }
+  if(rate<0){ toast("Valid rate enter karein"); return; }
+
+  var principal=0, fixedInt=0, reducingInt=0, daysEquiv=0, schedule=[];
+  var rDay = rate/100/365; // daily rate
+  var rMonth = rate/100/12;
+
+  if(mode==="DAILY"){
+    // N daily deposits of `amount`
+    var N = period;
+    principal = amount * N;
+    daysEquiv = N;
+    // Exact: deposit on day k earns (N-k+1) days interest
+    // Sum of days = N*(N+1)/2
+    var sumDays = N*(N+1)/2;
+    reducingInt = amount * rDay * sumDays;
+    // Fixed simple on full principal for full period (higher) — OR average capital
+    // User asked Fixed vs Reducing: Fixed = interest on total deposit as if kept full period
+    fixedInt = principal * (rate/100) * (N/365);
+    // Optional: show installment-wise sample (first 5, mid, last 5)
+    for(var d=1; d<=N; d++){
+      if(d<=3 || d>N-2 || d===Math.floor(N/2)){
+        var daysLeft = N-d+1;
+        var intEarned = amount * rDay * daysLeft;
+        schedule.push({n:d, deposit:amount, days:daysLeft, interest:intEarned, balance:amount*d});
+      }
+    }
+  } else if(mode==="WEEKLY"){
+    var W = period;
+    principal = amount * W;
+    daysEquiv = W*7;
+    var sumW = W*(W+1)/2;
+    reducingInt = amount * (rate/100) * (7/365) * sumW;
+    fixedInt = principal * (rate/100) * (daysEquiv/365);
+  } else if(mode==="MONTHLY"){
+    var M = period;
+    principal = amount * M;
+    daysEquiv = M*30; // approx
+    var sumM = M*(M+1)/2;
+    reducingInt = amount * rMonth * sumM; // each installment for remaining months
+    fixedInt = principal * (rate/100) * (M/12);
+  } else if(mode==="LUMPSUM" || mode==="BALANCE"){
+    principal = amount;
+    daysEquiv = period;
+    // Fixed simple
+    fixedInt = principal * (rate/100) * (period/365);
+    // Compound fixed
+    if(compound!=="NONE"){
+      var nComp = compound==="YEARLY"?1:compound==="HALF"?2:compound==="QUARTER"?4:12;
+      var years = period/365;
+      var mat = principal * Math.pow(1+rate/100/nComp, nComp*years);
+      fixedInt = mat - principal;
+    }
+    // Reducing for lumpsum on balance: same as simple if no withdrawals (flat balance)
+    // True reducing for loan EMI style — here for deposit balance, day-wise SI is same as fixed simple
+    reducingInt = principal * rDay * period;
+    schedule.push({n:1, deposit:principal, days:period, interest:reducingInt, balance:principal});
+  }
+
+  var maturityFixed = principal + fixedInt;
+  var maturityRed = principal + reducingInt;
+
+  window._icLast = {
+    mode:mode, amount:amount, period:period, rate:rate, method:method, compound:compound,
+    principal:principal, fixedInt:fixedInt, reducingInt:reducingInt,
+    maturityFixed:maturityFixed, maturityRed:maturityRed, daysEquiv:daysEquiv,
+    schedule:schedule,
+    account: window._icAccount
+  };
+
+  // UI
+  var stats = document.getElementById("ic-result-stats");
+  if(stats) stats.style.display="grid";
+  var setT=function(id,v){ var e=document.getElementById(id); if(e) e.textContent=v; };
+  setT("ic-r-principal", icFmt(principal));
+  setT("ic-r-fixed", icFmt(fixedInt));
+  setT("ic-r-reducing", icFmt(reducingInt));
+  setT("ic-r-maturity", icFmt(maturityFixed));
+
+  var showFixed = method==="BOTH"||method==="FIXED";
+  var showRed = method==="BOTH"||method==="REDUCING";
+  var modeLabel = {DAILY:"Daily Deposit",WEEKLY:"Weekly Deposit",MONTHLY:"Monthly Deposit",LUMPSUM:"Lumpsum",BALANCE:"Current Balance"}[mode]||mode;
+  var unitLabel = mode==="DAILY"?"days":mode==="WEEKLY"?"weeks":mode==="MONTHLY"?"months":"days";
+
+  var html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">';
+  html += '<div style="background:#F5E6EA;padding:10px;border-radius:6px">';
+  html += '<b style="color:#8B1538">Account</b><br>'
+    +(window._icAccount.ACCOUNT_NO||"—")+' · '+(window._icAccount.ACCOUNT_NAME||"—")+'<br>'
+    +'Type: '+(window._icAccount.ACCOUNT_TYPE||"—")+' · Rate used: <b>'+rate+'% p.a.</b>';
+  html += '</div><div style="background:#ECFDF5;padding:10px;border-radius:6px">';
+  html += '<b style="color:#065F46">Scheme</b><br>'+modeLabel+' · ₹ '+Number(amount).toLocaleString("en-IN")
+    +' × '+period+' '+unitLabel+'<br>Total Principal: <b>'+icFmt(principal)+'</b>';
+  html += '</div></div>';
+
+  html += '<div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:10px">';
+  if(showFixed){
+    html += '<div style="border:1px solid #A7F3D0;border-radius:6px;padding:10px">'
+      +'<div style="font-weight:700;color:#0F6B3A;margin-bottom:4px">FIXED Interest'
+      +(compound!=="NONE" && (mode==="LUMPSUM"||mode==="BALANCE") ? " ("+compound+" compound)" : " (Simple on full principal)")
+      +'</div>'
+      +'Interest: <b style="color:#0F6B3A">'+icFmt(fixedInt)+'</b><br>'
+      +'Maturity: <b>'+icFmt(maturityFixed)+'</b><br>'
+      +'<span style="font-size:10.5px;color:#555">Formula: full principal × rate × time (as if entire amount stayed for full period)</span>'
+      +'</div>';
+  }
+  if(showRed){
+    html += '<div style="border:1px solid #BFDBFE;border-radius:6px;padding:10px">'
+      +'<div style="font-weight:700;color:#1565C0;margin-bottom:4px">REDUCING / Accrual Interest</div>'
+      +'Interest: <b style="color:#1565C0">'+icFmt(reducingInt)+'</b><br>'
+      +'Maturity: <b>'+icFmt(maturityRed)+'</b><br>'
+      +'<span style="font-size:10.5px;color:#555">Each installment earns interest only for remaining days (day-wise accrual)</span>'
+      +'</div>';
+  }
+  html += '</div>';
+
+  if(showFixed && showRed){
+    var diff = Math.abs(fixedInt - reducingInt);
+    html += '<p style="margin-top:8px;font-size:11.5px;color:#444"><b>Difference (Fixed − Reducing):</b> '+icFmt(fixedInt-reducingInt)
+      +' · Reducing is usually lower for recurring deposits because early deposits earn longer, but Fixed applies full-period on total.</p>';
+  }
+
+  // Example callout for 100 x 365
+  if(mode==="DAILY" && amount===100 && period===365){
+    html += '<div style="margin-top:8px;padding:8px 10px;background:#FFF8F9;border:1px solid #F8BBD0;border-radius:6px;font-size:11.5px">'
+      +'<b>Example:</b> Customer deposits <b>₹100 daily</b> for <b>365 days</b> @ <b>'+rate+'%</b><br>'
+      +'Total deposit = ₹36,500<br>'
+      +'Fixed interest ≈ '+icFmt(fixedInt)+' · Reducing interest ≈ '+icFmt(reducingInt)
+      +'</div>';
+  }
+
+  var sumEl = document.getElementById("ic-summary");
+  if(sumEl) sumEl.innerHTML = html;
+
+  var thead = document.querySelector("#ic-schedule thead");
+  var tbody = document.querySelector("#ic-schedule tbody");
+  if(schedule.length && thead && tbody){
+    thead.innerHTML = "<tr><th>#</th><th>Deposit ₹</th><th>Days interest earned</th><th>Interest ₹</th><th>Cum. Principal ₹</th></tr>";
+    tbody.innerHTML = schedule.map(function(r){
+      return "<tr><td>"+r.n+"</td><td>"+Number(r.deposit).toLocaleString("en-IN")+"</td><td>"+r.days+"</td><td>"+Number(r.interest).toFixed(4)+"</td><td>"+Number(r.balance).toLocaleString("en-IN")+"</td></tr>";
+    }).join("") + (mode==="DAILY"?"<tr><td colspan='5' style='font-size:10.5px;color:#666'>Showing sample rows only (first / mid / last). Full interest uses exact sum of all "+period+" days.</td></tr>":"");
+  } else if(thead && tbody){
+    thead.innerHTML=""; tbody.innerHTML="";
+  }
+
+  var card = document.getElementById("ic-detail-card");
+  if(card) card.style.display="block";
+  var al = document.getElementById("al-int-calc");
+  if(al){ al.className="alert show alert-ok"; al.textContent="✓ Calculated — Principal "+icFmt(principal)+" · Fixed "+icFmt(fixedInt)+" · Reducing "+icFmt(reducingInt); }
+  toast("Interest calculated");
+}
+
+function icPrint(){
+  var L = window._icLast;
+  if(!L){ toast("Pehle Calculate karein"); return; }
+  var acc = L.account||{};
+  var w = window.open("", "_blank", "width=800,height=900");
+  if(!w){ toast("Allow popups"); return; }
+  w.document.write(printLetterhead({
+    title: "INTEREST CALCULATION SHEET",
+    sub: "A/c: <b>"+(acc.ACCOUNT_NO||"—")+"</b> · "+(acc.ACCOUNT_NAME||""),
+    date: (typeof todayISO==="function"?todayISO():"")
+  }));
+  w.document.write("<table>");
+  w.document.write("<tr><td>Mode</td><td>"+L.mode+"</td></tr>");
+  w.document.write("<tr><td>Installment / Amount</td><td>"+icFmt(L.amount)+"</td></tr>");
+  w.document.write("<tr><td>Period</td><td>"+L.period+"</td></tr>");
+  w.document.write("<tr><td>Rate % p.a.</td><td>"+L.rate+"%</td></tr>");
+  w.document.write("<tr><td>Total Principal</td><td>"+icFmt(L.principal)+"</td></tr>");
+  w.document.write("<tr><td>Fixed Interest</td><td>"+icFmt(L.fixedInt)+"</td></tr>");
+  w.document.write("<tr><td>Reducing Interest</td><td>"+icFmt(L.reducingInt)+"</td></tr>");
+  w.document.write("<tr class='tot'><td>Maturity (Fixed)</td><td>"+icFmt(L.maturityFixed)+"</td></tr>");
+  w.document.write("<tr class='tot'><td>Maturity (Reducing)</td><td>"+icFmt(L.maturityRed)+"</td></tr>");
+  w.document.write("</table>");
+  w.document.write("<p style='font-size:11px;margin-top:10px;color:#555'>Fixed = interest on full principal for entire period. Reducing = each deposit earns only for remaining days (accrual).</p>");
+  w.document.write(printLetterFooter());
+  w.document.write("<script>window.print()<\/script>");
+  w.document.close();
+}
+
+
+/* ===== Universal Document Preview (Image / PDF / DOC / Excel / other) ===== */
+function detectDocKind(dataUrl){
+  if(!dataUrl || typeof dataUrl !== "string") return {kind:"none", mime:"", label:"No file"};
+  var s = dataUrl.trim();
+  if(s.indexOf("data:")!==0) return {kind:"url", mime:"", label:"Link"};
+  var semi = s.indexOf(";");
+  var mime = (semi>5 ? s.substring(5, semi) : "").toLowerCase();
+  if(mime.indexOf("image/")===0) return {kind:"image", mime:mime, label:"Image"};
+  if(mime.indexOf("pdf")>=0 || mime==="application/pdf") return {kind:"pdf", mime:mime||"application/pdf", label:"PDF"};
+  if(mime.indexOf("msword")>=0 || mime.indexOf("wordprocessingml")>=0 || mime.indexOf("officedocument.word")>=0)
+    return {kind:"doc", mime:mime, label:"Word Document"};
+  if(mime.indexOf("excel")>=0 || mime.indexOf("spreadsheetml")>=0 || mime.indexOf("ms-excel")>=0)
+    return {kind:"xls", mime:mime, label:"Excel Spreadsheet"};
+  if(mime.indexOf("text/")===0 || mime.indexOf("rtf")>=0) return {kind:"text", mime:mime, label:"Text"};
+  if(mime.indexOf("octet-stream")>=0){
+    // guess from base64 header is hard — treat as download
+    return {kind:"file", mime:mime, label:"File"};
+  }
+  return {kind:"file", mime:mime||"application/octet-stream", label:"Document"};
+}
+function docKindIcon(kind){
+  return ({image:"🖼",pdf:"📄",doc:"📝",xls:"📊",text:"📃",file:"📎",url:"🔗",none:"—"})[kind]||"📎";
+}
+/** Returns HTML for inline preview. opts: {maxH:200, compact:false, downloadName:"document"} */
+function renderDocPreview(dataUrl, opts){
+  opts = opts || {};
+  var maxH = opts.maxH || 220;
+  var compact = !!opts.compact;
+  var name = opts.downloadName || "document";
+  var info = detectDocKind(dataUrl);
+  if(info.kind==="none" || !dataUrl){
+    return '<span style="color:#6B7280">'+(opts.emptyText||"No document")+'</span>';
+  }
+  var dl = '<a href="'+dataUrl+'" download="'+name+'" style="display:inline-block;margin-top:6px;padding:4px 10px;background:#8B1538;color:#fff;border-radius:5px;font-size:11px;font-weight:600;text-decoration:none">⬇ Download</a>'
+    +' <a href="'+dataUrl+'" target="_blank" rel="noopener" style="display:inline-block;margin-top:6px;padding:4px 10px;background:#fff;color:#8B1538;border:1px solid #8B1538;border-radius:5px;font-size:11px;font-weight:600;text-decoration:none">↗ Open</a>';
+  if(info.kind==="image"){
+    if(compact) return '<img src="'+dataUrl+'" alt="preview" style="max-width:140px;max-height:100px;object-fit:contain;border-radius:6px;border:1px solid #ddd;background:#fff">'+ (opts.showActions?('<div>'+dl+'</div>'):'');
+    return '<div style="text-align:center"><img src="'+dataUrl+'" alt="preview" style="max-width:100%;max-height:'+maxH+'px;object-fit:contain;border-radius:6px;border:1px solid #ddd;background:#fff"></div><div style="text-align:center">'+dl+'</div>';
+  }
+  if(info.kind==="pdf"){
+    if(compact){
+      return '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'
+        +'<span style="font-size:22px">📄</span><span style="font-weight:600;color:#8B1538">PDF Document</span>'
+        +dl+'</div>';
+    }
+    return '<div style="border:1px solid #e8d0d5;border-radius:6px;overflow:hidden;background:#fafafa">'
+      +'<div style="padding:6px 10px;background:#F5E6EA;font-size:11px;font-weight:700;color:#8B1538">📄 PDF Preview</div>'
+      +'<iframe src="'+dataUrl+'" style="width:100%;height:'+Math.max(maxH,320)+'px;border:none;background:#fff" title="PDF preview"></iframe>'
+      +'<div style="padding:8px;text-align:center;border-top:1px solid #eee">'+dl+'</div></div>';
+  }
+  if(info.kind==="text"){
+    // try decode for small preview
+    var body = "";
+    try{
+      var b64 = dataUrl.split(",")[1]||"";
+      body = decodeURIComponent(escape(atob(b64))).substring(0,800);
+    }catch(e){ body = "(preview unavailable)"; }
+    return '<div style="border:1px solid #e8d0d5;border-radius:6px;overflow:hidden">'
+      +'<div style="padding:6px 10px;background:#F5E6EA;font-size:11px;font-weight:700;color:#8B1538">📃 Text Preview</div>'
+      +'<pre style="margin:0;padding:10px;max-height:'+maxH+'px;overflow:auto;font-size:11px;white-space:pre-wrap;background:#fff">'+body.replace(/</g,"&lt;")+'</pre>'
+      +'<div style="padding:8px;text-align:center;border-top:1px solid #eee">'+dl+'</div></div>';
+  }
+  // DOC / XLS / generic — browser cannot fully render Office files from data-URI
+  var icon = docKindIcon(info.kind);
+  var tip = (info.kind==="doc"||info.kind==="xls")
+    ? "Browser me Word/Excel ka full preview possible nahi hai — Download karke open karein."
+    : "Preview is format ke liye available nahi — Download / Open use karein.";
+  return '<div style="border:1px solid #e8d0d5;border-radius:6px;padding:14px;text-align:center;background:#FFFBFB">'
+    +'<div style="font-size:36px;line-height:1">'+icon+'</div>'
+    +'<div style="font-weight:700;color:#8B1538;margin:6px 0 4px">'+info.label+'</div>'
+    +'<div style="font-size:11px;color:#6B7280;margin-bottom:8px">'+tip+'</div>'
+    +dl+'</div>';
+}
+function updateDocPreviewEl(elId, dataUrl, opts){
+  var el = document.getElementById(elId);
+  if(!el) return;
+  el.innerHTML = renderDocPreview(dataUrl, opts||{});
+}
+
+
+/* ===== Customer Profile Update (Account No locked) ===== */
+window._cupRow = null;
+window._cupAccount = null;
+
+window.fileToField = function(inp, fieldId){
+  var f = inp.files && inp.files[0];
+  if(!f) return;
+  // 5MB for PDF/docs, 3MB default images
+  var maxBytes = (f.type && (f.type.indexOf("pdf")>=0 || f.type.indexOf("officedocument")>=0 || f.type.indexOf("msword")>=0 || f.type.indexOf("ms-excel")>=0)) ? 5*1024*1024 : 3*1024*1024;
+  if(f.size > maxBytes){ toast("File too large (max "+Math.round(maxBytes/1024/1024)+"MB)"); inp.value=""; return; }
+  var reader = new FileReader();
+  reader.onload = function(e){
+    var dataUrl = e.target.result;
+    var hid = document.getElementById(fieldId);
+    if(hid) hid.value = dataUrl;
+    var hint = document.getElementById("hint-"+fieldId);
+    if(hint) hint.textContent = "✓ "+f.name+" ("+Math.round(f.size/1024)+" KB)";
+    // live preview for notice document
+    if(fieldId==="nt_NOTICE_IMAGE"){
+      updateDocPreviewEl("nt-img-preview", dataUrl, {maxH:180, compact:false, downloadName:f.name||"notice-doc"});
+    }
+    // generic: if hint sibling has data-preview id
+    var prevId = inp.getAttribute("data-preview");
+    if(prevId) updateDocPreviewEl(prevId, dataUrl, {maxH:160, downloadName:f.name||"document"});
+  };
+  reader.readAsDataURL(f);
+};
+
+function loadCustomerProfile(){
+  var q = (document.getElementById("cup_SEARCH")||{}).value || "";
+  q = q.trim();
+  var box = document.getElementById("cup-load-box");
+  var form = document.getElementById("form-customer-update");
+  var al = document.getElementById("al-customer-update");
+  if(al){ al.className="alert"; al.textContent=""; }
+  if(!q){
+    if(box){ box.className="verify-box err show"; box.innerHTML="<b>Enter Account No / Customer ID / Mobile</b>"; }
+    toast("Search value required");
+    return;
+  }
+  if(box){ box.className="verify-box show"; box.innerHTML="Loading profile…"; }
+  if(form) form.style.display="none";
+  window._cupRow = null;
+  window._cupAccount = null;
+
+  function fillFromCustomer(cust, acc){
+    window._cupRow = cust || {};
+    window._cupAccount = acc || null;
+    var set = function(id, v){ var e=document.getElementById(id); if(e) e.value = (v!=null && v!==undefined) ? v : ""; };
+    var pick = function(){
+      for(var i=0;i<arguments.length;i++){
+        var k=arguments[i];
+        if(cust && cust[k]!=null && cust[k]!=="") return cust[k];
+        if(acc && acc[k]!=null && acc[k]!=="") return acc[k];
+      }
+      return "";
+    };
+    set("cup_CUSTOMER_ID", pick("CUSTOMER_ID"));
+    set("cup_MEMBER_ID", pick("MEMBER_ID"));
+    set("cup_ACCOUNT_NO", pick("ACCOUNT_NO"));
+    set("cup_CUSTOMER_TYPE", pick("CUSTOMER_TYPE")||"INDIVIDUAL");
+    set("cup_PREFIX", pick("PREFIX")||"Mr");
+    set("cup_FIRST_NAME", pick("FIRST_NAME"));
+    set("cup_MIDDLE_NAME", pick("MIDDLE_NAME"));
+    set("cup_LAST_NAME", pick("LAST_NAME"));
+    // Name split fallback from ACCOUNT_NAME
+    if(!document.getElementById("cup_FIRST_NAME").value && pick("ACCOUNT_NAME")){
+      var parts = String(pick("ACCOUNT_NAME")).trim().split(/\s+/);
+      if(parts.length) set("cup_FIRST_NAME", parts[0]);
+      if(parts.length>2){ set("cup_MIDDLE_NAME", parts.slice(1,-1).join(" ")); set("cup_LAST_NAME", parts[parts.length-1]); }
+      else if(parts.length===2) set("cup_LAST_NAME", parts[1]);
+    }
+    set("cup_FATHER_NAME", pick("FATHER_NAME"));
+    set("cup_MOTHER_NAME", pick("MOTHER_NAME"));
+    set("cup_SPOUSE_NAME", pick("SPOUSE_NAME"));
+    set("cup_GENDER", pick("GENDER")||"Male");
+    var dob = pick("DOB");
+    if(dob && String(dob).length>=10) set("cup_DOB", String(dob).substring(0,10));
+    else set("cup_DOB", dob);
+    set("cup_AGE", pick("AGE"));
+    set("cup_MARITAL_STATUS", pick("MARITAL_STATUS")||"Single");
+    set("cup_MOBILE", pick("MOBILE"));
+    set("cup_ALT_MOBILE", pick("ALT_MOBILE"));
+    set("cup_EMAIL", pick("EMAIL"));
+    set("cup_AADHAR_NO", pick("AADHAR_NO","AADHAAR_NO"));
+    set("cup_PAN_NO", pick("PAN_NO"));
+    set("cup_VOTER_ID", pick("VOTER_ID"));
+    set("cup_DRIVING_LICENSE", pick("DRIVING_LICENSE"));
+    set("cup_PASSPORT_NO", pick("PASSPORT_NO"));
+    set("cup_RATION_CARD", pick("RATION_CARD"));
+    set("cup_OCCUPATION", pick("OCCUPATION"));
+    set("cup_MONTHLY_INCOME", pick("MONTHLY_INCOME"));
+    set("cup_ANNUAL_INCOME", pick("ANNUAL_INCOME"));
+    set("cup_CASTE", pick("CASTE"));
+    set("cup_RELIGION", pick("RELIGION"));
+    set("cup_NATIONALITY", pick("NATIONALITY")||"Indian");
+    set("cup_ADDRESS1", pick("ADDRESS1","ADDRESS"));
+    set("cup_ADDRESS2", pick("ADDRESS2"));
+    set("cup_CITY", pick("CITY"));
+    set("cup_DISTRICT", pick("DISTRICT"));
+    set("cup_STATE", pick("STATE"));
+    set("cup_PINCODE", pick("PINCODE"));
+    set("cup_PERMANENT_ADDRESS1", pick("PERMANENT_ADDRESS1"));
+    set("cup_PERMANENT_ADDRESS2", pick("PERMANENT_ADDRESS2"));
+    set("cup_PERMANENT_CITY", pick("PERMANENT_CITY"));
+    set("cup_PERMANENT_DISTRICT", pick("PERMANENT_DISTRICT"));
+    set("cup_PERMANENT_STATE", pick("PERMANENT_STATE"));
+    set("cup_PERMANENT_PINCODE", pick("PERMANENT_PINCODE"));
+    set("cup_NOMINEE_NAME", pick("NOMINEE_NAME"));
+    set("cup_NOMINEE_RELATION", pick("NOMINEE_RELATION"));
+    set("cup_NOMINEE_MOBILE", pick("NOMINEE_MOBILE"));
+    set("cup_NOMINEE_ADDRESS", pick("NOMINEE_ADDRESS"));
+    set("cup_KYC_STATUS", pick("KYC_STATUS")||"PENDING");
+    set("cup_MEMBER_STATUS", pick("MEMBER_STATUS","STATUS")||"ACTIVE");
+    set("cup_UPDATED_BY", (session.employeeCode||session.username||"")+(session.role?" / "+session.role:""));
+    // keep existing docs in hidden fields (unless user re-uploads)
+    ["PHOTO","SIGNATURE","AADHAR_FRONT","AADHAR_BACK","PAN_CARD"].forEach(function(f){
+      var v = pick(f);
+      set("cup_"+f, (v && String(v).indexOf("data:")===0) ? v : "");
+      var hint = document.getElementById("hint-cup_"+f);
+      if(hint) hint.textContent = (v && String(v).indexOf("data:")===0) ? "✓ On record (re-upload to replace)" : "";
+    });
+    var prev = document.getElementById("cup-preview");
+    if(prev){
+      var html = "";
+      [["PHOTO","Photo"],["SIGNATURE","Signature"]].forEach(function(pair){
+        var v = pick(pair[0]);
+        if(v && String(v).indexOf("data:")===0)
+          html += '<div style="text-align:center"><div style="font-size:10px;color:#6B7280;margin-bottom:4px">'+pair[1]+'</div><img src="'+v+'" style="width:90px;height:90px;object-fit:cover;border-radius:6px;border:1px solid #ddd"/></div>';
+      });
+      prev.innerHTML = html;
+    }
+    if(form) form.style.display="block";
+    if(box){
+      box.className="verify-box ok show";
+      box.innerHTML='<div class="verify-grid">'
+        +'<div><b>Customer ID</b>'+pick("CUSTOMER_ID")+'</div>'
+        +'<div><b>Account No</b>'+pick("ACCOUNT_NO")+' <span style="color:#8B1538;font-size:10px">(locked)</span></div>'
+        +'<div><b>Name</b>'+(pick("ACCOUNT_NAME")||(pick("FIRST_NAME")+" "+pick("LAST_NAME")))+'</div>'
+        +'<div><b>Mobile</b>'+pick("MOBILE")+'</div>'
+        +'<div><b>KYC</b>'+pick("KYC_STATUS")+'</div>'
+        +'<div><b>Status</b>'+pick("MEMBER_STATUS","ACCOUNT_STATUS","STATUS")+'</div>'
+        +'</div><p style="margin-top:6px;font-size:11px;color:#065F46">✓ Profile loaded — Account No cannot be changed. Update other fields and click <b>Update Profile</b>.</p>';
+    }
+    toast("Profile loaded");
+  }
+
+  // 1) Try account lookup (works for A/c no)
+  postGAS({action:"lookup_account", account_no:q}).then(function(accRes){
+    var acc = (accRes && accRes.status==="success") ? accRes : null;
+    var cid = acc && acc.CUSTOMER_ID;
+    // 2) Customer master list — match by CUSTOMER_ID / ACCOUNT_NO / MOBILE
+    return postGAS({action:"get_list", sheet:"CUSTOMER_MASTER", limit:2000}).then(function(r){
+      var rows = (r && r.rows) || [];
+      var qu = q.toUpperCase();
+      var found = null;
+      for(var i=0;i<rows.length;i++){
+        var x = rows[i];
+        if(String(x.CUSTOMER_ID||"").toUpperCase()===qu){ found=x; break; }
+        if(String(x.ACCOUNT_NO||"").toUpperCase()===qu){ found=x; break; }
+        if(String(x.MOBILE||"")===q || String(x.ALT_MOBILE||"")===q){ found=x; break; }
+        if(cid && String(x.CUSTOMER_ID||"").toUpperCase()===String(cid).toUpperCase()){ found=x; break; }
+      }
+      if(!found && !acc){
+        if(box){ box.className="verify-box err show"; box.innerHTML="⚠️ Customer not found for: <b>"+q+"</b>"; }
+        toast("Customer not found");
+        return;
+      }
+      // If only account found, build minimal customer from account
+      if(!found && acc){
+        found = {
+          CUSTOMER_ID: acc.CUSTOMER_ID,
+          MEMBER_ID: acc.MEMBER_ID,
+          ACCOUNT_NO: acc.ACCOUNT_NO,
+          ACCOUNT_NAME: acc.ACCOUNT_NAME,
+          MOBILE: acc.MOBILE,
+          EMAIL: acc.EMAIL,
+          KYC_STATUS: acc.KYC_STATUS,
+          MEMBER_STATUS: acc.ACCOUNT_STATUS,
+          PHOTO: acc.PHOTO,
+          SIGNATURE: acc.SIGNATURE
+        };
+      }
+      if(found && !found.ACCOUNT_NO && acc) found.ACCOUNT_NO = acc.ACCOUNT_NO;
+      fillFromCustomer(found, acc);
+    });
+  }).catch(function(){
+    if(box){ box.className="verify-box err show"; box.innerHTML="Network error"; }
+    toast("Network error");
+  });
+}
+
+function resetCustomerProfile(){
+  window._cupRow = null;
+  window._cupAccount = null;
+  var form = document.getElementById("form-customer-update");
+  if(form){ form.reset(); form.style.display="none"; }
+  var box = document.getElementById("cup-load-box");
+  if(box){ box.className="verify-box"; box.innerHTML=""; }
+  var al = document.getElementById("al-customer-update");
+  if(al){ al.className="alert"; al.textContent=""; }
+  var prev = document.getElementById("cup-preview");
+  if(prev) prev.innerHTML="";
+  var s = document.getElementById("cup_SEARCH");
+  if(s) s.value="";
+}
+
+function saveCustomerProfile(e){
+  e.preventDefault();
+  var al = document.getElementById("al-customer-update");
+  var form = document.getElementById("form-customer-update");
+  if(!window._cupRow && !(document.getElementById("cup_CUSTOMER_ID")||{}).value){
+    toast("Pehle profile Load karein");
+    return false;
+  }
+  var accNo = (document.getElementById("cup_ACCOUNT_NO")||{}).value || "";
+  var cid = (document.getElementById("cup_CUSTOMER_ID")||{}).value || "";
+  if(!accNo && !cid){ toast("Account No / Customer ID missing"); return false; }
+
+  // Account number is locked — never send a changed ACCOUNT_NO
+  var lockedAcc = (window._cupRow && window._cupRow.ACCOUNT_NO) || (window._cupAccount && window._cupAccount.ACCOUNT_NO) || accNo;
+  var fd = new FormData(form);
+  var o = {};
+  fd.forEach(function(v,k){ o[k]=v; });
+  o.ACCOUNT_NO = lockedAcc; // force original
+  o.CUSTOMER_ID = cid || o.CUSTOMER_ID;
+  o.UPDATED_BY = session.employeeCode || session.username || "";
+  o.UPDATED_AT = new Date().toISOString();
+  // Account name sync from personal names
+  o.ACCOUNT_NAME = [o.PREFIX, o.FIRST_NAME, o.MIDDLE_NAME, o.LAST_NAME].filter(Boolean).join(" ").replace(/\s+/g," ").trim();
+
+  // Do not blank existing documents if user did not re-upload
+  ["PHOTO","SIGNATURE","AADHAR_FRONT","AADHAR_BACK","PAN_CARD"].forEach(function(f){
+    if(!o[f] && window._cupRow && window._cupRow[f]) o[f] = window._cupRow[f];
+  });
+
+  var btn = form.querySelector('button[type="submit"]');
+  if(btn){ btn.disabled=true; btn.dataset.orig=btn.textContent; btn.textContent="Updating…"; }
+  if(al){ al.className="alert show"; al.textContent="Updating profile…"; }
+
+  var payload = {
+    action: "update",
+    sheet: "CUSTOMER_MASTER",
+    key_field: cid ? "CUSTOMER_ID" : "ACCOUNT_NO",
+    key_value: cid || lockedAcc,
+    row: o,
+    // also sync account display name / mobile on ACCOUNT_MASTER
+    sync_account: true,
+    ACCOUNT_NO: lockedAcc
+  };
+
+  postGAS(payload).then(function(r){
+    if(btn){ btn.disabled=false; btn.textContent=btn.dataset.orig||"Update Profile"; }
+    if(r && r.status==="success"){
+      if(al){ al.className="alert show alert-ok"; al.textContent="✓ Profile updated — A/c "+lockedAcc+" (Account No unchanged)"; }
+      toast("Profile updated");
+      window._cupRow = Object.assign({}, window._cupRow||{}, o);
+      try{ cacheInvalidate("cust360"); lookupCacheInvalidate("accounts"); window._cust360Rows=null; }catch(ex){}
+      writeClientAudit("CUSTOMER_UPDATE", "UPDATE", lockedAcc+" / "+cid);
+    } else {
+      // Fallback: some backends use update_row / edit
+      if(!r || r.status!=="success"){
+        return postGAS({
+          action: "update_row",
+          sheet: "CUSTOMER_MASTER",
+          key: "CUSTOMER_ID",
+          value: cid || lockedAcc,
+          data: o
+        }).then(function(r2){
+          if(r2 && r2.status==="success"){
+            if(al){ al.className="alert show alert-ok"; al.textContent="✓ Profile updated — A/c "+lockedAcc; }
+            toast("Profile updated");
+            try{ cacheInvalidate("cust360"); lookupCacheInvalidate("accounts"); }catch(ex){}
+          } else {
+            var msg = (r2&&r2.message)||(r&&r.message)||"Update failed — deploy Code.gs with action: update";
+            if(al){ al.className="alert show alert-er"; al.textContent="⚠️ "+msg; }
+            toast(msg);
+          }
+        });
+      }
+    }
+  }).catch(function(){
+    if(btn){ btn.disabled=false; btn.textContent=btn.dataset.orig||"Update Profile"; }
+    if(al){ al.className="alert show alert-er"; al.textContent="⚠️ Network error"; }
+    toast("Network error");
+  });
+  return false;
+}
 
 /* ===== Signature Verification Form ===== */
 window._svSpecimen = null;
