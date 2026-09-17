@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Shree Radha Credit Co-operative Society Ltd.</title>
 <style>
-:root{--p:#8B1538;--pd:#6B0F2A;--sb:#5C0A28;--sbh:#7A1238;--sba:#C2185B;--w:#fff;--bg:#F5F6FA;--cs:0 2px 8px rgba(0,0,0,.06);--t:#2D2D2D;--tm:#6B7280;--bd:#E5E7EB;--ok:#059669;--er:#DC2626}
+:root{--p:#8B1538;--pd:#6B0F2A;--sb:#5C0A28;--sbh:#7A1238;--sba:#C2185B;--w:#fff;--bg:#F8F6FB;--cs:0 2px 8px rgba(0,0,0,.05);--t:#2D2D2D;--tm:#6B7280;--bd:#EDE4F5;--ok:#059669;--er:#DC2626}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--t);font-size:13px;height:100vh;overflow:hidden}
 .app{display:flex;height:100vh}
@@ -34,8 +34,9 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .top{background:#fff;height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--bd)}
 .ht{font-size:13.5px;font-weight:700;color:var(--p)}.ht .br{font-size:10px;font-weight:500;color:var(--tm);display:block}
 .hr{display:flex;align-items:center;gap:10px}
-.search{display:flex;align-items:center;background:#F3F4F6;border-radius:16px;padding:4px 10px;gap:4px}
-.search input{border:none;background:transparent;outline:none;font-size:11.5px;width:140px}
+.search{display:flex;align-items:center;background:#F5F0FF;border-radius:16px;padding:5px 12px;gap:4px;border:1px solid #EDE4FF}
+.search input{border:none;background:transparent;outline:none;font-size:11.5px;width:140px;color:#1F2937}
+.search input::placeholder{color:#9CA3AF}
 .nb{position:relative;background:none;border:none;font-size:16px;cursor:pointer;color:var(--tm)}
 .nb .bdg{position:absolute;top:-2px;right:-4px;background:var(--er);color:#fff;font-size:8px;font-weight:700;width:14px;height:14px;border-radius:50%;display:flex;align-items:center;justify-content:center}
 .uc{display:flex;align-items:center;gap:6px;padding:2px 6px;border-radius:16px}
@@ -81,19 +82,34 @@ tr.emi-due-today-blink td{animation:emiBlinkSoft 1.4s ease-in-out infinite}
 .pv{display:none}.pv.active{display:block}
 .ptb{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
 .ptb h2{font-size:14px;font-weight:700;color:var(--p)}.ptb .bc{font-size:10.5px;color:var(--tm)}
-.fc{background:#fff;border-radius:8px;box-shadow:var(--cs);padding:12px 14px;margin-bottom:10px}
-.fc h3{font-size:12px;font-weight:700;color:var(--p);margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--bd)}
+.fc{background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.04);border:1px solid #F0E8F0;padding:14px 16px;margin-bottom:12px}
+.fc h3{font-size:12px;font-weight:700;color:var(--p);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #F3E8FF}
 .fr{display:grid;grid-template-columns:repeat(3,1fr);gap:6px 12px}
 .fg{display:flex;flex-direction:column;gap:2px}
-.fg label{font-size:10.5px;font-weight:600;color:var(--tm)}
+.fg label{font-size:10.5px;font-weight:600;color:#6B7280}
 .fg label .rq{color:var(--er)}
-.fg input,.fg select,.fg textarea{height:28px;padding:2px 8px;border:1px solid #D1D5DB;border-radius:5px;font-size:12px;font-family:inherit;background:#fff}
-.fg textarea{height:50px;resize:vertical}
-.fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:var(--p);box-shadow:0 0 0 2px rgba(139,21,56,.1)}
-.fg input[readonly]{background:#F3F4F6;color:#555}
-.btn{display:inline-flex;align-items:center;justify-content:center;padding:5px 14px;font-size:11.5px;font-weight:600;border-radius:5px;border:none;cursor:pointer;font-family:inherit}
-.btn-p{background:var(--p);color:#fff}.btn-p:hover{background:var(--pd)}
-.btn-o{background:#fff;color:var(--p);border:1.5px solid var(--p)}.btn-o:hover{background:#FCE4EC}
+.fg input,.fg select,.fg textarea{
+  height:32px;padding:4px 10px;border:1.5px solid #E5E7EB;border-radius:8px;
+  font-size:12px;font-family:inherit;background:#fff;color:#1F2937;
+  transition:border-color .15s,box-shadow .15s,background .15s
+}
+.fg textarea{height:56px;resize:vertical;padding-top:8px}
+.fg input::placeholder,.fg textarea::placeholder{color:#9CA3AF}
+.fg input:hover,.fg select:hover,.fg textarea:hover{border-color:#D1D5DB}
+.fg input:focus,.fg select:focus,.fg textarea:focus{
+  outline:none;border-color:#E91E8C;box-shadow:0 0 0 3px rgba(233,30,140,.12);background:#FFF9FC
+}
+.fg input[readonly],.fg input:disabled,.fg select:disabled{
+  background:#F3F4F6;color:#6B7280;border-color:#E5E7EB;cursor:not-allowed
+}
+/* Soft status field styles (Axis-like) */
+.fg input.ok,.fg input.is-ok{border-color:#86EFAC;background:#F0FDF4;color:#166534}
+.fg input.err,.fg input.is-err{border-color:#FCA5A5;background:#FEF2F2;color:#991B1B}
+.fg input.warn,.fg input.is-warn{border-color:#FCD34D;background:#FFFBEB;color:#92400E}
+.fg input.info,.fg input.is-info{border-color:#93C5FD;background:#EFF6FF;color:#1E40AF}
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:6px 16px;font-size:11.5px;font-weight:600;border-radius:8px;border:none;cursor:pointer;font-family:inherit;transition:all .15s}
+.btn-p{background:linear-gradient(135deg,#8B1538,#C2185B);color:#fff;box-shadow:0 2px 6px rgba(139,21,56,.2)}.btn-p:hover{background:linear-gradient(135deg,#6B0F2A,#A01545);box-shadow:0 3px 10px rgba(139,21,56,.28)}
+.btn-o{background:#fff;color:var(--p);border:1.5px solid #E8A0B8}.btn-o:hover{background:#FFF0F5;border-color:var(--p)}
 .ba{display:flex;justify-content:flex-end;gap:6px;margin-top:8px;padding-top:6px;border-top:1px solid var(--bd)}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
 .sc{background:#fff;border-radius:8px;padding:12px;box-shadow:var(--cs);display:flex;gap:10px;align-items:flex-start}
@@ -106,8 +122,44 @@ tr.emi-due-today-blink td{animation:emiBlinkSoft 1.4s ease-in-out infinite}
 table.tn{width:100%;border-collapse:collapse}
 table.tn th{text-align:left;padding:6px 10px;font-size:10px;font-weight:600;color:var(--tm);background:#FAFAFA;border-bottom:1px solid var(--bd)}
 table.tn td{padding:6px 10px;font-size:11px;border-bottom:1px solid #F0F0F0}
-.tb{display:inline-block;padding:1px 6px;border-radius:8px;font-size:10px;font-weight:600}
+/* Alternating ROW colors: 1 white, 2 light purple */
+table.tn tbody tr:nth-child(odd) td{background:#FFFFFF}
+table.tn tbody tr:nth-child(even) td{background:#F3E8FF}
+table.tn thead th{background:#EDE4FF;color:#5B21B6}
+/* Row hover */
+table.tn tbody tr:hover td{background:#E9D5FF !important;cursor:pointer}
+/* Selected row — full blue (including Actions buttons column) */
+table.tn tbody tr.row-selected td{
+  background:#BFDBFE !important;
+  color:#1E3A8A;
+  box-shadow:none;
+}
+table.tn tbody tr.row-selected{
+  outline:2px solid #2563EB;
+  outline-offset:-2px;
+}
+table.tn tbody tr.row-selected td:first-child{
+  box-shadow:inset 4px 0 0 #2563EB;
+}
+table.tn tbody tr.row-selected .lv-actions button{
+  background:#2563EB;
+  color:#fff;
+  border-color:#1D4ED8;
+}
+table.tn tbody tr.row-selected .lv-actions button:hover{
+  background:#1D4ED8;
+  color:#fff;
+}
+table.tn tbody tr.row-selected .lv-actions .apr{
+  background:#059669;border-color:#047857;color:#fff;
+}
+table.tn tbody tr.row-selected .lv-actions .rej{
+  background:#DC2626;border-color:#B91C1C;color:#fff;
+}
+.tb{display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600}
 .td{background:#D1FAE5;color:#065F46}.tw{background:#FEE2E2;color:#991B1B}.te{background:#DBEAFE;color:#1E40AF}
+.tb-pending{background:#DBEAFE;color:#1E40AF}.tb-process{background:#FEF3C7;color:#92400E}
+.tb-done{background:#EDE9FE;color:#5B21B6}.tb-reject{background:#FCE7F3;color:#9D174D}
 .ag{color:var(--ok);font-weight:600}.ar{color:var(--er);font-weight:600}
 .qa{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
 .qab{background:#fff;border-radius:8px;box-shadow:var(--cs);padding:12px 6px;text-align:center;cursor:pointer;border:1px solid transparent;text-decoration:none;color:var(--t)}
@@ -126,13 +178,15 @@ table.tn td{padding:6px 10px;font-size:11px;border-bottom:1px solid #F0F0F0}
 .login-box .logo .li{width:44px;height:44px;background:var(--p);color:#fff;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;margin-bottom:6px}
 .login-box h1{font-size:15px;color:var(--p);font-weight:700}.login-box .sub{font-size:10.5px;color:var(--tm)}
 .login-box .fg{margin-bottom:10px}.login-box .fg label{font-size:11.5px;font-weight:600;display:block;margin-bottom:2px}
-.login-box .fg input,.login-box .fg select{width:100%;height:34px;padding:4px 10px;border:1.5px solid #D1D5DB;border-radius:6px;font-size:12.5px}
+.login-box .fg input,.login-box .fg select{width:100%;height:36px;padding:6px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:12.5px;background:#fff;transition:border-color .15s,box-shadow .15s}
+.login-box .fg input:focus,.login-box .fg select:focus{outline:none;border-color:#E91E8C;box-shadow:0 0 0 3px rgba(233,30,140,.12)}
 .login-box .btn-p{width:100%;height:36px;font-size:13px;margin-top:4px}
 .hidden{display:none!important}
 @media(max-width:1100px){.stats{grid-template-columns:repeat(2,1fr)}.qa{grid-template-columns:repeat(4,1fr)}.two,.fr{grid-template-columns:1fr 1fr}}
 @media(max-width:768px){.sidebar{display:none}.stats,.qa,.fr{grid-template-columns:1fr}}
 .lv-bar{display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
-.lv-search{flex:1;min-width:180px;max-width:320px;padding:8px 10px;border:1px solid var(--bd);border-radius:6px;font-size:12px}
+.lv-search{flex:1;min-width:180px;max-width:320px;padding:8px 12px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:12px;background:#fff;transition:border-color .15s,box-shadow .15s}
+.lv-search:focus{outline:none;border-color:#E91E8C;box-shadow:0 0 0 3px rgba(233,30,140,.12)}
 .lv-count{font-size:11px;color:var(--tm)}
 .lv-wrap{overflow-x:auto;background:#fff;border-radius:10px;box-shadow:var(--cs)}
 .lv-empty{padding:26px;text-align:center;color:var(--tm);font-size:12px}
@@ -143,11 +197,65 @@ table.tn td{padding:6px 10px;font-size:11px;border-bottom:1px solid #F0F0F0}
 .lv-actions .rej{background:var(--er);color:#fff;border-color:var(--er)}
 .modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:999}
 .modal-ov.show{display:flex}
-.modal-box{background:#fff;border-radius:10px;max-width:720px;width:92%;max-height:82vh;overflow:auto;padding:18px}
+.modal-box{background:#fff;border-radius:12px;max-width:720px;width:92%;max-height:82vh;overflow:auto;padding:18px}
+.modal-box.cv-wide{max-width:980px;padding:0;overflow:hidden;display:flex;flex-direction:column}
 .modal-box h3{margin-bottom:12px;color:var(--p);display:flex;justify-content:space-between;align-items:center}
 .modal-box h3 span{cursor:pointer;font-size:16px;color:var(--tm)}
 .modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px 14px;font-size:12px}
 .modal-grid div b{display:block;color:var(--tm);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.3px}
+
+/* ===== Axis-style Customer View ===== */
+.cv-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #EDE4F5;background:#fff;flex-shrink:0}
+.cv-head h3{margin:0;font-size:15px;color:#8B1538;display:flex;align-items:center;gap:8px}
+.cv-head .cv-x{cursor:pointer;font-size:18px;color:#6B7280;padding:4px 8px;border-radius:6px}
+.cv-head .cv-x:hover{background:#F5F0FF;color:#8B1538}
+.cv-tabs{display:flex;gap:0;padding:0 12px;background:#FAF7FB;border-bottom:1px solid #EDE4F5;overflow-x:auto;flex-shrink:0}
+.cv-tab{padding:10px 14px;font-size:11.5px;font-weight:600;color:#6B7280;border:none;background:transparent;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;font-family:inherit}
+.cv-tab:hover{color:#8B1538}
+.cv-tab.on{color:#8B1538;border-bottom-color:#8B1538;background:#fff}
+.cv-body{padding:14px 18px;overflow-y:auto;flex:1;max-height:calc(82vh - 160px)}
+.cv-main{display:grid;grid-template-columns:120px 1fr 1fr;gap:16px;align-items:start}
+.cv-photo-col{text-align:center}
+.cv-photo{width:100px;height:100px;border-radius:10px;object-fit:cover;border:2px solid #EDE4F5;background:#F8F6FB;display:block;margin:0 auto}
+.cv-photo.placeholder{display:flex;align-items:center;justify-content:center;font-size:36px;color:#C4B5D0;width:100px;height:100px;margin:0 auto;border-radius:10px;border:2px solid #EDE4F5;background:#F8F6FB}
+.cv-sig{margin-top:10px;padding:6px;border:1px dashed #E0C4CA;border-radius:8px;background:#FFFBFB}
+.cv-sig img{max-width:100%;max-height:48px;object-fit:contain;display:block;margin:0 auto}
+.cv-sig .lbl{font-size:9.5px;color:#6B7280;text-align:center;margin-top:4px}
+.cv-fields{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;font-size:12px}
+.cv-fields .row{display:contents}
+.cv-fields .k{color:#6B7280;font-weight:500;font-size:11px}
+.cv-fields .v{color:#1F2937;font-weight:600}
+.cv-fields .v .st-active{display:inline-block;padding:2px 10px;border-radius:12px;background:#D1FAE5;color:#065F46;font-size:10.5px}
+.cv-fields .v .st-other{display:inline-block;padding:2px 10px;border-radius:12px;background:#FEE2E2;color:#991B1B;font-size:10.5px}
+.cv-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:14px}
+.cv-card{background:#fff;border:1px solid #F0E4E7;border-radius:10px;padding:12px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.cv-card h4{font-size:12px;color:#8B1538;margin:0 0 8px;display:flex;align-items:center;gap:6px;padding-bottom:6px;border-bottom:1px solid #F5E6EA}
+.cv-card .row{display:flex;justify-content:space-between;gap:8px;padding:3px 0;font-size:11.5px;border-bottom:1px solid #FAFAFA}
+.cv-card .row:last-child{border-bottom:none}
+.cv-card .row .k{color:#6B7280}
+.cv-card .row .v{font-weight:600;color:#1F2937;text-align:right}
+.cv-kyc{margin-top:14px}
+.cv-kyc h4{font-size:12px;color:#8B1538;margin:0 0 8px;display:flex;align-items:center;justify-content:space-between}
+.cv-kyc-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.cv-kyc-item{border:1px solid #EDE4F5;border-radius:8px;padding:10px 8px;text-align:center;background:#FAF7FB;cursor:pointer}
+.cv-kyc-item:hover{border-color:#8B1538;background:#FFF5F8}
+.cv-kyc-item .ico{font-size:22px;margin-bottom:4px}
+.cv-kyc-item .nm{font-size:10.5px;font-weight:600;color:#374151}
+.cv-kyc-item .act{font-size:10px;color:#8B1538;font-weight:600;margin-top:2px}
+.cv-kyc-item img{width:56px;height:40px;object-fit:cover;border-radius:4px;margin:0 auto 4px;display:block;border:1px solid #ddd}
+.cv-foot{display:flex;justify-content:flex-end;gap:8px;padding:12px 18px;border-top:1px solid #EDE4F5;background:#FAF7FB;flex-shrink:0}
+.cv-pane{display:none}
+.cv-pane.on{display:block}
+.cv-table{width:100%;border-collapse:collapse;font-size:11.5px;margin-top:8px}
+.cv-table th{background:#F5E6EA;color:#6B0F2A;padding:6px 8px;text-align:left;font-size:10.5px}
+.cv-table td{padding:6px 8px;border-bottom:1px solid #f0e4e7}
+.cv-empty{text-align:center;color:#6B7280;padding:24px;font-size:12px}
+@media(max-width:800px){
+  .cv-main{grid-template-columns:1fr}
+  .cv-cards{grid-template-columns:1fr}
+  .cv-kyc-grid{grid-template-columns:repeat(2,1fr)}
+  .cv-fields{grid-template-columns:1fr}
+}
 .notif-panel{position:absolute;top:42px;right:16px;width:340px;max-height:440px;overflow:auto;background:#fff;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.18);display:none;z-index:80;padding:0}
 .notif-panel.show{display:block}
 .notif-head{padding:10px 14px;font-weight:700;font-size:12px;color:var(--p);border-bottom:1px solid var(--bd);display:flex;justify-content:space-between}
@@ -171,7 +279,8 @@ table.tn td{padding:6px 10px;font-size:11px;border-bottom:1px solid #F0F0F0}
 .stmt-table td{padding:5px 8px;border-bottom:1px solid #eee}
 .stmt-head{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px}
 @media print{.sidebar,.top,.ft,.ba,.lv-bar,.ni,.nb,.search{display:none!important}.main,.content{overflow:visible!important;height:auto!important}}
-.fg input[type="file"]{height:auto;padding:4px;font-size:11px;border:1px dashed #D1D5DB;border-radius:5px;background:#FAFAFA}
+.fg input[type="file"]{height:auto;padding:8px 10px;font-size:11px;border:1.5px dashed #D4B8E0;border-radius:8px;background:#FAF5FF;color:#6B7280}
+.fg input[type="file"]:hover{border-color:#C084FC;background:#F5F0FF}
 
 /* Professional Accounting Reports */
 .acc-dual{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid #8B1538;border-radius:6px;overflow:hidden;background:#fff;font-size:11px}
@@ -3053,13 +3162,13 @@ table.tn td{padding:6px 10px;font-size:11px;border-bottom:1px solid #F0F0F0}
 <div class="ft"><span>© 2025 SRCCS. All rights reserved.</span><span>Version 1.0.0 • Full Menu</span></div>
 </div></div>
 <div class="toast" id="toast"></div>
-<div class="modal-ov" id="viewModal"><div class="modal-box">
-<h3><span id="vmTitle">Record</span><span onclick="closeModal()">✕</span></h3>
+<div class="modal-ov" id="viewModal"><div class="modal-box" id="viewModalBox">
+<h3 id="vmHeadDefault"><span id="vmTitle">Record</span><span onclick="closeModal()">✕</span></h3>
 <div class="modal-grid" id="vmBody"></div>
 <p style="margin-top:14px;text-align:right"><button class="btn btn-o" onclick="printModalRecord()">🖨 Print</button> <button class="btn btn-p" onclick="closeModal()">Close</button></p>
 </div></div>
 <script>
-const GS_URL="https://script.google.com/macros/s/AKfycbwRQyRenzL_VfnHLBwpS4UeqKbQjOL1US0m_Sf3u35gwnFAu_IHZ_RHy0BjrQbPJf71_g/exec";
+const GS_URL="https://script.google.com/macros/s/AKfycbygDhhrTUC7_LiX1UcAXXHvvdW54Plz-TW-o5-AfJVCyor-PtdhV6E0oKmyGUs4DK7A/exec";
 let session={employeeCode:"",role:"",name:"",agentId:"",mobile:"",branchId:""};
 let c={cu:14525,mb:14525,src:1253,emp:10001,app:14525,la:14525,gu:14526,txn:14525,rcp:14525,emi:14525,fd:14525,rd:14525,col:14525,agt:10001,lp:1001,br:1};
 
@@ -3388,6 +3497,25 @@ function wsClose(page){
   wsRenderTabs();
   goPage(WS.active);
 }
+/** Global top-bar search → Customer List filtered to the query */
+function doSearch(){
+  var inp = document.getElementById("globalSearch");
+  var q = (inp && inp.value || "").trim();
+  if(!q){ toast("Enter A/c, Name or Mobile"); return; }
+  go("customer-list");
+  setTimeout(function(){
+    var s = document.getElementById("srch-customer-list");
+    if(s){ s.value = q; filterCustomer360(); }
+    else {
+      // list not ready yet — retry once
+      setTimeout(function(){
+        var s2 = document.getElementById("srch-customer-list");
+        if(s2){ s2.value = q; filterCustomer360(); }
+      }, 600);
+    }
+  }, 400);
+}
+
 /** Public navigate — Ctrl/Cmd+Click or middle-click opens as extra tab without closing current work */
 function go(page, evt){
   var e = evt || window.event;
@@ -3564,6 +3692,8 @@ function paintListView(pageId,rows){
   const cnt=document.getElementById("cnt-"+pageId);
   const box=document.getElementById(lvContainerId(pageId));
   const actionsMode=box.dataset.actions;
+  // CRITICAL: store currently displayed rows so View/Action use filtered index correctly
+  box.dataset.viewRows=JSON.stringify(rows||[]);
   if(cnt)cnt.textContent=rows.length+" record(s)";
   if(!rows.length){thead.innerHTML="";tbody.innerHTML='<tr><td class="lv-empty">No records yet</td></tr>';return}
   const cols=Object.keys(rows[0]).filter(k=>!HIDDEN_COLS.includes(k)).slice(0,6);
@@ -3583,7 +3713,7 @@ function paintListView(pageId,rows){
       acts+='<button onclick="acctStatusAction(\''+pageId+'\','+i+',\'BLOCKED\')">Block</button>';
       acts+='<button class="rej" onclick="acctStatusAction(\''+pageId+'\','+i+',\'CLOSED\')">Close</button>';
     }
-    return "<tr>"+cols.map(c=>"<td>"+(r[c]!=null?r[c]:"")+"</td>").join("")+"<td class=\"lv-actions\">"+acts+"</td></tr>";
+    return "<tr data-row-idx=\""+i+"\">"+cols.map(c=>"<td>"+(r[c]!=null?r[c]:"")+"</td>").join("")+"<td class=\"lv-actions\">"+acts+"</td></tr>";
   }).join("");
 }
 function filterListView(pageId){
@@ -3594,13 +3724,29 @@ function filterListView(pageId){
   const filtered=all.filter(r=>Object.values(r).some(v=>String(v).toLowerCase().indexOf(q)>=0));
   paintListView(pageId,filtered);
 }
+/** Get row from currently displayed (filtered) list — fixes search-click wrong details */
+function getViewRow(boxOrDataset, idx){
+  var ds = boxOrDataset && boxOrDataset.dataset ? boxOrDataset.dataset : boxOrDataset;
+  if(!ds) return null;
+  var view = [];
+  try{ view = JSON.parse(ds.viewRows || "[]"); }catch(e){ view=[]; }
+  if(view.length && view[idx]) return view[idx];
+  try{
+    var all = JSON.parse(ds.rows || "[]");
+    return all[idx] || null;
+  }catch(e2){ return null; }
+}
 let _currentModalRow=null,_currentModalTitle="";
 function viewRecordModal(dataset,idx){
-  const rows=JSON.parse(dataset.rows||"[]");
-  const row=rows[idx];if(!row)return;
+  const row=getViewRow(dataset, idx); if(!row)return;
   _currentModalRow=row;_currentModalTitle=dataset.title||"Record";
+  var mb=document.getElementById("viewModalBox");
+  if(mb){ mb.classList.remove("cv-wide"); mb.style.padding=""; }
+  var hd=document.getElementById("vmHeadDefault");
+  if(hd) hd.style.display="";
   document.getElementById("vmTitle").textContent=_currentModalTitle;
   const body=document.getElementById("vmBody");
+  body.className="modal-grid"; body.style.display="";
   const IMG_KEYS=["PHOTO","SIGNATURE","AADHAR_FRONT","AADHAR_BACK","PAN_CARD","AADHAR_DOC","PAN_DOC","BANK_PASSBOOK","CHEQUE1","CHEQUE2","CHEQUE3","VOTER_CARD","DRIVING_LICENSE","PROPERTY_PHOTO","PROPERTY_DOCUMENT","OTHER_DOCUMENT","INCOME_PROOF","ADDRESS_PROOF"];
   body.innerHTML=Object.keys(row).filter(k=>!HIDDEN_COLS.includes(k)).map(function(k){
     var v=row[k];
@@ -3614,7 +3760,15 @@ function viewRecordModal(dataset,idx){
   }).join("");
   document.getElementById("viewModal").classList.add("show");
 }
-function closeModal(){document.getElementById("viewModal").classList.remove("show")}
+function closeModal(){
+  document.getElementById("viewModal").classList.remove("show");
+  var mb=document.getElementById("viewModalBox");
+  if(mb){ mb.classList.remove("cv-wide"); mb.style.padding=""; }
+  var hd=document.getElementById("vmHeadDefault");
+  if(hd) hd.style.display="";
+  var body=document.getElementById("vmBody");
+  if(body){ body.className="modal-grid"; body.style.display=""; }
+}
 function printModalRecord(){
   if(!_currentModalRow)return;
   const w=window.open("","_blank");
@@ -3626,10 +3780,9 @@ function printModalRecord(){
 /* ================= LOAN LIFECYCLE ACTIONS ================= */
 function loanAction(pageId,idx,action){
   const box=document.getElementById(lvContainerId(pageId));
-  const rows=JSON.parse(box.dataset.rows||"[]");
-  const row=rows[idx];if(!row)return;
+  const row=getViewRow(box, idx); if(!row)return;
   const label={loan_approve:"approve",loan_disburse:"disburse",loan_close:"close"}[action];
-  if(!confirm("Confirm "+label+" for loan "+row.LOAN_ACCOUNT_NO+"?"))return;
+  if(!confirm("Confirm "+label+" for loan "+(row.LOAN_ACCOUNT_NO||row.APPLICATION_ID)+"?"))return;
   postGAS({action:action,LOAN_ACCOUNT_NO:row.LOAN_ACCOUNT_NO,EMPLOYEE_ID:session.employeeCode,APPROVED_BY:session.employeeCode,REPAYMENT_FREQUENCY:row.REPAYMENT_FREQUENCY}).then(function(r){
     if(r&&r.status==="success"){toast(r.message||"Done");renderListView(pageId,box.dataset.sheet,box.dataset.title,box.dataset.actions)}
     else toast((r&&r.message)||"Failed");
@@ -3672,6 +3825,17 @@ function notifTab(t){
 document.addEventListener("click",function(e){
   const panel=document.getElementById("notifPanel"),btn=document.getElementById("notifBellBtn");
   if(panel&&panel.classList.contains("show")&&!panel.contains(e.target)&&e.target!==btn)panel.classList.remove("show");
+  /* Data table row select (Customer List / KYC / Search / all .tn list tables) */
+  var cell = e.target.closest("table.tn tbody td");
+  if(cell){
+    var tr = cell.parentElement;
+    var table = tr.closest("table.tn");
+    if(table && !e.target.closest("button,a,input,select,label")){
+      var was = tr.classList.contains("row-selected");
+      table.querySelectorAll("tbody tr.row-selected").forEach(function(r){ r.classList.remove("row-selected"); });
+      if(!was) tr.classList.add("row-selected");
+    }
+  }
 });
 setInterval(function(){if(session.employeeCode)loadNotifications()},120000);
 function saveForm(e,sheet,aid){
@@ -4466,8 +4630,7 @@ function onAccountTypeChange(val){
 }
 function kycAction(pageId,idx,status){
   const box=document.getElementById(lvContainerId(pageId));
-  const rows=JSON.parse(box.dataset.rows||"[]");
-  const row=rows[idx];if(!row)return;
+  const row=getViewRow(box, idx); if(!row)return;
   if(!confirm("Mark KYC as "+status+" for "+(row.CUSTOMER_ID||"")+"?"))return;
   postGAS({action:"kyc_verify",CUSTOMER_ID:row.CUSTOMER_ID,KYC_STATUS:status,EMPLOYEE_ID:session.employeeCode}).then(function(r){
     if(r&&r.status==="success"){toast(r.message||"Done");renderListView(pageId,box.dataset.sheet,box.dataset.title,box.dataset.actions)}
@@ -4476,8 +4639,7 @@ function kycAction(pageId,idx,status){
 }
 function acctStatusAction(pageId,idx,status){
   const box=document.getElementById(lvContainerId(pageId));
-  const rows=JSON.parse(box.dataset.rows||"[]");
-  const row=rows[idx];if(!row)return;
+  const row=getViewRow(box, idx); if(!row)return;
   if(!confirm("Set account "+row.ACCOUNT_NO+" status to "+status+"?"))return;
   postGAS({action:"account_status",ACCOUNT_NO:row.ACCOUNT_NO,ACCOUNT_STATUS:status,EMPLOYEE_ID:session.employeeCode}).then(function(r){
     if(r&&r.status==="success"){toast(r.message||"Done");renderListView(pageId,box.dataset.sheet,box.dataset.title,box.dataset.actions)}
@@ -4589,13 +4751,17 @@ function paintCustomer360(rows){
   const thead=document.querySelector("#tbl-customer-list thead");
   const tbody=document.querySelector("#tbl-customer-list tbody");
   const cnt=document.getElementById("cnt-customer-list");
+  const box=document.getElementById("lv-customer-list");
+  // CRITICAL: currently displayed (possibly filtered) rows — View must use this, not full list
+  if(box) box.dataset.viewRows=JSON.stringify(rows||[]);
   if(cnt)cnt.textContent=rows.length+" record(s)";
   if(!rows.length){thead.innerHTML="";tbody.innerHTML='<tr><td class="lv-empty">No records</td></tr>';return}
   thead.innerHTML="<tr><th>A/c No</th><th>Name</th><th>A/c Type</th><th>Cust Type</th><th>Mobile</th><th>Total Amount</th><th>Status</th><th>Actions</th></tr>";
   tbody.innerHTML=rows.map(function(r,i){
     var st=r.ACCOUNT_STATUS||"—";
     var badge=st==="ACTIVE"?"td":(st==="CLOSED"||st==="BLOCKED"?"tw":"te");
-    return "<tr>"
+    var accEsc=String(r.ACCOUNT_NO||"").replace(/'/g,"\\'");
+    return "<tr data-row-idx=\""+i+"\" data-account-no=\""+String(r.ACCOUNT_NO||"").replace(/"/g,"&quot;")+"\">"
       +"<td>"+(r.ACCOUNT_NO||"—")+"</td>"
       +"<td>"+(r.ACCOUNT_NAME||"—")+"</td>"
       +"<td>"+(r.ACCOUNT_TYPE||"—")+"</td>"
@@ -4603,8 +4769,8 @@ function paintCustomer360(rows){
       +"<td>"+(r.MOBILE||"—")+"</td>"
       +"<td>₹ "+Number(r.TOTAL_AMOUNT||0).toLocaleString("en-IN")+"</td>"
       +"<td><span class='tb "+badge+"'>"+st+"</span></td>"
-      +"<td class='lv-actions'><button onclick='viewCustomer360("+i+")'>View</button>"
-      +'<button onclick="goStatement(\''+(r.ACCOUNT_NO||'')+'\')">Statement</button></td></tr>';
+      +"<td class='lv-actions'><button type='button' onclick='viewCustomer360("+i+")'>View</button>"
+      +'<button type="button" onclick="goStatement(\''+accEsc+'\')">Statement</button></td></tr>';
   }).join("");
 }
 function filterCustomer360(){
@@ -4619,61 +4785,331 @@ function filterCustomer360(){
 }
 function viewCustomer360(idx){
   const box=document.getElementById("lv-customer-list");
-  const rows=JSON.parse(box.dataset.rows||"[]");
-  const r=rows[idx];if(!r)return;
-  _currentModalTitle="Customer 360° — "+(r.ACCOUNT_NO||r.CUSTOMER_ID||"");
+  // Use currently painted (filtered) rows — NOT full master list
+  const r=getViewRow(box, idx); if(!r)return;
+  _currentModalTitle="View Customer Details";
   _currentModalRow=r;
-  document.getElementById("vmTitle").textContent=_currentModalTitle;
+  var modalBox=document.getElementById("viewModalBox");
+  var headDef=document.getElementById("vmHeadDefault");
+  if(headDef) headDef.style.display="none";
+  if(modalBox){ modalBox.classList.add("cv-wide"); modalBox.style.padding="0"; }
   const body=document.getElementById("vmBody");
-  body.innerHTML="<div style='grid-column:1/-1'>Loading full details…</div>";
+  body.className="";
+  body.style.display="block";
+  body.innerHTML="<div class='cv-empty'>Loading full details…</div>";
   document.getElementById("viewModal").classList.add("show");
 
-  function sec(title,obj){
-    if(!obj)return "<div style='grid-column:1/-1;margin-top:8px;color:var(--tm)'><b>"+title+"</b> — none</div>";
-    var html="<div style='grid-column:1/-1;margin-top:10px;padding-top:6px;border-top:1px solid var(--bd)'><b style='color:var(--p)'>"+title+"</b></div>";
-    Object.keys(obj).forEach(function(k){
-      if(k.charAt(0)==="_")return;
-      if(["PASSWORD","MPIN","TRANSACTION_PIN"].indexOf(k)>=0)return;
-      var v=obj[k];
-      if(v==null||v==="")return;
-      var sv=String(v);
-      if(["PHOTO","SIGNATURE","AADHAR_FRONT","AADHAR_BACK","PAN_CARD"].indexOf(k)>=0){
-        if(sv.indexOf("data:image")===0)
-          html+="<div style='grid-column:1/-1'><b>"+k.replace(/_/g," ")+"</b><br><img src='"+sv+"' style='max-width:160px;max-height:120px;border:1px solid #ddd;border-radius:6px;margin-top:4px'/></div>";
-        else if(sv.indexOf("data:")===0) html+="<div><b>"+k.replace(/_/g," ")+"</b>✓ uploaded</div>";
-        else html+="<div><b>"+k.replace(/_/g," ")+"</b>"+sv.substring(0,40)+"</div>";
-      } else {
-        html+="<div><b>"+k.replace(/_/g," ")+"</b>"+sv+"</div>";
-      }
+  function pick(){
+    var sources=[].slice.call(arguments,0);
+    for(var i=0;i<sources.length;i++){
+      var o=sources[i]; if(!o) continue;
+      for(var j=1;j<arguments.length;j++){ /* noop */ }
+    }
+    // actual pick of field keys below via helper
+  }
+  function val(){
+    for(var i=0;i<arguments.length;i++){
+      var v=arguments[i];
+      if(v!=null && v!=="" && v!=="—") return v;
+    }
+    return "—";
+  }
+  function money(n){
+    n=Number(n)||0;
+    return "₹ "+n.toLocaleString("en-IN");
+  }
+  function isImg(s){ return s && String(s).indexOf("data:image")===0; }
+  function isData(s){ return s && String(s).indexOf("data:")===0; }
+
+  function buildUI(info){
+    var c = info.customer || info._customer || {};
+    var a = info.account || info._account || info || {};
+    var merge = Object.assign({}, c, a, info);
+    // prefer explicit top-level from list row
+    ["ACCOUNT_NO","ACCOUNT_NAME","ACCOUNT_TYPE","CUSTOMER_TYPE","MOBILE","EMAIL","CURRENT_BALANCE","FD_TOTAL","RD_TOTAL","TOTAL_AMOUNT","ACCOUNT_STATUS","KYC_STATUS","CUSTOMER_ID","PHOTO","SIGNATURE"].forEach(function(k){
+      if((info[k]!=null&&info[k]!=="") || (r[k]!=null&&r[k]!==""))
+        merge[k] = (info[k]!=null&&info[k]!=="") ? info[k] : r[k];
     });
-    return html;
+
+    var name = val(merge.ACCOUNT_NAME, [merge.PREFIX,merge.FIRST_NAME,merge.MIDDLE_NAME,merge.LAST_NAME].filter(Boolean).join(" ").trim());
+    var status = val(merge.ACCOUNT_STATUS, merge.MEMBER_STATUS, merge.STATUS, "—");
+    var statusHtml = (String(status).toUpperCase()==="ACTIVE")
+      ? "<span class='st-active'>Active</span>"
+      : "<span class='st-other'>"+status+"</span>";
+    var photo = merge.PHOTO;
+    var sig = merge.SIGNATURE;
+    var aadhaar = merge.AADHAR_FRONT || merge.AADHAAR_FRONT || merge.AADHAR_NO || merge.AADHAAR_NO;
+    var panDoc = merge.PAN_CARD;
+    var addressProof = merge.ADDRESS_PROOF || merge.AADHAR_BACK;
+
+    var father = val(merge.FATHER_NAME, merge.HUSBAND_NAME);
+    var dob = val(merge.DOB); if(dob && String(dob).length>=10) dob=String(dob).substring(0,10);
+    var gender = val(merge.GENDER);
+    var marital = val(merge.MARITAL_STATUS);
+    var pan = val(merge.PAN_NO, merge.PAN);
+    var aadharNo = val(merge.AADHAR_NO, merge.AADHAAR_NO);
+    var mobile = val(merge.MOBILE);
+    var email = val(merge.EMAIL);
+    var custType = val(merge.CUSTOMER_TYPE, "Individual");
+    var occupation = val(merge.OCCUPATION);
+    var annualInc = merge.ANNUAL_INCOME!=null && merge.ANNUAL_INCOME!=="" ? money(merge.ANNUAL_INCOME) : (merge.MONTHLY_INCOME!=null && merge.MONTHLY_INCOME!=="" ? money(Number(merge.MONTHLY_INCOME)*12) : "—");
+    var addr1 = val(merge.ADDRESS1, merge.ADDRESS, merge.CURRENT_ADDRESS);
+    var addr2 = [merge.CITY, merge.DISTRICT, merge.STATE, merge.PINCODE].filter(Boolean).join(", ");
+    var fullAddr = addr1 + (addr2 && addr2!=="—" ? (addr1!=="—"?", ":"")+addr2 : "");
+    var custSince = val(merge.CUSTOMER_SINCE, merge.CREATED_AT, merge.OPENING_DATE, merge.JOINING_DATE);
+    if(custSince && String(custSince).length>=10) custSince=String(custSince).substring(0,10);
+    var custId = val(merge.CUSTOMER_ID, merge.MEMBER_ID);
+    var accNo = val(merge.ACCOUNT_NO);
+
+    var permAddr = val(merge.PERMANENT_ADDRESS1, merge.PERMANENT_ADDRESS);
+    if(permAddr==="—" || !permAddr) permAddr = "Same as Current Address";
+    else {
+      var p2=[merge.PERMANENT_CITY,merge.PERMANENT_DISTRICT,merge.PERMANENT_STATE,merge.PERMANENT_PINCODE].filter(Boolean).join(", ");
+      if(p2) permAddr += ", "+p2;
+    }
+
+    var nationality = val(merge.NATIONALITY, "Indian");
+    var religion = val(merge.RELIGION);
+    var category = val(merge.CASTE, merge.CATEGORY);
+    var blood = val(merge.BLOOD_GROUP);
+    var commPref = val(merge.COMMUNICATION_PREF, merge.COMM_PREF, "SMS, Email");
+
+    var totalAcc = val(merge.TOTAL_ACCOUNTS, info.account_count, 1);
+    var totalDep = money(val(merge.TOTAL_AMOUNT, merge.CURRENT_BALANCE, 0));
+    var totalLoan = money(val(merge.TOTAL_LOANS, merge.LOAN_OUTSTANDING, 0));
+    var totalTxn = val(merge.TOTAL_TRANSACTIONS, merge.TXN_COUNT, "—");
+    var lastTxn = val(merge.LAST_TRANSACTION, merge.LAST_TXN_DATE);
+    if(lastTxn && String(lastTxn).length>=10) lastTxn=String(lastTxn).substring(0,10);
+
+    // Photo HTML
+    var photoHtml = isImg(photo)
+      ? "<img class='cv-photo' src='"+photo+"' alt='Photo'>"
+      : "<div class='cv-photo placeholder'>👤</div>";
+    var sigHtml = isImg(sig)
+      ? "<div class='cv-sig'><img src='"+sig+"' alt='Signature'><div class='lbl'>Customer Signature</div></div>"
+      : "<div class='cv-sig'><div style='height:36px;display:flex;align-items:center;justify-content:center;color:#aaa;font-size:11px'>No signature</div><div class='lbl'>Customer Signature</div></div>";
+
+    function kycCard(label, data, icon){
+      if(isImg(data)){
+        return "<div class='cv-kyc-item' onclick=\"window.open(this.querySelector('img').src,'_blank')\"><img src='"+data+"' alt='"+label+"'><div class='nm'>"+label+"</div><div class='act'>View</div></div>";
+      }
+      if(isData(data)){
+        return "<div class='cv-kyc-item' onclick=\"var a=document.createElement('a');a.href='"+data+"';a.target='_blank';a.click()\"><div class='ico'>"+icon+"</div><div class='nm'>"+label+"</div><div class='act'>View</div></div>";
+      }
+      return "<div class='cv-kyc-item'><div class='ico'>"+icon+"</div><div class='nm'>"+label+"</div><div class='act' style='color:#9CA3AF'>Not uploaded</div></div>";
+    }
+
+    // Account details pane content
+    var accRows = [
+      ["Account No", accNo],
+      ["Account Type", val(merge.ACCOUNT_TYPE)],
+      ["Account Status", status],
+      ["KYC Status", val(merge.KYC_STATUS)],
+      ["Savings Balance", money(merge.CURRENT_BALANCE)],
+      ["FD Total", money(merge.FD_TOTAL)],
+      ["RD Total", money(merge.RD_TOTAL)],
+      ["Total Amount", money(merge.TOTAL_AMOUNT)],
+      ["Branch", val(merge.BRANCH, merge.BRANCH_ID, session.branchId||session.branch||"HO")],
+      ["Opening Date", val(merge.OPENING_DATE, merge.CREATED_AT)]
+    ];
+    var accTable = accRows.map(function(x){ return "<tr><td class='k' style='color:#6B7280;width:40%'>"+x[0]+"</td><td style='font-weight:600'>"+x[1]+"</td></tr>"; }).join("");
+
+    // Nominee
+    var nomRows = [
+      ["Nominee Name", val(merge.NOMINEE_NAME)],
+      ["Relation", val(merge.NOMINEE_RELATION)],
+      ["Mobile", val(merge.NOMINEE_MOBILE)],
+      ["Address", val(merge.NOMINEE_ADDRESS)],
+      ["Guarantor", val(merge.GUARANTOR_NAME, merge.GUARANTOR)]
+    ];
+    var nomTable = nomRows.map(function(x){ return "<tr><td class='k' style='color:#6B7280;width:40%'>"+x[0]+"</td><td style='font-weight:600'>"+x[1]+"</td></tr>"; }).join("");
+
+    // Loans from info if any
+    var loans = info.loan_list || info.loans || [];
+    var loanHtml = "";
+    if(loans && loans.length){
+      loanHtml = "<table class='cv-table'><thead><tr><th>Loan A/c</th><th>Product</th><th>Amount</th><th>Outstanding</th><th>Status</th></tr></thead><tbody>"
+        + loans.map(function(L){
+          return "<tr><td>"+(L.LOAN_ACCOUNT_NO||L.ACCOUNT_NO||"—")+"</td><td>"+(L.PRODUCT||L.LOAN_TYPE||"—")+"</td><td>"+money(L.LOAN_AMOUNT||L.SANCTIONED_AMOUNT)+"</td><td>"+money(L.OUTSTANDING||L.BALANCE)+"</td><td>"+(L.STATUS||"—")+"</td></tr>";
+        }).join("") + "</tbody></table>";
+    } else {
+      loanHtml = "<div class='cv-empty'>No active loans found for this customer</div>";
+    }
+
+    var html = ""
+      +"<div class='cv-head'><h3>👤 View Customer Details</h3><span class='cv-x' onclick='closeModal()'>✕</span></div>"
+      +"<div class='cv-tabs'>"
+      +"  <button type='button' class='cv-tab on' data-pane='personal' onclick='cvSwitchTab(this)'>Personal Details</button>"
+      +"  <button type='button' class='cv-tab' data-pane='account' onclick='cvSwitchTab(this)'>Account Details</button>"
+      +"  <button type='button' class='cv-tab' data-pane='loan' onclick='cvSwitchTab(this)'>Loan Details</button>"
+      +"  <button type='button' class='cv-tab' data-pane='kyc' onclick='cvSwitchTab(this)'>KYC Documents</button>"
+      +"  <button type='button' class='cv-tab' data-pane='nominee' onclick='cvSwitchTab(this)'>Nominee / Guarantor</button>"
+      +"  <button type='button' class='cv-tab' data-pane='txn' onclick='cvSwitchTab(this)'>Transaction History</button>"
+      +"</div>"
+      +"<div class='cv-body'>"
+      // PERSONAL
+      +"<div class='cv-pane on' id='cv-pane-personal'>"
+      +"  <div class='cv-main'>"
+      +"    <div class='cv-photo-col'>"+photoHtml+sigHtml+"</div>"
+      +"    <div class='cv-fields'>"
+      +"      <span class='k'>Customer ID</span><span class='v'>"+custId+"</span>"
+      +"      <span class='k'>Customer Name</span><span class='v'>"+name+"</span>"
+      +"      <span class='k'>Father / Husband</span><span class='v'>"+father+"</span>"
+      +"      <span class='k'>Date of Birth</span><span class='v'>"+dob+"</span>"
+      +"      <span class='k'>Gender</span><span class='v'>"+gender+"</span>"
+      +"      <span class='k'>Marital Status</span><span class='v'>"+marital+"</span>"
+      +"      <span class='k'>PAN Number</span><span class='v'>"+pan+"</span>"
+      +"      <span class='k'>Aadhaar Number</span><span class='v'>"+aadharNo+"</span>"
+      +"    </div>"
+      +"    <div class='cv-fields'>"
+      +"      <span class='k'>Mobile Number</span><span class='v'>"+mobile+"</span>"
+      +"      <span class='k'>Email ID</span><span class='v'>"+email+"</span>"
+      +"      <span class='k'>Customer Type</span><span class='v'>"+custType+"</span>"
+      +"      <span class='k'>Occupation</span><span class='v'>"+occupation+"</span>"
+      +"      <span class='k'>Annual Income</span><span class='v'>"+annualInc+"</span>"
+      +"      <span class='k'>Address</span><span class='v'>"+fullAddr+"</span>"
+      +"      <span class='k'>Customer Since</span><span class='v'>"+custSince+"</span>"
+      +"      <span class='k'>Status</span><span class='v'>"+statusHtml+"</span>"
+      +"    </div>"
+      +"  </div>"
+      +"  <div class='cv-cards'>"
+      +"    <div class='cv-card'><h4>📍 Address Details</h4>"
+      +"      <div class='row'><span class='k'>Current Address</span><span class='v'>"+fullAddr+"</span></div>"
+      +"      <div class='row'><span class='k'>Permanent Address</span><span class='v'>"+permAddr+"</span></div>"
+      +"    </div>"
+      +"    <div class='cv-card'><h4>ℹ Other Details</h4>"
+      +"      <div class='row'><span class='k'>Nationality</span><span class='v'>"+nationality+"</span></div>"
+      +"      <div class='row'><span class='k'>Religion</span><span class='v'>"+religion+"</span></div>"
+      +"      <div class='row'><span class='k'>Category</span><span class='v'>"+category+"</span></div>"
+      +"      <div class='row'><span class='k'>Blood Group</span><span class='v'>"+blood+"</span></div>"
+      +"      <div class='row'><span class='k'>Communication Preference</span><span class='v'>"+commPref+"</span></div>"
+      +"    </div>"
+      +"    <div class='cv-card'><h4>🏦 Banking Relationship</h4>"
+      +"      <div class='row'><span class='k'>Total Accounts</span><span class='v'>"+totalAcc+"</span></div>"
+      +"      <div class='row'><span class='k'>Total Deposits</span><span class='v'>"+totalDep+"</span></div>"
+      +"      <div class='row'><span class='k'>Total Loans</span><span class='v'>"+totalLoan+"</span></div>"
+      +"      <div class='row'><span class='k'>Total Transactions</span><span class='v'>"+totalTxn+"</span></div>"
+      +"      <div class='row'><span class='k'>Last Transaction</span><span class='v'>"+lastTxn+"</span></div>"
+      +"    </div>"
+      +"  </div>"
+      +"  <div class='cv-kyc'><h4>📄 KYC Documents <a href='#' onclick=\"cvSwitchTab(document.querySelector('.cv-tab[data-pane=kyc]'));return false\" style='font-size:11px;color:#8B1538;font-weight:600'>View All</a></h4>"
+      +"    <div class='cv-kyc-grid'>"
+      +kycCard("Aadhaar Card", merge.AADHAR_FRONT||merge.AADHAAR_FRONT, "🪪")
+      +kycCard("PAN Card", panDoc, "💳")
+      +kycCard("Photo", photo, "🖼")
+      +kycCard("Address Proof", addressProof, "🏠")
+      +kycCard("Signature", sig, "✍️")
+      +"    </div>"
+      +"  </div>"
+      +"</div>"
+      // ACCOUNT
+      +"<div class='cv-pane' id='cv-pane-account'>"
+      +"  <table class='cv-table'><tbody>"+accTable+"</tbody></table>"
+      +"</div>"
+      // LOAN
+      +"<div class='cv-pane' id='cv-pane-loan'>"+loanHtml+"</div>"
+      // KYC
+      +"<div class='cv-pane' id='cv-pane-kyc'>"
+      +"  <div class='cv-kyc-grid' style='grid-template-columns:repeat(3,1fr)'>"
+      +kycCard("Aadhaar Front", merge.AADHAR_FRONT||merge.AADHAAR_FRONT, "🪪")
+      +kycCard("Aadhaar Back", merge.AADHAR_BACK||merge.AADHAAR_BACK, "🪪")
+      +kycCard("PAN Card", panDoc, "💳")
+      +kycCard("Photo", photo, "🖼")
+      +kycCard("Signature", sig, "✍️")
+      +kycCard("Address Proof", addressProof, "🏠")
+      +"  </div>"
+      +"</div>"
+      // NOMINEE
+      +"<div class='cv-pane' id='cv-pane-nominee'>"
+      +"  <table class='cv-table'><tbody>"+nomTable+"</tbody></table>"
+      +"</div>"
+      // TXN
+      +"<div class='cv-pane' id='cv-pane-txn'>"
+      +"  <div id='cv-txn-body' class='cv-empty'>Loading recent transactions…</div>"
+      +"</div>"
+      +"</div>" // cv-body
+      +"<div class='cv-foot'>"
+      +"  <button type='button' class='btn btn-o' onclick='printCustomerView()'>🖨 Print</button>"
+      +"  <button type='button' class='btn btn-o' onclick='closeModal()'>Close</button>"
+      +"  <button type='button' class='btn btn-p' onclick=\"closeModal();go('customer-update');setTimeout(function(){var s=document.getElementById('cup_SEARCH');if(s){s.value='"+String(accNo).replace(/'/g,"")+"';loadCustomerProfile();}},200)\">✏ Edit Customer</button>"
+      +"</div>";
+
+    body.innerHTML = html;
+    _currentModalRow = merge;
+    window._cvLast = merge;
+
+    // Load recent transactions
+    if(accNo && accNo!=="—"){
+      postGAS({action:"get_list", sheet:"TRANSACTION", limit:20, filter_field:"ACCOUNT_NO", filter_value:accNo}).then(function(tr){
+        var el=document.getElementById("cv-txn-body");
+        if(!el)return;
+        var rows=(tr&&tr.rows)||[];
+        if(!rows.length){
+          // try alternate
+          return postGAS({action:"account_statement", account_no:accNo, limit:15}).then(function(st){
+            var rows2=(st&&(st.rows||st.transactions))||[];
+            paintCvTxn(el, rows2);
+          }).catch(function(){ el.innerHTML="<div class='cv-empty'>No transactions found</div>"; });
+        } else paintCvTxn(el, rows);
+      }).catch(function(){
+        var el=document.getElementById("cv-txn-body");
+        if(el) el.innerHTML="<div class='cv-empty'>Could not load transactions</div>";
+      });
+    } else {
+      var el=document.getElementById("cv-txn-body");
+      if(el) el.innerHTML="<div class='cv-empty'>No account number</div>";
+    }
   }
-  function renderFull(info){
-    var summary="<div><b>A/c No</b>"+(info.ACCOUNT_NO||"—")+"</div>"
-      +"<div><b>Name</b>"+(info.ACCOUNT_NAME||"—")+"</div>"
-      +"<div><b>A/c Type</b>"+(info.ACCOUNT_TYPE||"—")+"</div>"
-      +"<div><b>Cust Type</b>"+(info.CUSTOMER_TYPE||"—")+"</div>"
-      +"<div><b>Mobile</b>"+(info.MOBILE||"—")+"</div>"
-      +"<div><b>Savings Bal</b>₹ "+Number(info.CURRENT_BALANCE||0).toLocaleString("en-IN")+"</div>"
-      +"<div><b>FD Total</b>₹ "+Number(info.FD_TOTAL||0).toLocaleString("en-IN")+"</div>"
-      +"<div><b>RD Monthly</b>₹ "+Number(info.RD_TOTAL||0).toLocaleString("en-IN")+"</div>"
-      +"<div><b>Total Amount</b>₹ "+Number(info.TOTAL_AMOUNT||0).toLocaleString("en-IN")+"</div>"
-      +"<div><b>Status</b>"+(info.ACCOUNT_STATUS||"—")+"</div>"
-      +"<div><b>KYC</b>"+(info.KYC_STATUS||"—")+"</div>";
-    body.innerHTML=summary
-      +sec("Customer Master",info.customer||r._customer)
-      +sec("Account Master",info.account||r._account)
-      +sec("Customer Login",info.login)
-      +(info.fd_list&&info.fd_list.length?sec("FD ("+info.fd_list.length+")",info.fd_list[0]):sec("FD Accounts",null))
-      +(info.rd_list&&info.rd_list.length?sec("RD ("+info.rd_list.length+")",info.rd_list[0]):sec("RD Accounts",null));
-    _currentModalRow=info;
+
+  function paintCvTxn(el, rows){
+    if(!rows||!rows.length){ el.innerHTML="<div class='cv-empty'>No transactions found</div>"; return; }
+    el.innerHTML = "<table class='cv-table'><thead><tr><th>Date</th><th>Txn ID</th><th>Particulars</th><th>Type</th><th>Amount</th><th>Balance</th></tr></thead><tbody>"
+      + rows.slice(0,20).map(function(t){
+        var amt = t.AMOUNT!=null?t.AMOUNT:(t.DEPOSIT||t.WITHDRAWAL||t.CREDIT||t.DEBIT||"");
+        var type = t.TYPE||t.TXN_TYPE||t.DR_CR||"—";
+        return "<tr><td>"+(t.DATE||t.TXN_DATE||"—")+"</td><td>"+(t.TRANSACTION_ID||t.TXN_ID||"—")+"</td><td>"+(t.PARTICULARS||t.NARRATION||"—")+"</td><td>"+type+"</td><td>"+(amt!==""?("₹ "+Number(amt).toLocaleString("en-IN")):"—")+"</td><td>"+(t.CLOSING_BALANCE!=null?("₹ "+Number(t.CLOSING_BALANCE).toLocaleString("en-IN")):"—")+"</td></tr>";
+      }).join("") + "</tbody></table>";
   }
-  var q=r.ACCOUNT_NO&&r.ACCOUNT_NO!=="—"?r.ACCOUNT_NO:r.CUSTOMER_ID;
-  postGAS({action:"lookup_account",account_no:q}).then(function(res){
-    if(res&&res.status==="success")renderFull(res);
-    else renderFull({ACCOUNT_NO:r.ACCOUNT_NO,ACCOUNT_NAME:r.ACCOUNT_NAME,ACCOUNT_TYPE:r.ACCOUNT_TYPE,CUSTOMER_TYPE:r.CUSTOMER_TYPE,MOBILE:r.MOBILE,CURRENT_BALANCE:r.CURRENT_BALANCE,FD_TOTAL:r.FD_TOTAL,RD_TOTAL:r.RD_TOTAL,TOTAL_AMOUNT:r.TOTAL_AMOUNT,ACCOUNT_STATUS:r.ACCOUNT_STATUS,KYC_STATUS:r.KYC_STATUS,customer:r._customer,account:r._account});
-  }).catch(function(){renderFull(r)});
+
+  var q = r.ACCOUNT_NO && r.ACCOUNT_NO!=="—" ? r.ACCOUNT_NO : r.CUSTOMER_ID;
+  postGAS({action:"lookup_account", account_no:q}).then(function(res){
+    if(res && res.status==="success") buildUI(res);
+    else buildUI(Object.assign({}, r, {ACCOUNT_NO:r.ACCOUNT_NO, ACCOUNT_NAME:r.ACCOUNT_NAME}));
+  }).catch(function(){ buildUI(r); });
 }
+
+function cvSwitchTab(btn){
+  var pane = btn.getAttribute("data-pane");
+  document.querySelectorAll(".cv-tab").forEach(function(t){ t.classList.toggle("on", t===btn); });
+  document.querySelectorAll(".cv-pane").forEach(function(p){ p.classList.toggle("on", p.id==="cv-pane-"+pane); });
+}
+
+function printCustomerView(){
+  var m = window._cvLast || _currentModalRow || {};
+  var name = m.ACCOUNT_NAME || [m.FIRST_NAME,m.LAST_NAME].filter(Boolean).join(" ") || "—";
+  var w = window.open("", "_blank", "width=900,height=700");
+  if(!w){ toast("Allow popups"); return; }
+  var css = "body{font-family:Segoe UI,system-ui,sans-serif;padding:20px;color:#1a1a1a;font-size:12px}"
+    +"h1{color:#8B1538;font-size:16px;margin:0}.sub{font-size:11px;color:#666;margin-bottom:12px}"
+    +"table{width:100%;border-collapse:collapse;margin-top:8px}td,th{border:1px solid #e8d0d5;padding:6px 8px;text-align:left}"
+    +"th{background:#F5E6EA;color:#6B0F2A;width:30%}.photo{max-width:100px;max-height:100px;border-radius:8px}";
+  w.document.write("<html><head><title>Customer Details — "+(m.ACCOUNT_NO||"")+"</title><style>"+css+"</style></head><body>");
+  w.document.write("<h1>SHREE RADHA CREDIT CO-OPERATIVE SOCIETY LTD.</h1>");
+  w.document.write("<div class='sub'>Customer Profile · "+(m.ACCOUNT_NO||"—")+"</div>");
+  if(m.PHOTO && String(m.PHOTO).indexOf("data:image")===0)
+    w.document.write("<img class='photo' src='"+m.PHOTO+"'><br><br>");
+  w.document.write("<table>");
+  var rows=[["Customer ID",m.CUSTOMER_ID],["Name",name],["Father / Husband",m.FATHER_NAME],["DOB",m.DOB],["Gender",m.GENDER],
+    ["Mobile",m.MOBILE],["Email",m.EMAIL],["PAN",m.PAN_NO],["Aadhaar",m.AADHAR_NO||m.AADHAAR_NO],
+    ["Account No",m.ACCOUNT_NO],["Account Type",m.ACCOUNT_TYPE],["Status",m.ACCOUNT_STATUS||m.STATUS],
+    ["KYC",m.KYC_STATUS],["Address",(m.ADDRESS1||m.ADDRESS||"")+", "+(m.CITY||"")+", "+(m.STATE||"")+" - "+(m.PINCODE||"")],
+    ["Nominee",m.NOMINEE_NAME],["Occupation",m.OCCUPATION]];
+  rows.forEach(function(x){ w.document.write("<tr><th>"+x[0]+"</th><td>"+(x[1]!=null&&x[1]!==""?x[1]:"—")+"</td></tr>"); });
+  w.document.write("</table>");
+  w.document.write("<script>window.print()<\/script></body></html>");
+  w.document.close();
+}
+
 function goStatement(accNo){
   go("account-statement");
   setTimeout(function(){
@@ -7789,11 +8225,15 @@ function ntView(i){
     +'</div>'+imgHtml;
   if(typeof _currentModalTitle!=="undefined") window._currentModalTitle = "Notice — "+(x.NOTICE_NO||"");
   window._currentModalRow = x;
+  var mb=document.getElementById("viewModalBox");
+  if(mb){ mb.classList.remove("cv-wide"); mb.style.padding=""; }
+  var hd=document.getElementById("vmHeadDefault");
+  if(hd) hd.style.display="";
   var title=document.getElementById("vmTitle");
   var body=document.getElementById("vmBody");
   var modal=document.getElementById("viewModal");
   if(title) title.textContent = "Notice — "+(x.NOTICE_NO||x.NOTICE_ID||"");
-  if(body) body.innerHTML = html;
+  if(body){ body.className="modal-grid"; body.style.display=""; body.innerHTML = html; }
   if(modal) modal.classList.add("show");
 }
 function ntEdit(i){
@@ -8252,26 +8692,115 @@ function updateDocPreviewEl(elId, dataUrl, opts){
 window._cupRow = null;
 window._cupAccount = null;
 
+/* Google Sheets cell limit = 50,000 characters. Base64 photos easily exceed this.
+   Compress images client-side (resize + JPEG) so every image field stays under ~40k chars. */
+window._SHEET_CELL_SAFE = 42000;
+window._uploadedDocFields = window._uploadedDocFields || {};
+
+function compressImageDataUrl(dataUrl, maxSide, quality, cb){
+  maxSide = maxSide || 480;
+  quality = quality == null ? 0.58 : quality;
+  try{
+    var img = new Image();
+    img.onload = function(){
+      var w = img.naturalWidth || img.width;
+      var h = img.naturalHeight || img.height;
+      if(!w || !h){ cb(dataUrl); return; }
+      var scale = 1;
+      if(w > maxSide || h > maxSide) scale = maxSide / Math.max(w, h);
+      var nw = Math.max(1, Math.round(w * scale));
+      var nh = Math.max(1, Math.round(h * scale));
+      var canvas = document.createElement("canvas");
+      canvas.width = nw; canvas.height = nh;
+      var ctx = canvas.getContext("2d");
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(0,0,nw,nh);
+      ctx.drawImage(img, 0, 0, nw, nh);
+      var out = canvas.toDataURL("image/jpeg", quality);
+      // If still too large, reduce quality further
+      if(out.length > window._SHEET_CELL_SAFE && quality > 0.35){
+        compressImageDataUrl(dataUrl, Math.min(maxSide, 360), Math.max(0.35, quality - 0.15), cb);
+        return;
+      }
+      if(out.length > window._SHEET_CELL_SAFE){
+        compressImageDataUrl(dataUrl, 280, 0.4, cb);
+        return;
+      }
+      cb(out);
+    };
+    img.onerror = function(){ cb(dataUrl); };
+    img.src = dataUrl;
+  }catch(ex){ cb(dataUrl); }
+}
+
 window.fileToField = function(inp, fieldId){
   var f = inp.files && inp.files[0];
   if(!f) return;
   // 5MB for PDF/docs, 3MB default images
-  var maxBytes = (f.type && (f.type.indexOf("pdf")>=0 || f.type.indexOf("officedocument")>=0 || f.type.indexOf("msword")>=0 || f.type.indexOf("ms-excel")>=0)) ? 5*1024*1024 : 3*1024*1024;
+  var isPdfOrDoc = f.type && (f.type.indexOf("pdf")>=0 || f.type.indexOf("officedocument")>=0 || f.type.indexOf("msword")>=0 || f.type.indexOf("ms-excel")>=0 || f.type.indexOf("text/")>=0);
+  var maxBytes = isPdfOrDoc ? 5*1024*1024 : 3*1024*1024;
   if(f.size > maxBytes){ toast("File too large (max "+Math.round(maxBytes/1024/1024)+"MB)"); inp.value=""; return; }
   var reader = new FileReader();
   reader.onload = function(e){
     var dataUrl = e.target.result;
-    var hid = document.getElementById(fieldId);
-    if(hid) hid.value = dataUrl;
-    var hint = document.getElementById("hint-"+fieldId);
-    if(hint) hint.textContent = "✓ "+f.name+" ("+Math.round(f.size/1024)+" KB)";
-    // live preview for notice document
-    if(fieldId==="nt_NOTICE_IMAGE"){
-      updateDocPreviewEl("nt-img-preview", dataUrl, {maxH:180, compact:false, downloadName:f.name||"notice-doc"});
+    var isImage = f.type && f.type.indexOf("image/")===0;
+
+    function applyValue(finalUrl){
+      // Hard guard: never put over-limit data into sheet cells
+      if(finalUrl && finalUrl.length > window._SHEET_CELL_SAFE){
+        toast("File still too large for Google Sheet cell (max ~40KB after compress). Use a smaller image.");
+        inp.value = "";
+        return;
+      }
+      var hid = document.getElementById(fieldId);
+      if(hid) hid.value = finalUrl;
+      // Track which document fields user uploaded this session (for profile update — don't re-send old base64)
+      window._uploadedDocFields[fieldId] = true;
+      // Also mark the form field name without cup_ prefix
+      if(fieldId.indexOf("cup_")===0) window._uploadedDocFields[fieldId.substring(4)] = true;
+      var hint = document.getElementById("hint-"+fieldId);
+      if(hint){
+        var kb = Math.round((finalUrl ? finalUrl.length : f.size)/1024);
+        hint.textContent = "✓ "+f.name+" ("+kb+" KB"+(isImage?" compressed":"")+")";
+      }
+      if(fieldId==="nt_NOTICE_IMAGE"){
+        updateDocPreviewEl("nt-img-preview", finalUrl, {maxH:180, compact:false, downloadName:f.name||"notice-doc"});
+      }
+      var prevId = inp.getAttribute("data-preview");
+      if(prevId) updateDocPreviewEl(prevId, finalUrl, {maxH:160, downloadName:f.name||"document"});
+      // live photo/signature preview on profile update
+      if(fieldId==="cup_PHOTO" || fieldId==="cup_SIGNATURE"){
+        try{
+          var prev = document.getElementById("cup-preview");
+          if(prev){
+            var photo = (document.getElementById("cup_PHOTO")||{}).value||"";
+            var sig = (document.getElementById("cup_SIGNATURE")||{}).value||"";
+            var html = "";
+            if(photo && photo.indexOf("data:")===0) html += '<div style="text-align:center"><div style="font-size:10px;color:#6B7280;margin-bottom:4px">Photo</div><img src="'+photo+'" style="width:90px;height:90px;object-fit:cover;border-radius:6px;border:1px solid #ddd"/></div>';
+            if(sig && sig.indexOf("data:")===0) html += '<div style="text-align:center"><div style="font-size:10px;color:#6B7280;margin-bottom:4px">Signature</div><img src="'+sig+'" style="width:90px;height:90px;object-fit:contain;border-radius:6px;border:1px solid #ddd;background:#fff"/></div>';
+            if(html) prev.innerHTML = html;
+          }
+        }catch(ex){}
+      }
     }
-    // generic: if hint sibling has data-preview id
-    var prevId = inp.getAttribute("data-preview");
-    if(prevId) updateDocPreviewEl(prevId, dataUrl, {maxH:160, downloadName:f.name||"document"});
+
+    if(isImage){
+      // Resize + JPEG compress so cell stays under Google Sheets 50k limit
+      compressImageDataUrl(dataUrl, 480, 0.58, function(out){
+        applyValue(out);
+        if(out.length < dataUrl.length){
+          toast("Image compressed for sheet ("+Math.round(out.length/1024)+" KB)");
+        }
+      });
+    } else {
+      // PDF / docs — if over limit, reject (Sheets cannot store large PDFs in one cell)
+      if(dataUrl.length > window._SHEET_CELL_SAFE){
+        toast("PDF/Document too large for Google Sheet cell (max ~40KB). Use a smaller scan or image instead.");
+        inp.value = "";
+        return;
+      }
+      applyValue(dataUrl);
+    }
   };
   reader.readAsDataURL(f);
 };
@@ -8363,10 +8892,12 @@ function loadCustomerProfile(){
     set("cup_KYC_STATUS", pick("KYC_STATUS")||"PENDING");
     set("cup_MEMBER_STATUS", pick("MEMBER_STATUS","STATUS")||"ACTIVE");
     set("cup_UPDATED_BY", (session.employeeCode||session.username||"")+(session.role?" / "+session.role:""));
-    // keep existing docs in hidden fields (unless user re-uploads)
+    // Do NOT put existing large base64 into hidden fields (Sheets 50k cell limit).
+    // Only show "on record" hint + preview. User must re-upload to replace a document.
+    window._uploadedDocFields = {};
     ["PHOTO","SIGNATURE","AADHAR_FRONT","AADHAR_BACK","PAN_CARD"].forEach(function(f){
       var v = pick(f);
-      set("cup_"+f, (v && String(v).indexOf("data:")===0) ? v : "");
+      set("cup_"+f, ""); // empty until user re-uploads (compressed)
       var hint = document.getElementById("hint-cup_"+f);
       if(hint) hint.textContent = (v && String(v).indexOf("data:")===0) ? "✓ On record (re-upload to replace)" : "";
     });
@@ -8402,14 +8933,17 @@ function loadCustomerProfile(){
     // 2) Customer master list — match by CUSTOMER_ID / ACCOUNT_NO / MOBILE
     return postGAS({action:"get_list", sheet:"CUSTOMER_MASTER", limit:2000}).then(function(r){
       var rows = (r && r.rows) || [];
-      var qu = q.toUpperCase();
+      var qu = q.toUpperCase().replace(/[\s\-]/g,"");
+      var quSrc = /^\d+$/.test(qu) ? ("SRC"+qu) : qu;
       var found = null;
       for(var i=0;i<rows.length;i++){
         var x = rows[i];
-        if(String(x.CUSTOMER_ID||"").toUpperCase()===qu){ found=x; break; }
-        if(String(x.ACCOUNT_NO||"").toUpperCase()===qu){ found=x; break; }
+        var xCid = String(x.CUSTOMER_ID||"").toUpperCase().replace(/[\s\-]/g,"");
+        var xAcc = String(x.ACCOUNT_NO||"").toUpperCase().replace(/[\s\-]/g,"");
+        if(xCid===qu){ found=x; break; }
+        if(xAcc===qu || xAcc===quSrc || ("SRC"+xAcc.replace(/^SRC/,""))===qu){ found=x; break; }
         if(String(x.MOBILE||"")===q || String(x.ALT_MOBILE||"")===q){ found=x; break; }
-        if(cid && String(x.CUSTOMER_ID||"").toUpperCase()===String(cid).toUpperCase()){ found=x; break; }
+        if(cid && xCid===String(cid).toUpperCase().replace(/[\s\-]/g,"")){ found=x; break; }
       }
       if(!found && !acc){
         if(box){ box.className="verify-box err show"; box.innerHTML="⚠️ Customer not found for: <b>"+q+"</b>"; }
@@ -8443,6 +8977,7 @@ function loadCustomerProfile(){
 function resetCustomerProfile(){
   window._cupRow = null;
   window._cupAccount = null;
+  window._uploadedDocFields = {};
   var form = document.getElementById("form-customer-update");
   if(form){ form.reset(); form.style.display="none"; }
   var box = document.getElementById("cup-load-box");
@@ -8453,10 +8988,14 @@ function resetCustomerProfile(){
   if(prev) prev.innerHTML="";
   var s = document.getElementById("cup_SEARCH");
   if(s) s.value="";
+  ["cup_PHOTO","cup_SIGNATURE","cup_AADHAR_FRONT","cup_AADHAR_BACK","cup_PAN_CARD"].forEach(function(id){
+    var e=document.getElementById(id); if(e) e.value="";
+    var hint=document.getElementById("hint-"+id); if(hint) hint.textContent="";
+  });
 }
 
 function saveCustomerProfile(e){
-  e.preventDefault();
+  if(e && e.preventDefault) e.preventDefault();
   var al = document.getElementById("al-customer-update");
   var form = document.getElementById("form-customer-update");
   if(!window._cupRow && !(document.getElementById("cup_CUSTOMER_ID")||{}).value){
@@ -8472,68 +9011,107 @@ function saveCustomerProfile(e){
   var fd = new FormData(form);
   var o = {};
   fd.forEach(function(v,k){ o[k]=v; });
-  o.ACCOUNT_NO = lockedAcc; // force original
-  o.CUSTOMER_ID = cid || o.CUSTOMER_ID;
-  o.UPDATED_BY = session.employeeCode || session.username || "";
+  o.ACCOUNT_NO = lockedAcc;
+  o.CUSTOMER_ID = cid || o.CUSTOMER_ID || (window._cupRow && window._cupRow.CUSTOMER_ID) || "";
+  o.MEMBER_ID = o.MEMBER_ID || (window._cupRow && window._cupRow.MEMBER_ID) || "";
+  o.UPDATED_BY = (typeof session!=="undefined" && (session.employeeCode || session.username)) || "";
   o.UPDATED_AT = new Date().toISOString();
-  // Account name sync from personal names
   o.ACCOUNT_NAME = [o.PREFIX, o.FIRST_NAME, o.MIDDLE_NAME, o.LAST_NAME].filter(Boolean).join(" ").replace(/\s+/g," ").trim();
 
-  // Do not blank existing documents if user did not re-upload
-  ["PHOTO","SIGNATURE","AADHAR_FRONT","AADHAR_BACK","PAN_CARD"].forEach(function(f){
-    if(!o[f] && window._cupRow && window._cupRow[f]) o[f] = window._cupRow[f];
+  /* IMPORTANT: Google Sheets cell limit is 50,000 characters.
+     Do NOT re-send old base64 documents on every profile update — that causes
+     "cell exceeds maximum" errors. Only send a document field if the user
+     uploaded a new file this session (tracked in _uploadedDocFields). */
+  var docFields = ["PHOTO","SIGNATURE","AADHAR_FRONT","AADHAR_BACK","PAN_CARD"];
+  var uploaded = window._uploadedDocFields || {};
+  docFields.forEach(function(f){
+    var cupKey = "cup_"+f;
+    var newlyUploaded = !!(uploaded[f] || uploaded[cupKey]);
+    var val = o[f];
+    if(newlyUploaded && val && String(val).indexOf("data:")===0){
+      // Keep new compressed image; hard-cap if somehow still over limit
+      if(String(val).length > (window._SHEET_CELL_SAFE||42000)){
+        delete o[f];
+        toast(f+" too large — skipped (use smaller image)");
+      }
+      // keep o[f]
+    } else {
+      // User did not re-upload this field → do not overwrite sheet cell
+      delete o[f];
+    }
   });
 
-  var btn = form.querySelector('button[type="submit"]');
+  var btn = form ? form.querySelector('button[type="submit"]') : null;
   if(btn){ btn.disabled=true; btn.dataset.orig=btn.textContent; btn.textContent="Updating…"; }
   if(al){ al.className="alert show"; al.textContent="Updating profile…"; }
+
+  var keyField = o.CUSTOMER_ID ? "CUSTOMER_ID" : "ACCOUNT_NO";
+  var keyValue = o.CUSTOMER_ID || lockedAcc;
 
   var payload = {
     action: "update",
     sheet: "CUSTOMER_MASTER",
-    key_field: cid ? "CUSTOMER_ID" : "ACCOUNT_NO",
-    key_value: cid || lockedAcc,
+    key_field: keyField,
+    key_value: keyValue,
     row: o,
-    // also sync account display name / mobile on ACCOUNT_MASTER
     sync_account: true,
     ACCOUNT_NO: lockedAcc
   };
 
-  postGAS(payload).then(function(r){
+  function onOk(msg){
     if(btn){ btn.disabled=false; btn.textContent=btn.dataset.orig||"Update Profile"; }
-    if(r && r.status==="success"){
-      if(al){ al.className="alert show alert-ok"; al.textContent="✓ Profile updated — A/c "+lockedAcc+" (Account No unchanged)"; }
-      toast("Profile updated");
-      window._cupRow = Object.assign({}, window._cupRow||{}, o);
-      try{ cacheInvalidate("cust360"); lookupCacheInvalidate("accounts"); window._cust360Rows=null; }catch(ex){}
-      writeClientAudit("CUSTOMER_UPDATE", "UPDATE", lockedAcc+" / "+cid);
-    } else {
-      // Fallback: some backends use update_row / edit
-      if(!r || r.status!=="success"){
+    if(al){ al.className="alert show alert-ok"; al.textContent="✓ "+(msg||("Profile updated — A/c "+lockedAcc+" (Account No unchanged)")); }
+    toast("Profile updated");
+    // Merge only non-doc fields + newly uploaded docs into local cache
+    window._cupRow = Object.assign({}, window._cupRow||{}, o);
+    window._uploadedDocFields = {};
+    // Clear file inputs so next update doesn't re-send
+    ["cup_PHOTO","cup_SIGNATURE","cup_AADHAR_FRONT","cup_AADHAR_BACK","cup_PAN_CARD"].forEach(function(id){
+      var e=document.getElementById(id); if(e) e.value="";
+      var hint=document.getElementById("hint-"+id); if(hint) hint.textContent="";
+    });
+    try{ cacheInvalidate("cust360"); lookupCacheInvalidate("accounts"); window._cust360Rows=null; }catch(ex){}
+    try{ writeClientAudit("CUSTOMER_UPDATE", "UPDATE", lockedAcc+" / "+(o.CUSTOMER_ID||"")); }catch(ex){}
+  }
+  function onFail(msg){
+    if(btn){ btn.disabled=false; btn.textContent=btn.dataset.orig||"Update Profile"; }
+    if(al){ al.className="alert show alert-er"; al.textContent="⚠️ "+(msg||"Update failed"); }
+    toast(msg||"Update failed");
+  }
+
+  postGAS(payload).then(function(r){
+    if(r && r.status==="success"){ onOk(r.message); return; }
+    // Fallback 1: update_row
+    return postGAS({
+      action: "update_row",
+      sheet: "CUSTOMER_MASTER",
+      key: keyField,
+      keyColumn: keyField,
+      value: keyValue,
+      keyValue: keyValue,
+      data: o,
+      patch: o,
+      row: o
+    }).then(function(r2){
+      if(r2 && r2.status==="success"){ onOk(r2.message); return; }
+      // Fallback 2: try ACCOUNT_NO if CUSTOMER_ID failed
+      if(keyField==="CUSTOMER_ID" && lockedAcc){
         return postGAS({
-          action: "update_row",
+          action: "update",
           sheet: "CUSTOMER_MASTER",
-          key: "CUSTOMER_ID",
-          value: cid || lockedAcc,
-          data: o
-        }).then(function(r2){
-          if(r2 && r2.status==="success"){
-            if(al){ al.className="alert show alert-ok"; al.textContent="✓ Profile updated — A/c "+lockedAcc; }
-            toast("Profile updated");
-            try{ cacheInvalidate("cust360"); lookupCacheInvalidate("accounts"); }catch(ex){}
-          } else {
-            var msg = (r2&&r2.message)||(r&&r.message)||"Update failed — deploy Code.gs with action: update";
-            if(al){ al.className="alert show alert-er"; al.textContent="⚠️ "+msg; }
-            toast(msg);
-          }
+          key_field: "ACCOUNT_NO",
+          key_value: lockedAcc,
+          row: o,
+          sync_account: true,
+          ACCOUNT_NO: lockedAcc
+        }).then(function(r3){
+          if(r3 && r3.status==="success") onOk(r3.message);
+          else onFail((r3&&r3.message)||(r2&&r2.message)||(r&&r.message)||"Update failed — redeploy Code.gs");
         });
       }
-    }
-  }).catch(function(){
-    if(btn){ btn.disabled=false; btn.textContent=btn.dataset.orig||"Update Profile"; }
-    if(al){ al.className="alert show alert-er"; al.textContent="⚠️ Network error"; }
-    toast("Network error");
-  });
+      onFail((r2&&r2.message)||(r&&r.message)||"Update failed — redeploy Code.gs with action: update");
+    });
+  }).catch(function(){ onFail("Network error"); });
   return false;
 }
 
