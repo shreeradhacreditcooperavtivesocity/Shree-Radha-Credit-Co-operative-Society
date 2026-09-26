@@ -1182,9 +1182,10 @@ table.tn tbody tr.row-selected .lv-actions .rej{
 <div style="width:90px;height:90px;border-radius:50%;background:conic-gradient(#8B1538 0% var(--ld-a,58%),#DC2626 var(--ld-a,58%) var(--ld-o,76%),#059669 var(--ld-o,76%) 100%);display:flex;align-items:center;justify-content:center"><div style="width:58px;height:58px;border-radius:50%;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--p)"><span id="ld-total-ring">0</span><span style="font-size:9px;font-weight:500;color:var(--tm)">Total</span></div></div>
 <div style="font-size:11.5px;line-height:1.8">
 <div><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#8B1538;margin-right:4px"></span>Active Loans <b id="ld-s-active">0</b> (<span id="ld-p-active">0</span>%)</div>
+<div><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#2563EB;margin-right:4px"></span>Pending Loans <b id="ld-s-pending">0</b> (<span id="ld-p-pending">0</span>%)</div>
 <div><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#DC2626;margin-right:4px"></span>Overdue Loans <b id="ld-s-overdue">0</b> (<span id="ld-p-overdue">0</span>%)</div>
 <div><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#059669;margin-right:4px"></span>Closed Loans <b id="ld-s-closed">0</b> (<span id="ld-p-closed">0</span>%)</div>
-<div style="margin-top:4px;font-weight:600">Total <span id="ld-s-total">0</span> Loans</div>
+<div style="margin-top:4px;font-weight:600">Total <span id="ld-s-total">0</span> Loans · Outstanding <b id="ld-s-out">₹0</b></div>
 </div></div></div>
 <div class="card"><div class="ch"><h3>Loan Outstanding Trend</h3><span style="font-size:10px;color:var(--tm)">Last 6 Months</span></div>
 <div style="padding:10px 12px;height:120px;display:flex;align-items:flex-end;gap:8px" id="ld-trend">
@@ -2405,6 +2406,11 @@ table.tn tbody tr.row-selected .lv-actions .rej{
 <!-- Today's list -->
 <div class="fc">
   <h3>Today's Collections (this agent)</h3>
+  <div class="fr" style="margin-bottom:8px">
+    <div class="fg"><label>From</label><input type="date" id="ac_FROM"></div>
+    <div class="fg"><label>To</label><input type="date" id="ac_TO"></div>
+    <div class="fg"><label>&nbsp;</label><button type="button" class="btn btn-p" onclick="loadAgentCollectionList()">Apply</button></div>
+  </div>
   <div class="lv-bar">
     <input class="lv-search" id="ac-search" placeholder="Search A/c, receipt, type…" oninput="filterACList()">
     <span class="lv-count" id="ac-list-count"></span>
@@ -2684,12 +2690,38 @@ table.tn tbody tr.row-selected .lv-actions .rej{
 </div></div>
 
 <div class="pv" id="p-rpt-loan">
-<div class="ptb"><h2>Loan Report</h2><span class="bc">Loan Report</span></div>
-<div class="ph"><div class="pi">📋</div><h3>Loan Report</h3>
-<p>Module ready for Google Sheets connection. Staff ID auto from login. Use structure in Google_Sheets_Structure_All_Masters.xlsx</p>
-<p style="margin-top:8px"><button class="btn btn-p" onclick="toast('Loan Report – connect sheet for live data')">Open Module</button>
-<button class="btn btn-o" style="margin-left:6px" onclick="window.print()">Print</button></p>
-</div></div>
+<div class="ptb"><h2>Loan Report</h2><span class="bc">Reports › Loan Report</span></div>
+<div class="stats" style="grid-template-columns:repeat(5,1fr);margin-bottom:10px">
+  <div class="sc"><div class="si" style="background:#FFF3E0">₹</div><div><div class="sl">Total Outstanding</div><div class="sv" id="lrpt-outstanding">—</div></div></div>
+  <div class="sc"><div class="si" style="background:#E8F5E9">✅</div><div><div class="sl">Active Loans</div><div class="sv" id="lrpt-active">—</div></div></div>
+  <div class="sc"><div class="si" style="background:#E3F2FD">⏳</div><div><div class="sl">Pending Loans</div><div class="sv" id="lrpt-pending">—</div></div></div>
+  <div class="sc"><div class="si" style="background:#F3E5F5">🔒</div><div><div class="sl">Closed Loans</div><div class="sv" id="lrpt-closed">—</div></div></div>
+  <div class="sc"><div class="si" style="background:#FFEBEE">⏱</div><div><div class="sl">Overdue A/cs</div><div class="sv" id="lrpt-overdue" style="color:var(--er)">—</div></div></div>
+</div>
+<div class="filter-bar">
+  <div class="fg"><label>Status</label>
+    <select id="lrpt-status">
+      <option value="">All Status</option>
+      <option value="ACTIVE">Active / Disbursed</option>
+      <option value="PENDING">Pending / Applied</option>
+      <option value="CLOSED">Closed</option>
+      <option value="REJECTED">Rejected</option>
+    </select>
+  </div>
+  <div class="fg"><label>Search</label>
+    <input type="text" id="lrpt-search" placeholder="A/c No / Name / Loan A/c / Customer ID" style="min-width:220px">
+  </div>
+  <button class="btn btn-p" onclick="loadLoanReport(true)">Apply / Refresh</button>
+  <button class="btn btn-o" onclick="document.getElementById('lrpt-status').value='';document.getElementById('lrpt-search').value='';loadLoanReport(true)">Clear</button>
+  <button class="btn btn-o" onclick="printAccountingArea('lrptPrintArea')">Print</button>
+  <span class="lv-count" id="lrpt-count" style="align-self:center"></span>
+</div>
+<div id="lrptPrintArea">
+  <div id="lrpt-report-root" class="rpt-wrap">
+    <div style="text-align:center;color:#888;padding:24px;font-size:12px">Click <b>Apply / Refresh</b> to load Loan Report</div>
+  </div>
+</div>
+</div>
 
 <div class="pv" id="p-rpt-emi">
 <div class="ptb"><h2>EMI Report</h2><span class="bc">EMI Report</span></div>
@@ -3168,7 +3200,7 @@ table.tn tbody tr.row-selected .lv-actions .rej{
 <p style="margin-top:14px;text-align:right"><button class="btn btn-o" onclick="printModalRecord()">🖨 Print</button> <button class="btn btn-p" onclick="closeModal()">Close</button></p>
 </div></div>
 <script>
-const GS_URL="https://script.google.com/macros/s/AKfycbw0J2ZOXgITjKxfJKyr4RLzISxLQ1Fr3tJTjQ0PeOcQs5AU2ySbOZRI374Fz_rq7JBR/exec";
+const GS_URL="https://script.google.com/macros/s/AKfycbwphzaOrvsN8KMWN7vN9_AH5nJJKcUsEeLbkC-G1CNsldqO5TCQO_c18jauj8EmW1nj5w/exec";
 let session={employeeCode:"",role:"",name:"",agentId:"",mobile:"",branchId:""};
 let c={cu:14525,mb:14525,src:1253,emp:10001,app:14525,la:14525,gu:14526,txn:14525,rcp:14525,emi:14525,fd:14525,rd:14525,col:14525,agt:10001,lp:1001,br:1};
 
@@ -3549,6 +3581,7 @@ function goPage(page){
   // Reports / lists — safe to refresh from cache (no form wipe)
   if(page==="dashboard"){ loadDashboard(); return; }
   if(page==="loan-dashboard"){ loadLoanDashboard(); return; }
+  if(page==="rpt-loan"){ loadLoanReport(false); return; }
   if(page==="customer-list"){ renderCustomer360(false); return; }
   if(page==="notice-register"||page==="notice-sms"||page==="notice-wa"||page==="notice-email"||page==="notice-announce"){ initNoticeRegister(); return; }
   if(page==="account-statement"){ return; }
@@ -3882,6 +3915,16 @@ function saveForm(e,sheet,aid){
       var vbox2=document.getElementById("ftto-verify");
       if(vbox2&&!vbox2.classList.contains("ok")){toast("To Account bhi Verify karein");return false}
       if(!o.TO_ACCOUNT){toast("To Account required");return false}
+      // Client-side same-account guard (server also blocks after Code.gs Fix 11)
+      var _from = String(o.ACCOUNT_NO||"").trim().toUpperCase().replace(/[\s\-]/g,"");
+      var _to = String(o.TO_ACCOUNT||"").trim().toUpperCase().replace(/[\s\-]/g,"");
+      if(/^\d+$/.test(_from)) _from = "SRC"+_from;
+      if(/^\d+$/.test(_to)) _to = "SRC"+_to;
+      if(_from && _to && _from === _to){
+        toast("Source and destination account cannot be the same");
+        if(al){al.textContent="⚠️ Source and destination account cannot be the same";al.className="alert show alert-er"}
+        return false;
+      }
       o.TRANSACTION_TYPE=o.TRANSACTION_TYPE||"TRANSFER";
       if(!o.TRANSFER&&o.DEPOSIT)o.TRANSFER=o.DEPOSIT;
     }
@@ -4442,18 +4485,27 @@ function loadLoanDashboard(){
   var s=function(id,v){var e=document.getElementById(id);if(e)e.textContent=v};
   postGAS({action:"get_loan_dashboard"}).then(function(r){
     if(!r||r.status!=="success"){toast((r&&r.message)||"Loan dashboard load failed"); loadDueEmisAndPaint([]); return}
+    window._loanDashCache = r;
     s("ld-active",(r.TOTAL_ACTIVE_LOANS||0).toLocaleString("en-IN"));
     s("ld-disbursed",fmtINR(r.TOTAL_LOAN_DISBURSED));
     s("ld-collected",fmtINR(r.TOTAL_AMOUNT_COLLECTED));
     s("ld-outstanding",fmtINR(r.TOTAL_OUTSTANDING));
     var sm=r.LOAN_SUMMARY||{};
-    var tot=sm.total||((sm.active||0)+(sm.overdue||0)+(sm.closed||0))||1;
-    s("ld-s-active",sm.active||0);s("ld-s-overdue",sm.overdue||0);s("ld-s-closed",sm.closed||0);s("ld-s-total",sm.total||tot);
+    var tot=sm.total||((sm.active||0)+(sm.pending||0)+(sm.closed||0))||1;
+    s("ld-s-active",sm.active||0);
+    s("ld-s-pending",sm.pending||0);
+    s("ld-s-overdue",sm.overdue||0);
+    s("ld-s-closed",sm.closed||0);
+    s("ld-s-total",sm.total||tot);
+    s("ld-s-out",fmtINR(r.TOTAL_OUTSTANDING));
     s("ld-total-ring",sm.total||tot);
     s("ld-p-active",Math.round(((sm.active||0)/tot)*100));
+    s("ld-p-pending",Math.round(((sm.pending||0)/tot)*100));
     s("ld-p-overdue",Math.round(((sm.overdue||0)/tot)*100));
     s("ld-p-closed",Math.round(((sm.closed||0)/tot)*100));
-    var aPct=((sm.active||0)/tot)*100, oPct=aPct+((sm.overdue||0)/tot)*100;
+    var aPct=((sm.active||0)/tot)*100;
+    var pPct=aPct+((sm.pending||0)/tot)*100;
+    var oPct=pPct+((sm.overdue||0)/tot)*100;
     document.documentElement.style.setProperty("--ld-a",aPct+"%");
     document.documentElement.style.setProperty("--ld-o",oPct+"%");
     var pur=r.LOAN_BY_PURPOSE||[];
@@ -4475,12 +4527,13 @@ function loadLoanDashboard(){
       if(!apps.length)tb.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--tm)">No recent applications</td></tr>';
       else tb.innerHTML=apps.map(function(a){
         var st=String(a.STATUS||"").toUpperCase();
-        var badge=st==="APPROVED"||st==="DISBURSED"?"td":(st==="REJECTED"?"tw":"te");
-        return "<tr><td>"+(a.LOAN_ID||"—")+"</td><td>"+(a.APPLICANT||"—")+"</td><td>"+fmtINR(a.AMOUNT)+"</td><td>"+(a.PURPOSE||"—")+"</td>"
+        var badge=st==="APPROVED"||st==="DISBURSED"||st==="ACTIVE"?"td":(st==="REJECTED"?"tw":(st==="CLOSED"?"tb-done":"te"));
+        var name = a.APPLICANT || a.CUSTOMER_NAME || "—";
+        var acc = a.ACCOUNT_NO ? (" <span style='color:#888;font-size:10px'>("+a.ACCOUNT_NO+")</span>") : "";
+        return "<tr><td>"+(a.LOAN_ID||"—")+"</td><td>"+name+acc+"</td><td>"+fmtINR(a.AMOUNT)+"</td><td>"+(a.PURPOSE||"—")+"</td>"
           +"<td><span class='tb "+badge+"'>"+(a.STATUS||"—")+"</span></td><td>"+(a.DATE||"—")+"</td></tr>";
       }).join("");
     }
-    // EMI amount + auto penalty + blinking due rows
     var ol = r.OVERDUE_LIST || r.DUE_EMI_LIST || [];
     loadDueEmisAndPaint(ol);
   }).catch(function(){
@@ -4488,6 +4541,117 @@ function loadLoanDashboard(){
     loadDueEmisAndPaint([]);
   });
 }
+
+function loadLoanReport(force){
+  var root=document.getElementById("lrpt-report-root");
+  var statusF=(document.getElementById("lrpt-status")||{}).value||"";
+  var q=((document.getElementById("lrpt-search")||{}).value||"").trim().toUpperCase();
+  var s=function(id,v){var e=document.getElementById(id);if(e)e.textContent=v;};
+
+  function paint(r){
+    var sm=r.LOAN_SUMMARY||{};
+    s("lrpt-outstanding", fmtINR(r.TOTAL_OUTSTANDING));
+    s("lrpt-active", (r.TOTAL_ACTIVE_LOANS||sm.active||0).toLocaleString("en-IN"));
+    s("lrpt-pending", (r.TOTAL_PENDING_LOANS||sm.pending||0).toLocaleString("en-IN"));
+    s("lrpt-closed", (r.TOTAL_CLOSED_LOANS||sm.closed||0).toLocaleString("en-IN"));
+    s("lrpt-overdue", (r.OVERDUE_ACCOUNTS||sm.overdue||0).toLocaleString("en-IN"));
+
+    var rows=r.LOANS||[];
+    rows=rows.filter(function(x){
+      var st=String(x.LOAN_STATUS||"").toUpperCase();
+      if(statusF==="ACTIVE"){
+        if(!(st==="DISBURSED"||st==="APPROVED"||st==="ACTIVE")) return false;
+      } else if(statusF==="PENDING"){
+        if(!(st==="APPLIED"||st==="PENDING"||st==="UNDER_REVIEW"||st==="")) return false;
+      } else if(statusF==="CLOSED"){
+        if(st!=="CLOSED") return false;
+      } else if(statusF==="REJECTED"){
+        if(st!=="REJECTED") return false;
+      }
+      if(q){
+        var hay=[x.ACCOUNT_NO,x.CUSTOMER_NAME,x.CUSTOMER_ID,x.LOAN_ACCOUNT_NO,x.APPLICATION_ID,x.MOBILE,x.LOAN_PURPOSE].join(" ").toUpperCase();
+        if(hay.indexOf(q)<0) return false;
+      }
+      return true;
+    });
+
+    var filtOut=0, filtAmt=0;
+    rows.forEach(function(x){
+      filtOut+=parseFloat(x.OUTSTANDING_PRINCIPAL)||0;
+      filtAmt+=parseFloat(x.LOAN_AMOUNT)||0;
+    });
+
+    var body="";
+    if(!rows.length){
+      body='<tr><td colspan="11" style="text-align:center;color:#888;padding:16px">No loans found</td></tr>';
+    } else {
+      rows.forEach(function(x,i){
+        var st=String(x.LOAN_STATUS||"").toUpperCase();
+        var badge=st==="DISBURSED"||st==="ACTIVE"||st==="APPROVED"?"td":(st==="CLOSED"?"tb-done":(st==="REJECTED"?"tw":"te"));
+        body+="<tr>"
+          +"<td class='c'>"+(i+1)+"</td>"
+          +"<td>"+(x.LOAN_ACCOUNT_NO||x.APPLICATION_ID||"—")+"</td>"
+          +"<td>"+(x.ACCOUNT_NO||"—")+"</td>"
+          +"<td style='font-weight:600'>"+(x.CUSTOMER_NAME||"—")+"</td>"
+          +"<td>"+(x.MOBILE||"—")+"</td>"
+          +"<td>"+(x.LOAN_PURPOSE||x.LOAN_TYPE||"—")+"</td>"
+          +"<td class='r'>"+fmtINRPlain(x.LOAN_AMOUNT)+"</td>"
+          +"<td class='r' style='font-weight:700;color:#8B1538'>"+fmtINRPlain(x.OUTSTANDING_PRINCIPAL)+"</td>"
+          +"<td class='r'>"+fmtINRPlain(x.EMI_AMOUNT)+"</td>"
+          +"<td><span class='tb "+badge+"'>"+(x.LOAN_STATUS||"—")+"</span></td>"
+          +"<td>"+(x.APPLICATION_DATE||"—")+"</td>"
+          +"</tr>";
+      });
+      body+="<tr class='tot'>"
+        +"<td colspan='6' style='text-align:right;font-weight:800'>TOTAL ("+rows.length+" loans)</td>"
+        +"<td class='r'>"+fmtINRPlain(filtAmt)+"</td>"
+        +"<td class='r'>"+fmtINRPlain(filtOut)+"</td>"
+        +"<td colspan='3'></td></tr>";
+    }
+
+    var period="All Loans";
+    var html = (typeof rptHeader==="function" ? rptHeader("LOAN REPORT", period, {date: todayISO(), filt:{}}) : "<h3>LOAN REPORT</h3>");
+    html += '<div style="background:linear-gradient(135deg,#8B1538,#C2185B);color:#fff;border-radius:8px;padding:12px 16px;margin:8px 0 12px;display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between">'
+      +'<div><div style="font-size:11px;opacity:.9">TOTAL OUTSTANDING</div><div style="font-size:20px;font-weight:800">₹ '+fmtINRPlain(r.TOTAL_OUTSTANDING)+'</div></div>'
+      +'<div style="text-align:center"><div style="font-size:11px;opacity:.9">Active</div><div style="font-size:16px;font-weight:700">'+(r.TOTAL_ACTIVE_LOANS||0)+'</div></div>'
+      +'<div style="text-align:center"><div style="font-size:11px;opacity:.9">Pending</div><div style="font-size:16px;font-weight:700">'+(r.TOTAL_PENDING_LOANS||0)+'</div></div>'
+      +'<div style="text-align:center"><div style="font-size:11px;opacity:.9">Closed</div><div style="font-size:16px;font-weight:700">'+(r.TOTAL_CLOSED_LOANS||0)+'</div></div>'
+      +'<div style="text-align:center"><div style="font-size:11px;opacity:.9">Filtered Outstanding</div><div style="font-size:16px;font-weight:700">₹ '+fmtINRPlain(filtOut)+'</div></div>'
+      +'</div>';
+
+    html += '<div class="cr-panel"><div class="cr-h">LOAN REGISTER — FULL LIST ('+rows.length+')</div><div class="cr-b" style="overflow-x:auto">'
+      +'<table class="rpt-table" style="margin:0"><thead><tr>'
+      +'<th class="c">#</th><th>Loan A/c</th><th>Account No</th><th>Customer Name</th><th>Mobile</th>'
+      +'<th>Purpose</th><th class="r">Loan Amount ₹</th><th class="r">Outstanding ₹</th><th class="r">EMI ₹</th><th>Status</th><th>Date</th>'
+      +'</tr></thead><tbody>'+body+'</tbody></table></div></div>';
+
+    html += '<div class="rpt-note"><b>NOTE:</b> Customer Name Account Master / Customer Master se Account No ke through resolve hota hai. '
+      +'Outstanding = OUTSTANDING_PRINCIPAL (warna full loan amount for active loans).</div>';
+    if(typeof rptFooter==="function") html += rptFooter();
+
+    if(root) root.innerHTML=html;
+    var cnt=document.getElementById("lrpt-count");
+    if(cnt) cnt.textContent=rows.length+" loan(s) · Outstanding ₹ "+fmtINRPlain(filtOut);
+    if(typeof toast==="function") toast("Loan Report: "+rows.length+" loans · Outstanding "+fmtINR(filtOut));
+  }
+
+  if(!force && window._loanDashCache && window._loanDashCache.LOANS){
+    paint(window._loanDashCache);
+    return;
+  }
+  if(root) root.innerHTML='<div style="text-align:center;padding:16px;color:#888">Loading Loan Report…</div>';
+  postGAS({action:"get_loan_dashboard"}).then(function(r){
+    if(!r||r.status!=="success"){
+      if(root) root.innerHTML='<div style="color:var(--er);text-align:center;padding:16px">'+(r&&r.message||"Failed")+'</div>';
+      return;
+    }
+    window._loanDashCache=r;
+    paint(r);
+  }).catch(function(){
+    if(root) root.innerHTML='<div style="color:var(--er);text-align:center;padding:16px">Network error</div>';
+  });
+}
+
 function loadDashboard(){
   if(!(GS_URL&&GS_URL.indexOf("YOUR_")<0))return;
   postGAS({action:"get_dashboard"}).then(function(r){
@@ -5917,10 +6081,14 @@ function loadDayBookAdvanced(force){
     html += colTable(creditRows, "inc", "CREDIT (RECEIPTS &amp; INCOME)");
     html += '</div>';
     html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px">';
-    html += '<div class="rpt-box"><div class="bh">SUMMARY</div><div class="bb"><table>'
-      +'<tr><td>Total Debit (Receipts &amp; Expenses)</td><td class="dr">'+fmtINRPlain(tDeb)+'</td></tr>'
-      +'<tr><td>Total Credit (Receipts &amp; Income)</td><td class="cr">'+fmtINRPlain(tCred)+'</td></tr>'
-      +'<tr class="tot"><td>Difference</td><td>'+fmtINRPlain(Math.abs(tDeb-tCred))+'</td></tr>'
+    var openBal = (r.summary && r.summary.opening != null) ? parseFloat(r.summary.opening) : 0;
+    var closeBal = (r.summary && (r.summary.closing != null || r.summary.balance != null))
+      ? parseFloat(r.summary.closing != null ? r.summary.closing : r.summary.balance) : (openBal + tCred - tDeb);
+    html += '<div class="rpt-box"><div class="bh">SUMMARY (Selected Period)</div><div class="bb"><table>'
+      +'<tr><td>Opening Balance</td><td>'+fmtINRPlain(openBal)+'</td></tr>'
+      +'<tr><td>Total Credit (Receipts)</td><td class="cr">'+fmtINRPlain(tCred)+'</td></tr>'
+      +'<tr><td>Total Debit (Payments)</td><td class="dr">'+fmtINRPlain(tDeb)+'</td></tr>'
+      +'<tr class="tot"><td>Closing Balance</td><td>'+fmtINRPlain(closeBal)+'</td></tr>'
       +'</table></div></div>';
     html += '<div class="rpt-note" style="margin-top:0"><b>Note :</b><br>1. All transactions recorded on the basis of vouchers.<br>2. Debit side includes all receipts &amp; expenses.<br>3. Credit side includes all incomes &amp; receipts.<br>4. Day Book totals are tallied with Trial Balance.</div>';
     html += '</div>';
@@ -6030,8 +6198,21 @@ function loadGLAdvanced(force){
       +'<th class="r">Debit (\u20b9)</th><th class="r">Credit (\u20b9)</th><th class="r">Balance (\u20b9)</th><th class="ctr">Balance Type</th>'
       +'</tr></thead><tbody>';
     if(!rows.length) html += '<tr><td colspan="9" style="text-align:center;color:#888;padding:16px">No GL entries for selected period. Post vouchers first.</td></tr>';
-    else html += bodyRows;
-    html += '<tr class="tot"><td colspan="5" style="text-align:center;font-weight:800">TOTAL</td>'
+    else {
+      var glOpen = (r.summary && r.summary.opening != null) ? parseFloat(r.summary.opening) : null;
+      if(glOpen != null && !isNaN(glOpen)){
+        var oi = fmtBal(glOpen, glOpen < 0 ? "Credit" : "Debit");
+        html += '<tr class="tot"><td colspan="5">Opening Balance</td><td class="r">—</td><td class="r">—</td><td class="r '+oi.cls+'">'+oi.txt+'</td><td class="c">'+oi.type+'</td></tr>';
+      }
+      html += bodyRows;
+      var glClose = (r.summary && (r.summary.closing != null || r.summary.balance != null))
+        ? parseFloat(r.summary.closing != null ? r.summary.closing : r.summary.balance) : null;
+      if(glClose != null && !isNaN(glClose)){
+        var ci = fmtBal(glClose, glClose < 0 ? "Credit" : "Debit");
+        html += '<tr class="tot"><td colspan="5">Closing Balance</td><td class="r">—</td><td class="r">—</td><td class="r '+ci.cls+'">'+ci.txt+'</td><td class="c">'+ci.type+'</td></tr>';
+      }
+    }
+    html += '<tr class="tot"><td colspan="5" style="text-align:center;font-weight:800">TOTAL (Period)</td>'
       +'<td class="r" style="color:#C62828">'+fmtINRPlain(td)+'</td>'
       +'<td class="r" style="color:#2E7D32">'+fmtINRPlain(tc)+'</td>'
       +'<td colspan="2" style="text-align:center;font-size:10px;font-weight:600">(All Balances Carry Forward to Next Year)</td></tr>';
@@ -6329,14 +6510,33 @@ function loadCollectionSummary(){
     per.textContent=p.join(" | ")||"All periods";
   }
   if(body) body.innerHTML='<tr><td colspan="3" style="text-align:center">Loading…</td></tr>';
-  postGAS({action:"get_list",sheet:"DAILY_COLLECTION_MASTER",limit:3000}).then(function(r){
+  postGAS({action:"get_list",sheet:"DAILY_COLLECTION_MASTER",limit:5000}).then(function(r){
     var rows=(r&&r.rows)||[];
+    function moneyOf(v){
+      if(v==null||v==="") return 0;
+      if(typeof v==="number"&&!isNaN(v)) return v;
+      var s=String(v).replace(/[₹Rs\.\,\s]/gi,"").replace(/,/g,"").trim();
+      var n=parseFloat(s); return isNaN(n)?0:n;
+    }
+    function rowAmt(x){
+      var n=moneyOf(x.DEPOSIT); if(n) return n;
+      n=moneyOf(x.AMOUNT); if(n) return n;
+      n=moneyOf(x.TOTAL_RECEIVED); if(n) return n;
+      n=moneyOf(x.deposit); if(n) return n;
+      n=moneyOf(x.amount); return n||0;
+    }
+    function rowD(x){
+      var d=String(x.DATE||"");
+      if(/^\d{4}-\d{2}-\d{2}/.test(d)) return d.substring(0,10);
+      if(typeof normDate==="function") return normDate(d)||d.substring(0,10);
+      return d.substring(0,10);
+    }
     rows=rows.filter(function(x){
-      var d=normDate(x.DATE);
-      if(filt.from_date && d && d<filt.from_date) return false;
-      if(filt.to_date && d && d>filt.to_date) return false;
-      if(filt.year && d && d.substring(0,4)!==String(filt.year)) return false;
-      if(filt.month && d && d.substring(5,7)!==String(filt.month).padStart(2,"0")) return false;
+      var d=rowD(x);
+      if(d && /^\d{4}-\d{2}-\d{2}/.test(d)){
+        if(filt.from_date && d<filt.from_date) return false;
+        if(filt.to_date && d>filt.to_date) return false;
+      }
       return true;
     });
     var map={DAILY:{count:0,amt:0},WEEKLY:{count:0,amt:0},MONTHLY:{count:0,amt:0},OTHER:{count:0,amt:0}};
@@ -6347,7 +6547,7 @@ function loadCollectionSummary(){
       else if(t.indexOf("WEEKLY")>=0) key="WEEKLY";
       else if(t.indexOf("MONTHLY")>=0) key="MONTHLY";
       map[key].count++;
-      map[key].amt+=parseFloat(x.AMOUNT)||0;
+      map[key].amt+=rowAmt(x);
     });
     var grand=map.DAILY.amt+map.WEEKLY.amt+map.MONTHLY.amt+map.OTHER.amt;
     var s=function(id,v){var e=document.getElementById(id);if(e)e.textContent=v;};
@@ -6372,6 +6572,53 @@ function loadCollectionReport(force){
   var typeFilter=typeEl?String(typeEl.value||"").toUpperCase():"";
   var root=document.getElementById("cr-report-root");
 
+  /* Robust money: handles 1000, "1,000.50", "₹ 1,000", "Rs.500" */
+  function moneyOf(v){
+    if(v==null || v==="") return 0;
+    if(typeof v==="number" && !isNaN(v)) return v;
+    var s=String(v).replace(/[₹Rs\.\,\s]/gi,"").replace(/,/g,"").trim();
+    var n=parseFloat(s);
+    return isNaN(n) ? 0 : n;
+  }
+  function rowAmount(x){
+    if(!x) return 0;
+    /* Sheet may use DEPOSIT instead of AMOUNT */
+    var keys=["DEPOSIT","deposit","AMOUNT","amount","COLLECTION_AMOUNT","TOTAL","TOTAL_RECEIVED","EMI_AMOUNT","PAYMENT","Receipt Amount","Collection Amount"];
+    for(var i=0;i<keys.length;i++){
+      if(x[keys[i]]!=null && x[keys[i]]!==""){
+        var n=moneyOf(x[keys[i]]);
+        if(n) return n;
+      }
+    }
+    /* scan any key containing DEPOSIT / AMOUNT / AMT */
+    for(var k in x){
+      if(!Object.prototype.hasOwnProperty.call(x,k)) continue;
+      if(/DEPOSIT|AMOUNT|AMT|TOTAL|COLLECTION/i.test(k) && !/ID|NO|COUNT|STATUS|TYPE|MODE|DATE/i.test(k)){
+        var n2=moneyOf(x[k]);
+        if(n2) return n2;
+      }
+    }
+    return 0;
+  }
+  function rowDate(x){
+    var d=x.DATE||x.PAID_DATE||x.COLLECTION_DATE||x.CREATED_DATE||"";
+    if(d instanceof Date && !isNaN(d.getTime())){
+      var m=String(d.getMonth()+1).padStart(2,"0");
+      var day=String(d.getDate()).padStart(2,"0");
+      return d.getFullYear()+"-"+m+"-"+day;
+    }
+    d=String(d||"");
+    if(/^\d{4}-\d{2}-\d{2}/.test(d)) return d.substring(0,10);
+    /* dd/mm/yyyy or dd-mm-yyyy */
+    var m=d.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+    if(m) return m[3]+"-"+String(m[2]).padStart(2,"0")+"-"+String(m[1]).padStart(2,"0");
+    if(typeof normDate==="function"){
+      var n=normDate(d);
+      if(n && /^\d{4}-\d{2}-\d{2}/.test(n)) return n;
+    }
+    return d.substring(0,10);
+  }
+
   function normalizeHead(raw){
     var t=String(raw||"").trim();
     var u=t.toUpperCase();
@@ -6381,15 +6628,14 @@ function loadCollectionReport(force){
     if(u.indexOf("DEPOSIT")>=0 || u.indexOf("SAVING")>=0) return "Deposit (Saving)";
     if(u.indexOf("LOAN")>=0 && (u.indexOf("REPAY")>=0 || u.indexOf("PRINCIPAL")>=0)) return "Loan Repayment (Principal)";
     if(u.indexOf("INTEREST")>=0 && u.indexOf("LOAN")>=0) return "Interest Received on Loans";
-    if(u.indexOf("INTEREST")>=0 && u.indexOf("FD")>=0 && u.indexOf("ACCRU")>=0) return "Interest on FD Accrued";
     if(u.indexOf("INTEREST")>=0 && u.indexOf("FD")>=0) return "Interest on FD";
     if(u.indexOf("TDS")>=0) return "TDS Refund Received";
-    if(u.indexOf("PROCESSING")>=0 || u.indexOf("PROCESS")>=0) return "Loan Processing Fees";
-    if(u.indexOf("PENALTY")>=0 || u.indexOf("OTHER INCOME")>=0) return "Other Income (Penalty etc.)";
-    if(u==="DAILY" || u.indexOf("DAILY")>=0) return "Daily Collection";
-    if(u==="WEEKLY" || u.indexOf("WEEKLY")>=0) return "Weekly Collection";
-    if(u==="MONTHLY" || u.indexOf("MONTHLY")>=0) return "Monthly Collection";
-    if(u==="EMI" || u.indexOf("EMI")>=0) return "Loan EMI Collection";
+    if(u.indexOf("PROCESSING")>=0) return "Loan Processing Fees";
+    if(u.indexOf("PENALTY")>=0) return "Other Income (Penalty etc.)";
+    if(u.indexOf("DAILY")>=0) return "Daily Collection";
+    if(u.indexOf("WEEKLY")>=0) return "Weekly Collection";
+    if(u.indexOf("MONTHLY")>=0) return "Monthly Collection";
+    if(u.indexOf("EMI")>=0) return "Loan EMI Collection";
     return t;
   }
   function detectMode(x){
@@ -6400,40 +6646,35 @@ function loadCollectionReport(force){
     if(m.indexOf("UPI")>=0) return "UPI";
     if(m.indexOf("CHEQUE")>=0 || m.indexOf("CHECK")>=0) return "Cheque";
     if(m) return "Other";
-    return "Bank";
+    return "Cash";
   }
   function weekBuckets(rows){
     var byDate={};
     rows.forEach(function(x){
-      var d=normDate(x.DATE); if(!d) return;
+      var d=rowDate(x); if(!d) return;
       if(!byDate[d]) byDate[d]={amt:0,count:0};
-      byDate[d].amt+=parseFloat(x.AMOUNT)||0;
+      byDate[d].amt+=rowAmount(x);
       byDate[d].count++;
     });
     var dates=Object.keys(byDate).sort();
     if(!dates.length) return [];
-    var buckets=[];
-    var chunkStart=dates[0], chunkEnd=dates[0], amt=0, cnt=0, dayCount=0;
-    function flush(){
-      if(cnt) buckets.push({from:chunkStart,to:chunkEnd,amt:amt,count:cnt});
-      amt=0; cnt=0; dayCount=0;
-    }
+    var buckets=[], chunkStart=dates[0], chunkEnd=dates[0], amt=0, cnt=0, dayCount=0;
+    function flush(){ if(cnt) buckets.push({from:chunkStart,to:chunkEnd,amt:amt,count:cnt}); amt=0; cnt=0; dayCount=0; }
     dates.forEach(function(d){
       if(dayCount===0){ chunkStart=d; chunkEnd=d; }
       var diff=(new Date(d)-new Date(chunkStart))/(86400000);
       if(diff>6){ flush(); chunkStart=d; chunkEnd=d; dayCount=0; }
-      chunkEnd=d;
-      amt+=byDate[d].amt; cnt+=byDate[d].count; dayCount++;
+      chunkEnd=d; amt+=byDate[d].amt; cnt+=byDate[d].count; dayCount++;
     });
     flush();
     return buckets;
   }
   function pieGradient(parts){
-    var total=0; parts.forEach(function(p){ total+=p.pct; });
-    if(total<=0) return "conic-gradient(#e0e0e0 0 100%)";
+    var tot=0; parts.forEach(function(p){ tot+=p.pct; });
+    if(tot<=0) return "conic-gradient(#e0e0e0 0 100%)";
     var acc=0, stops=[];
     parts.forEach(function(p){
-      var a=acc; acc+= (p.pct/total)*100;
+      var a=acc; acc+=(p.pct/tot)*100;
       stops.push(p.color+" "+a.toFixed(2)+"% "+acc.toFixed(2)+"%");
     });
     return "conic-gradient("+stops.join(",")+")";
@@ -6441,35 +6682,42 @@ function loadCollectionReport(force){
 
   function renderCR(allRows){
     var rows=(allRows||[]).filter(function(x){
-      var d=normDate(x.DATE);
-      if(filt.from_date && d && d<filt.from_date) return false;
-      if(filt.to_date && d && d>filt.to_date) return false;
-      if(filt.year && d && d.substring(0,4)!==String(filt.year)) return false;
-      if(filt.month && d && d.substring(5,7)!==String(filt.month).padStart(2,"0")) return false;
-      var t=String(x.COLLECTION_TYPE||"").toUpperCase();
+      var d=rowDate(x);
+      /* Soft date filter: only exclude when date is parseable AND outside range */
+      if(d && /^\d{4}-\d{2}-\d{2}/.test(d)){
+        if(filt.from_date && d<filt.from_date) return false;
+        if(filt.to_date && d>filt.to_date) return false;
+      }
+      var t=String(x.COLLECTION_TYPE||x.TRANSACTION_TYPE||"").toUpperCase();
       if(typeFilter && t.indexOf(typeFilter)<0) return false;
       return true;
     });
-    rows=sortRowsRecent(rows, filt.recent_top!==false);
+    /* recent on top */
+    rows=rows.slice().sort(function(a,b){
+      var da=rowDate(a), db=rowDate(b);
+      if(filt.recent_top===false) return (da+" "+String(a.RECEIPT_NO||"")).localeCompare(db+" "+String(b.RECEIPT_NO||""));
+      return (db+" "+String(b.RECEIPT_NO||"")).localeCompare(da+" "+String(a.RECEIPT_NO||""));
+    });
 
     var total=0, cashT=0, bankT=0;
-    var byHead={}, byMode={"Cash":0,"NEFT / RTGS":0,"IMPS":0,"UPI":0,"Cheque":0,"Other":0,"Bank":0};
+    var byHead={}, byMode={"Cash":0,"NEFT / RTGS":0,"IMPS":0,"UPI":0,"Cheque":0,"Other":0};
     var daily=0, weekly=0, monthly=0;
     var maxAmt=0, maxHead="", minAmt=Infinity, minHead="";
     var receiptNos={};
+    var zeroAmtCount=0;
 
     rows.forEach(function(x){
-      var amt=parseFloat(x.AMOUNT)||0;
+      var amt=rowAmount(x);
+      if(!amt) zeroAmtCount++;
       total+=amt;
-      var head=normalizeHead(x.COLLECTION_TYPE||x.PARTICULARS||"Other");
+      var head=normalizeHead(x.COLLECTION_TYPE||x.PARTICULARS||x.TRANSACTION_TYPE||"Other");
       if(!byHead[head]) byHead[head]={count:0,amt:0,cash:0,bank:0};
       byHead[head].count++; byHead[head].amt+=amt;
       var mode=detectMode(x);
       if(mode==="Cash"){ byHead[head].cash+=amt; cashT+=amt; byMode["Cash"]+=amt; }
       else {
         byHead[head].bank+=amt; bankT+=amt;
-        if(mode==="Bank") byMode["NEFT / RTGS"]+=amt;
-        else if(byMode[mode]!=null) byMode[mode]+=amt;
+        if(byMode[mode]!=null) byMode[mode]+=amt;
         else byMode["Other"]+=amt;
       }
       var t=String(x.COLLECTION_TYPE||"").toUpperCase();
@@ -6484,22 +6732,25 @@ function loadCollectionReport(force){
     var nReceipts=Object.keys(receiptNos).length || rows.length;
     var avg=nReceipts? total/nReceipts : 0;
 
-    var preferred=["Share Capital","Members Fees","Deposit (Saving)","Loan Repayment (Principal)","Interest Received on Loans","Interest on FD","TDS Refund Received","Loan Processing Fees","Interest on FD Accrued","Other Income (Penalty etc.)","Daily Collection","Weekly Collection","Monthly Collection","Loan EMI Collection","Other Receipts"];
+    var preferred=["Share Capital","Members Fees","Deposit (Saving)","Loan Repayment (Principal)","Interest Received on Loans","Interest on FD","TDS Refund Received","Loan Processing Fees","Other Income (Penalty etc.)","Daily Collection","Weekly Collection","Monthly Collection","Loan EMI Collection","Other Receipts"];
     var heads=preferred.filter(function(h){ return byHead[h] && byHead[h].amt>0; });
     Object.keys(byHead).forEach(function(h){ if(heads.indexOf(h)<0 && byHead[h].amt>0) heads.push(h); });
+    /* if all zero still show heads with count */
+    if(!heads.length){
+      Object.keys(byHead).forEach(function(h){ if(byHead[h].count) heads.push(h); });
+    }
 
     var pieColors=["#1565C0","#C62828","#2E7D32","#7B1FA2","#EF6C00","#00838F","#6A1B9A","#455A64"];
     var pieParts=[], legendHtml="", othersAmt=0;
     heads.forEach(function(h,i){
       var pct=total? (byHead[h].amt/total)*100 : 0;
-      if(pct<0.5 && h!=="Share Capital"){ othersAmt+=byHead[h].amt; return; }
+      if(total && pct<0.5 && h!=="Share Capital"){ othersAmt+=byHead[h].amt; return; }
       var col=pieColors[i%pieColors.length];
-      pieParts.push({pct:pct, color:col, name:h, amt:byHead[h].amt});
+      pieParts.push({pct:pct||1, color:col, name:h, amt:byHead[h].amt});
       legendHtml+='<span><i style="background:'+col+'"></i>'+h+'</span>';
     });
     if(othersAmt>0){
-      var op=total?(othersAmt/total)*100:0;
-      pieParts.push({pct:op, color:"#607D8B", name:"Others", amt:othersAmt});
+      pieParts.push({pct:total?(othersAmt/total)*100:0, color:"#607D8B", name:"Others", amt:othersAmt});
       legendHtml+='<span><i style="background:#607D8B"></i>Others</span>';
     }
 
@@ -6507,6 +6758,7 @@ function loadCollectionReport(force){
     var modeRows="";
     modeOrder.forEach(function(m){
       var a=byMode[m]||0;
+      if(!a && !rows.length) return;
       if(!a) return;
       var pct=total?((a/total)*100).toFixed(2):"0.00";
       modeRows+="<tr><td>"+m+"</td><td class='r'>"+fmtINRPlain(a)+"</td><td class='r'>"+pct+"%</td></tr>";
@@ -6527,20 +6779,20 @@ function loadCollectionReport(force){
       dailyRows+="<tr class='tot'><td>TOTAL</td><td class='r'>"+fmtINRPlain(total)+"</td><td class='c'>"+nReceipts+"</td><td class='r'>"+fmtINRPlain(avg)+"</td></tr>";
     }
 
-    var detailRows="";
-    if(!heads.length) detailRows="<tr><td colspan='7' style='text-align:center;color:#888'>No collections for selected period</td></tr>";
+    var headRows="";
+    if(!heads.length) headRows="<tr><td colspan='7' style='text-align:center;color:#888'>No collections for selected period</td></tr>";
     else {
       heads.forEach(function(h,i){
         var o=byHead[h];
         var pct=total?((o.amt/total)*100).toFixed(2):"0.00";
-        detailRows+="<tr><td class='c'>"+(i+1)+"</td><td>"+h+"</td>"
+        headRows+="<tr><td class='c'>"+(i+1)+"</td><td>"+h+"</td>"
           +"<td class='r'>"+(o.cash?fmtINRPlain(o.cash):"—")+"</td>"
           +"<td class='r'>"+(o.bank?fmtINRPlain(o.bank):"—")+"</td>"
           +"<td class='r'>"+fmtINRPlain(o.amt)+"</td>"
           +"<td class='c'>"+o.count+"</td>"
           +"<td class='r'>"+pct+"%</td></tr>";
       });
-      detailRows+="<tr class='tot'><td></td><td>TOTAL COLLECTION</td><td class='r'>"+fmtINRPlain(cashT)+"</td><td class='r'>"+fmtINRPlain(bankT)+"</td><td class='r'>"+fmtINRPlain(total)+"</td><td class='c'>"+nReceipts+"</td><td class='r'>100.00%</td></tr>";
+      headRows+="<tr class='tot'><td></td><td>TOTAL COLLECTION</td><td class='r'>"+fmtINRPlain(cashT)+"</td><td class='r'>"+fmtINRPlain(bankT)+"</td><td class='r'>"+fmtINRPlain(total)+"</td><td class='c'>"+nReceipts+"</td><td class='r'>100.00%</td></tr>";
     }
 
     var breakRows="";
@@ -6548,25 +6800,70 @@ function loadCollectionReport(force){
       var pct=total?((p.amt/total)*100).toFixed(2):"0.00";
       breakRows+="<tr><td>"+p.name+"</td><td class='r'>"+fmtINRPlain(p.amt)+"</td><td class='r'>"+pct+"%</td></tr>";
     });
-    breakRows+="<tr class='tot'><td>TOTAL</td><td class='r'>"+fmtINRPlain(total)+"</td><td class='r'>100.00%</td></tr>";
+    if(!breakRows) breakRows="<tr><td colspan='3' style='text-align:center;color:#888'>No data</td></tr>";
+    breakRows+="<tr class='tot'><td>TOTAL</td><td class='r'>"+fmtINRPlain(total)+"</td><td class='r'>100%</td></tr>";
 
-    var period=rptPeriodLabel(filt);
-    var html = rptHeader("COLLECTION DETAILS (HEAD WISE)", period, {date: filt.to_date||todayISO(), filt: filt});
+    /* FULL HISTORY */
+    var histRows="";
+    if(!rows.length){
+      histRows="<tr><td colspan='10' style='text-align:center;color:#888;padding:16px'>No collection history for selected period. Clear filter or check DAILY_COLLECTION_MASTER sheet.</td></tr>";
+    } else {
+      rows.forEach(function(x,i){
+        var amt=rowAmount(x);
+        var mode=detectMode(x);
+        histRows+="<tr>"
+          +"<td class='c'>"+(i+1)+"</td>"
+          +"<td>"+rowDate(x)+"</td>"
+          +"<td>"+(x.RECEIPT_NO||x.COLLECTION_ID||"—")+"</td>"
+          +"<td>"+(x.ACCOUNT_NO||"—")+"</td>"
+          +"<td style='max-width:140px;white-space:normal'>"+(x.ACCOUNT_NAME||x.CUSTOMER_ID||"—")+"</td>"
+          +"<td>"+(x.COLLECTION_TYPE||x.TRANSACTION_TYPE||"—")+"</td>"
+          +"<td>"+mode+"</td>"
+          +"<td style='max-width:120px;white-space:normal;font-size:10px'>"+(x.PARTICULARS||x.REFERENCE_NO||"—")+"</td>"
+          +"<td>"+(x.AGENT_NAME||x.AGENT_ID||x.EMPLOYEE_ID||"—")+"</td>"
+          +"<td class='r' style='font-weight:600;color:"+(amt?"#8B1538":"#999")+"'>"+fmtINRPlain(amt)+"</td>"
+          +"</tr>";
+      });
+      histRows+="<tr class='tot'>"
+        +"<td colspan='9' style='text-align:right;font-weight:800'>TOTAL COLLECTION ("+rows.length+" receipts)</td>"
+        +"<td class='r' style='font-weight:800'>"+fmtINRPlain(total)+"</td>"
+        +"</tr>";
+    }
+
+    var period = (typeof rptPeriodLabel==="function") ? rptPeriodLabel(filt) : (
+      (filt.from_date||filt.to_date) ? ("for the Period "+(filt.from_date||"…")+" to "+(filt.to_date||"…")) : "All periods"
+    );
+
+    var html = rptHeader("COLLECTION REPORT", period, {date: filt.to_date||filt.from_date||todayISO(), filt: filt});
+
+    html += '<div style="background:linear-gradient(135deg,#8B1538,#C2185B);color:#fff;border-radius:8px;padding:14px 18px;margin:8px 0 12px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between">'
+      +'<div><div style="font-size:11px;opacity:.9">TOTAL COLLECTION</div>'
+      +'<div style="font-size:22px;font-weight:800">₹ '+fmtINRPlain(total)+'</div></div>'
+      +'<div style="text-align:center"><div style="font-size:11px;opacity:.9">Receipts</div><div style="font-size:18px;font-weight:700">'+rows.length+'</div></div>'
+      +'<div style="text-align:center"><div style="font-size:11px;opacity:.9">Cash</div><div style="font-size:16px;font-weight:700">₹ '+fmtINRPlain(cashT)+'</div></div>'
+      +'<div style="text-align:center"><div style="font-size:11px;opacity:.9">Bank / UPI / Other</div><div style="font-size:16px;font-weight:700">₹ '+fmtINRPlain(bankT)+'</div></div>'
+      +'<div style="text-align:right;font-size:11px;opacity:.85">'+period+'</div>'
+      +'</div>';
+
+    if(zeroAmtCount>0 && total===0 && rows.length>0){
+      html += '<div class="rpt-note" style="border-color:#F59E0B;background:#FFFBEB"><b>⚠ Notice:</b> '+rows.length+' rows milin lekin AMOUNT field 0 / empty hai. '
+        +'Google Sheet mein column name <b>AMOUNT</b> check karein, ya collection dobara save karein (Agent Collection / Daily Collection form se).</div>';
+    }
 
     html += '<div class="cr-top">';
-    html += '<div class="cr-panel"><div class="cr-h">COLLECTION DETAILS (HEAD WISE)</div><div class="cr-b"><table>'
-      +'<thead><tr><th class="c" style="width:36px">Sr. No.</th><th>Particulars / Head</th><th class="r">Cash (₹)</th><th class="r">Bank (₹)</th><th class="r">Total Amount (₹)</th><th class="c">No. of Receipts</th><th class="r">% of Total</th></tr></thead>'
-      +'<tbody>'+detailRows+'</tbody></table></div></div>';
-
-    html += '<div class="cr-panel"><div class="cr-h green">COLLECTION SUMMARY</div><div class="cr-b">'
+    html += '<div class="cr-panel"><div class="cr-h">COLLECTION SNAPSHOT</div><div class="cr-b">'
       +'<div class="cr-sum-row hi"><span class="lbl">Total Collection (A)</span><span class="val"><b>'+fmtINRPlain(total)+'</b></span></div>'
       +'<div class="cr-sum-row"><span class="lbl">Total Cash Collection</span><span class="val">'+fmtINRPlain(cashT)+'</span></div>'
       +'<div class="cr-sum-row"><span class="lbl">Total Bank Collection</span><span class="val">'+fmtINRPlain(bankT)+'</span></div>'
       +'<div class="cr-sum-row" style="margin-top:4px;border-top:1px solid #e0c4ca;padding-top:6px"><span class="lbl">Total Number of Receipts</span><span class="val"><b>'+nReceipts+'</b></span></div>'
       +'<div class="cr-sum-row"><span class="lbl">Average Collection per Receipt</span><span class="val">'+fmtINRPlain(avg)+'</span></div>'
-      +'<div class="cr-sum-row" style="margin-top:4px;border-top:1px solid #e0c4ca;padding-top:6px"><span class="lbl">Highest Collection in Single Receipt<br><span style="font-size:9.5px;color:#888">('+(maxHead||"—")+')</span></span><span class="val"><b>'+fmtINRPlain(maxAmt)+'</b></span></div>'
-      +'<div class="cr-sum-row"><span class="lbl">Lowest Collection in Single Receipt<br><span style="font-size:9.5px;color:#888">('+(minHead||"—")+')</span></span><span class="val">'+fmtINRPlain(minAmt)+'</span></div>'
+      +'<div class="cr-sum-row" style="margin-top:4px;border-top:1px solid #e0c4ca;padding-top:6px"><span class="lbl">Highest Single Receipt</span><span class="val"><b>'+fmtINRPlain(maxAmt)+'</b></span></div>'
+      +'<div class="cr-sum-row"><span class="lbl">Lowest Single Receipt</span><span class="val">'+fmtINRPlain(minAmt)+'</span></div>'
       +'</div></div>';
+
+    html += '<div class="cr-panel"><div class="cr-h green">HEAD-WISE TOTAL</div><div class="cr-b"><table>'
+      +'<thead><tr><th class="c">#</th><th>Head</th><th class="r">Cash</th><th class="r">Bank</th><th class="r">Total ₹</th><th class="c">Count</th><th class="r">%</th></tr></thead>'
+      +'<tbody>'+headRows+'</tbody></table></div></div>';
     html += '</div>';
 
     html += '<div class="cr-bot">';
@@ -6579,29 +6876,107 @@ function loadCollectionReport(force){
     html += '<div class="cr-panel"><div class="cr-h teal">COLLECTION MODE WISE SUMMARY</div><div class="cr-b"><table>'
       +'<thead><tr><th>Mode of Collection</th><th class="r">Amount (₹)</th><th class="r">% of Total</th></tr></thead>'
       +'<tbody>'+modeRows+'</tbody></table></div></div>';
-    html += '<div class="cr-panel"><div class="cr-h">DAILY COLLECTION SUMMARY</div><div class="cr-b"><table>'
-      +'<thead><tr><th>Date</th><th class="r">Total Collection (₹)</th><th class="c">No. of Receipts</th><th class="r">Average Collection (₹)</th></tr></thead>'
+    html += '<div class="cr-panel"><div class="cr-h">PERIOD / WEEKLY BUCKETS</div><div class="cr-b"><table>'
+      +'<thead><tr><th>Date Range</th><th class="r">Total Collection (₹)</th><th class="c">No. of Receipts</th><th class="r">Average (₹)</th></tr></thead>'
       +'<tbody>'+dailyRows+'</tbody></table></div></div>';
     html += '</div></div>';
 
-    html += '<div class="rpt-note"><b>NOTE :</b><br>'
-      +'1. This report is based on cash book receipts and bank transactions.<br>'
-      +'2. All amounts are inclusive of taxes wherever applicable.<br>'
-      +'3. For detailed receipt wise list, please refer collection register.</div>';
+    html += '<div class="cr-panel" style="margin-top:12px"><div class="cr-h" style="background:#8B1538">FULL COLLECTION HISTORY — ALL RECEIPTS ('+rows.length+')</div><div class="cr-b" style="overflow-x:auto">'
+      +'<table class="rpt-table" style="margin:0"><thead><tr>'
+      +'<th class="c">#</th><th>Date</th><th>Receipt No</th><th>Account No</th><th>Name / Customer</th>'
+      +'<th>Type</th><th>Mode</th><th>Particulars</th><th>Agent / Staff</th><th class="r">Amount ₹</th>'
+      +'</tr></thead><tbody>'+histRows+'</tbody></table></div></div>';
+
+    html += '<div class="rpt-note"><b>NOTE :</b> Total Collection = sum of AMOUNT on each receipt in filtered period. '
+      +'Sheet column <b>DEPOSIT</b> or <b>AMOUNT</b> se total nikalta hai.</div>';
     html += rptFooter();
 
     if(root) root.innerHTML=html;
     var s=function(id,v){var e=document.getElementById(id);if(e)e.textContent=v;};
-    s("cr-total",fmtINR(total));s("cr-daily",fmtINR(daily));s("cr-weekly",fmtINR(weekly));s("cr-monthly",fmtINR(monthly));
+    s("cr-total",fmtINR(total));
+    s("cr-daily",fmtINR(daily));
+    s("cr-weekly",fmtINR(weekly));
+    s("cr-monthly",fmtINR(monthly));
+    if(typeof toast==="function"){
+      if(rows.length && total===0) toast("⚠ "+rows.length+" rows but AMOUNT is 0 — check sheet column");
+      else toast("Total Collection: "+fmtINR(total)+" ("+rows.length+" receipts)");
+    }
   }
 
   if(!force){ var c=cacheGet("coll",filt); if(c&&c.rows){ renderCR(c.rows); return; } }
-  if(root) root.innerHTML='<div style="text-align:center;padding:16px;color:#888">Loading…</div>';
-  postGAS({action:"get_list",sheet:"DAILY_COLLECTION_MASTER",limit:2000}).then(function(r){
-    cacheSet("coll", filt, r||{rows:[]});
-    renderCR((r&&r.rows)||[]);
-  }).catch(function(){ if(root) root.innerHTML='<div style="color:var(--er);text-align:center;padding:16px">Network error</div>'; });
+  if(root) root.innerHTML='<div style="text-align:center;padding:16px;color:#888">Loading Collection Report…</div>';
+
+  /* Fetch daily collections + also merge deposit txns so report is not empty */
+  Promise.all([
+    postGAS({action:"get_list",sheet:"DAILY_COLLECTION_MASTER",limit:5000}),
+    postGAS({action:"get_list",sheet:"TRANSACTION_MASTER",limit:3000}).catch(function(){ return {rows:[]}; }),
+    postGAS({action:"get_list",sheet:"EMI_COLLECTION_MASTER",limit:2000}).catch(function(){ return {rows:[]}; })
+  ]).then(function(results){
+    var dailyRows=(results[0]&&results[0].rows)||[];
+    var txns=(results[1]&&results[1].rows)||[];
+    var emis=(results[2]&&results[2].rows)||[];
+
+    /* Normalize alternate sources into collection-like rows if daily sheet empty or sparse */
+    var seen={};
+    dailyRows.forEach(function(x){ if(x.RECEIPT_NO) seen[String(x.RECEIPT_NO)]=true; if(x.COLLECTION_ID) seen[String(x.COLLECTION_ID)]=true; });
+
+    txns.forEach(function(t){
+      var dep=moneyOf(t.DEPOSIT);
+      if(dep<=0) return;
+      var rcp=String(t.RECEIPT_NO||t.TRANSACTION_ID||"");
+      if(rcp && seen[rcp]) return;
+      if(rcp) seen[rcp]=true;
+      dailyRows.push({
+        DATE: t.DATE,
+        RECEIPT_NO: t.RECEIPT_NO||t.TRANSACTION_ID,
+        COLLECTION_ID: t.TRANSACTION_ID,
+        ACCOUNT_NO: t.ACCOUNT_NO,
+        ACCOUNT_NAME: t.ACCOUNT_NAME||"",
+        CUSTOMER_ID: t.CUSTOMER_ID,
+        COLLECTION_TYPE: t.TRANSACTION_TYPE||"DEPOSIT",
+        AMOUNT: dep,
+        PAYMENT_MODE: t.TRANSACTION_MODE||t.MODE||"CASH",
+        PARTICULARS: t.PARTICULARS||"Deposit",
+        AGENT_ID: t.EMPLOYEE_ID||"",
+        EMPLOYEE_ID: t.EMPLOYEE_ID||"",
+        STATUS: t.STATUS||"SUCCESS",
+        _src: "TXN"
+      });
+    });
+
+    emis.forEach(function(e){
+      if(String(e.STATUS||"").toUpperCase()!=="PAID") return;
+      var amt=moneyOf(e.TOTAL_RECEIVED)||moneyOf(e.EMI_AMOUNT);
+      if(amt<=0) return;
+      var rcp=String(e.RECEIPT_NO||e.EMI_ID||"");
+      if(rcp && seen[rcp]) return;
+      if(rcp) seen[rcp]=true;
+      dailyRows.push({
+        DATE: e.PAID_DATE||e.DUE_DATE,
+        RECEIPT_NO: e.RECEIPT_NO||e.EMI_ID,
+        COLLECTION_ID: e.EMI_ID,
+        ACCOUNT_NO: e.ACCOUNT_NO||e.LOAN_ACCOUNT_NO,
+        ACCOUNT_NAME: "",
+        CUSTOMER_ID: e.CUSTOMER_ID,
+        COLLECTION_TYPE: "EMI",
+        AMOUNT: amt,
+        PAYMENT_MODE: e.PAYMENT_MODE||"CASH",
+        PARTICULARS: "EMI #"+ (e.EMI_NO||"") +" collection",
+        AGENT_ID: e.COLLECTED_BY||"",
+        EMPLOYEE_ID: e.COLLECTED_BY||"",
+        STATUS: "PAID",
+        _src: "EMI"
+      });
+    });
+
+    cacheSet("coll", filt, {rows: dailyRows});
+    renderCR(dailyRows);
+  }).catch(function(err){
+    console.error(err);
+    if(root) root.innerHTML='<div style="color:var(--er);text-align:center;padding:16px">Network error loading collections</div>';
+  });
 }
+
 
 
 
@@ -7793,7 +8168,6 @@ function loadAgentDaySummary(){
 
 function loadAgentCollectionList(){
   var agentId = (document.getElementById("ac_AGENT_ID").value||"").trim();
-  var date = document.getElementById("ac_DATE").value || (typeof todayISO==="function"?todayISO():"");
   var tbody = document.querySelector("#tbl-ac-list tbody");
   if(!tbody) return;
   if(!agentId){
@@ -7802,12 +8176,7 @@ function loadAgentCollectionList(){
   }
   tbody.innerHTML='<tr><td colspan="8" class="lv-empty">Loading…</td></tr>';
   postGAS({action:"get_list", sheet:"DAILY_COLLECTION_MASTER", limit:2000}).then(function(r){
-    var rows = ((r && r.rows) || []).filter(function(x){
-      if(String(x.AGENT_ID||"").toUpperCase() !== agentId.toUpperCase()) return false;
-      var d = String(x.DATE||"").substring(0,10);
-      if(date && d && d !== date) return false;
-      return true;
-    });
+    var rows = ((r && r.rows) || []).filter(function(x){ return acInRange(x, agentId); });
     window._acList = rows;
     paintACList(rows);
   }).catch(function(){
@@ -9337,5 +9706,223 @@ setInterval(function(){
 },1000);
 // Refresh dashboard every 3 min while logged in
 setInterval(function(){if(session.employeeCode)loadDashboard()},180000);
+
+
+
+
+/* ===== REPORTS FIX — proper (layout preserve) =====
+ * 1) Date filter: From/To OR Month+Year OR Year(FY Apr–Mar) → unified from_date/to_date
+ * 2) Cash Book paint: backend opening + closing c/d + period totals
+ * 3) Collection / all reports: same filter, period totals show correctly
+ * Does NOT wipe professional dual-column HTML layouts.
+ */
+(function () {
+  "use strict";
+
+  function pad2(n) { return ("0" + n).slice(-2); }
+  function lastDay(y, m) { return new Date(y, m, 0).getDate(); }
+
+  /* ---- 1) Unified getAccFilter ---- */
+  var _gaf = typeof getAccFilter === "function" ? getAccFilter : null;
+  window.getAccFilter = function (prefix) {
+    var f = _gaf ? _gaf(prefix) : {
+      from_date: "", to_date: "", month: "", year: "", account_no: "", date: "",
+      from_time: "", to_time: "", use_time: false, recent_top: true
+    };
+    var y = parseInt(f.year, 10);
+    var m = parseInt(f.month, 10);
+    var nowY = new Date().getFullYear();
+
+    if (!f.from_date && !f.to_date && (y || m)) {
+      if (!y) y = nowY;
+      if (m >= 1 && m <= 12) {
+        f.from_date = y + "-" + pad2(m) + "-01";
+        f.to_date = y + "-" + pad2(m) + "-" + pad2(lastDay(y, m));
+      } else {
+        /* Financial Year Apr–Mar */
+        f.from_date = y + "-04-01";
+        f.to_date = (y + 1) + "-03-31";
+      }
+    }
+    /* Balance Sheet "as on" */
+    if (!f.date) f.date = f.to_date || f.from_date || "";
+
+    /* Clear month/year so client-side filters don't double-cut FY spans */
+    f.month = "";
+    f.year = "";
+    return f;
+  };
+
+  /* ---- 2) Cash Book dual paint: use backend summary.opening + closing c/d ---- */
+  window.paintDualCashBook = function (rows, summary) {
+    var recBody = document.getElementById("cb-receipts-body");
+    var payBody = document.getElementById("cb-payments-body");
+    var grid = document.getElementById("cb-summary-grid");
+    if (!recBody || !payBody) return;
+
+    var receipts = [], payments = [];
+    var totalRec = 0, totalPay = 0, cashRec = 0, bankRec = 0, cashPay = 0, bankPay = 0;
+
+    var openBal = 0;
+    if (summary && summary.opening != null && !isNaN(parseFloat(summary.opening))) {
+      openBal = parseFloat(summary.opening);
+    } else {
+      /* fallback: infer from first BALANCE column */
+      var chrono = (rows || []).slice().sort(function (a, b) {
+        return (String(a.DATE || "") + " " + String(a.TIME || "")).localeCompare(String(b.DATE || "") + " " + String(b.TIME || ""));
+      });
+      if (chrono.length) {
+        var first = chrono[0];
+        var fBal = parseFloat(first.BALANCE);
+        var fRec = parseFloat(first.RECEIPT) || 0, fPay = parseFloat(first.PAYMENT) || 0;
+        if (!isNaN(fBal)) openBal = fBal - fRec + fPay;
+      }
+    }
+
+    if (openBal > 0) {
+      receipts.push({
+        date: "", particulars: "Opening Balance b/d", vch: "—",
+        cash: openBal, bank: 0, total: openBal, isOpen: true
+      });
+      totalRec += openBal; cashRec += openBal;
+    } else if (openBal < 0) {
+      payments.push({
+        date: "", particulars: "Opening Balance b/d", vch: "—",
+        cash: Math.abs(openBal), bank: 0, total: Math.abs(openBal), isOpen: true
+      });
+      totalPay += Math.abs(openBal); cashPay += Math.abs(openBal);
+    }
+
+    (rows || []).forEach(function (x) {
+      var r = parseFloat(x.RECEIPT) || 0, p = parseFloat(x.PAYMENT) || 0;
+      var mode = (String(x.REMARKS || "") + " " + String(x.PARTICULARS || "")).toUpperCase();
+      var isCash = /\bCASH\b|HAND/.test(mode) && !/BANK|CHEQUE|UPI|NEFT|RTGS|IMPS/.test(mode);
+      var nd = (typeof normDate === "function" ? normDate(x.DATE) : String(x.DATE || "").substring(0, 10));
+      if (r > 0) {
+        totalRec += r;
+        var cA = isCash ? r : 0, bA = isCash ? 0 : r;
+        if (isCash) cashRec += r; else bankRec += r;
+        receipts.push({ date: nd, particulars: x.PARTICULARS || "—", vch: x.VOUCHER_NO || x.ENTRY_ID || "", cash: cA, bank: bA, total: r });
+      }
+      if (p > 0) {
+        totalPay += p;
+        var cA2 = isCash ? p : 0, bA2 = isCash ? 0 : p;
+        if (isCash) cashPay += p; else bankPay += p;
+        payments.push({ date: nd, particulars: x.PARTICULARS || "—", vch: x.VOUCHER_NO || x.ENTRY_ID || "", cash: cA2, bank: bA2, total: p });
+      }
+    });
+
+    /* Closing from backend summary (preferred) */
+    var closing;
+    if (summary && summary.closing != null && !isNaN(parseFloat(summary.closing))) {
+      closing = parseFloat(summary.closing);
+    } else if (summary && summary.balance != null && !isNaN(parseFloat(summary.balance))) {
+      closing = parseFloat(summary.balance);
+    } else {
+      closing = openBal + (totalRec - (openBal > 0 ? openBal : 0)) - (totalPay - (openBal < 0 ? Math.abs(openBal) : 0));
+      /* simpler: period receipts - period payments + open */
+      var periodRec = 0, periodPay = 0;
+      (rows || []).forEach(function (x) {
+        periodRec += parseFloat(x.RECEIPT) || 0;
+        periodPay += parseFloat(x.PAYMENT) || 0;
+      });
+      closing = openBal + periodRec - periodPay;
+    }
+
+    /* Closing c/d on opposite side so both sides tally */
+    if (closing >= 0) {
+      payments.push({
+        date: "", particulars: "Closing Balance c/d", vch: "—",
+        cash: closing, bank: 0, total: closing, isClose: true
+      });
+      totalPay += closing; cashPay += closing;
+    } else {
+      receipts.push({
+        date: "", particulars: "Closing Balance c/d", vch: "—",
+        cash: Math.abs(closing), bank: 0, total: Math.abs(closing), isClose: true
+      });
+      totalRec += Math.abs(closing); cashRec += Math.abs(closing);
+    }
+
+    function fmtP(v) {
+      return (typeof fmtINRPlain === "function" ? fmtINRPlain(v) : Number(v || 0).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+    }
+    function rowHtml(list, isRec, sideCash, sideBank, sideTot) {
+      if (!list.length) return '<tr><td colspan="6" style="text-align:center;color:#888">No entries</td></tr>';
+      var h = list.map(function (x) {
+        var bold = (x.isOpen || x.isClose) ? "font-weight:700;" : "";
+        return "<tr style='" + bold + "'><td>" + (x.date || "") + "</td>"
+          + "<td style='max-width:180px;white-space:normal'>" + x.particulars + "</td><td>" + x.vch + "</td>"
+          + "<td class='amt'>" + (x.cash ? fmtP(x.cash) : "—") + "</td>"
+          + "<td class='amt'>" + (x.bank ? fmtP(x.bank) : "—") + "</td>"
+          + "<td class='amt' style='font-weight:600;color:" + (isRec ? "#0F6B3A" : "#B71C1C") + "'>" + fmtP(x.total) + "</td></tr>";
+      }).join("");
+      h += "<tr><td class='tot' colspan='3'>TOTAL " + (isRec ? "RECEIPTS" : "PAYMENTS") + "</td>"
+        + "<td class='tot amt'>" + fmtP(sideCash) + "</td>"
+        + "<td class='tot amt'>" + fmtP(sideBank) + "</td>"
+        + "<td class='tot amt'>" + fmtP(sideTot) + "</td></tr>";
+      return h;
+    }
+
+    recBody.innerHTML = rowHtml(receipts, true, cashRec, bankRec, totalRec);
+    payBody.innerHTML = rowHtml(payments, false, cashPay, bankPay, totalPay);
+
+    /* Summary boxes — period figures (exclude open/close from display totals where needed) */
+    var periodRec = 0, periodPay = 0;
+    (rows || []).forEach(function (x) {
+      periodRec += parseFloat(x.RECEIPT) || 0;
+      periodPay += parseFloat(x.PAYMENT) || 0;
+    });
+    var cashClose = Math.max(0, closing);
+    var bankClose = 0; /* simplified — full split needs mode history */
+
+    var set = function (id, val) {
+      var e = document.getElementById(id);
+      if (e) e.textContent = (typeof val === "string" ? val : ("₹ " + fmtP(val)));
+    };
+    set("cb-sum-cash", cashClose);
+    set("cb-sum-bank", bankClose);
+    set("cb-sum-total", closing);
+    set("cb-sum-rec", periodRec);
+    set("cb-sum-pay", periodPay);
+    set("cb-sum-close", closing);
+    set("cb-sum-grand", periodRec + (openBal > 0 ? openBal : 0));
+    set("cb-ver-cash", cashClose);
+    set("cb-ver-bank", bankClose);
+    set("cb-ver-total", closing);
+    if (grid) grid.style.display = "grid";
+    var note = document.getElementById("cb-note");
+    if (note) note.style.display = "block";
+
+    /* Top stat cards */
+    set("cb-receipts", periodRec);
+    set("cb-payments", periodPay);
+    set("cb-balance", closing);
+    var cnt = document.getElementById("cb-count");
+    if (cnt) cnt.textContent = String((rows || []).length);
+  };
+
+  /* ---- 3) Period label helper used by screens ---- */
+  window.rptPeriodLabel = function (filt) {
+    if (!filt) return "All periods";
+    if (filt.from_date || filt.to_date) {
+      return "for the Period " + (filt.from_date || "Start") + " to " + (filt.to_date || (typeof todayISO === "function" ? todayISO() : ""));
+    }
+    return "All periods";
+  };
+
+  console.log("[SRCCS] Reports FIX loaded — date filter + Cash Book totals (layout preserved)");
+})();
+
+/* 6) Agent Collection — From/To date filters (ac_FROM, ac_TO) + acInRange already applied in this HTML. */
+function acInRange(x, agentId) {
+  var from = (document.getElementById("ac_FROM") || {}).value || "", to = (document.getElementById("ac_TO") || {}).value || "";
+  var d = String(x.DATE || "").substring(0, 10);
+  if (agentId && String(x.AGENT_ID || "").toUpperCase() !== agentId.toUpperCase()) return false;
+  if (!from && !to) { var one = (document.getElementById("ac_DATE") || {}).value; return !one || !d || d === one; }
+  return (!from || d >= from) && (!to || d <= to);
+}
+/* usage inside loadAgentCollectionList: .filter(function(x){ return acInRange(x, agentId); }) */
+
 </script>
 </body></html>
